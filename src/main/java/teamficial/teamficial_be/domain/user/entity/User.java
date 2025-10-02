@@ -4,13 +4,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
+import teamficial.teamficial_be.global.entity.BaseEntity;
+
 
 @Entity
 @Getter
-public class User {
+@Builder
+public class User extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String email;
 
     private String userName;
 
@@ -18,5 +24,5 @@ public class User {
 
     private UserRole userRole;
 
-    boolean isDeleted=false;
+
 }

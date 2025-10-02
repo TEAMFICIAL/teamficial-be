@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
+@Component
 @RequiredArgsConstructor
 public class KakaoUtil {
     @Value("${spring.security.oauth2.client.registration.kakao.client_id}")
     private String client;
-    @Value("$spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String redirect;
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
     private String clientSecret;
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
@@ -22,7 +22,7 @@ public class KakaoUtil {
     private final RestClient restClient = RestClient.create();
     private final ObjectMapper objectMapper;
 
-    public KakaoDTO.OAuthToken requestToken(String accessCode) {
+    public KakaoDTO.OAuthToken requestToken(String accessCode,String redirect) {
         String response = restClient.post()
                         .uri(uriBuilder -> uriBuilder
                                 .scheme("https")

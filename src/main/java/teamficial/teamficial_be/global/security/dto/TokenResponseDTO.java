@@ -1,4 +1,4 @@
-package teamficial.teamficial_be.global.dto;
+package teamficial.teamficial_be.global.security.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

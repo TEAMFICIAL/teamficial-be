@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import teamficial.teamficial_be.domain.user.entity.User;
-import teamficial.teamficial_be.global.dto.TokenResponseDTO;
+import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
+import teamficial.teamficial_be.global.security.dto.TokenResponse;
+import teamficial.teamficial_be.global.security.dto.TokenResponseDTO;
+import teamficial.teamficial_be.global.redis.RedisService;
 
 import java.security.Key;
 import java.util.Date;
@@ -35,6 +40,7 @@ public class TokenProvider implements InitializingBean {
     private long refreshExpirationTime;
 
     private final UserDetailsService userDetailsService;
+    private final RedisService redisService;
 
     @Override
     public void afterPropertiesSet(){
@@ -66,6 +72,13 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
+    public TokenResponse createToken(User user) {
+        return TokenResponse.builder()
+                .accessToken(createAccessToken(user))
+                .refreshToken(createRefreshToken(user))
+                .build();
+    }
+
     public TokenResponseDTO.RefreshTokenResponseDto recreate(User user, String refreshToken) {
         String accessToken = createAccessToken(user);
 
@@ -86,7 +99,7 @@ public class TokenProvider implements InitializingBean {
                 .getTime();
     }
 
-    public String getAccessToken(HttpServletRequest request){
+    public String resolveToken(HttpServletRequest request){
         String token = request.getHeader("Authorization");
         if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
             return token.substring(7);
@@ -110,6 +123,14 @@ public class TokenProvider implements InitializingBean {
                         userDetailsService.loadUserByUsername(getUserIdFromToken(token));
         return new UsernamePasswordAuthenticationToken(
                 userDetails, token, userDetails.getAuthorities());
+    }
+
+    @Transactional
+    public void invalidateToken(String token) {
+        if (!validateToken(token)) {
+            throw new GeneralException(ErrorStatus.TOKEN_INVALID);
+        }
+        redisService.deleteValue(getUserIdFromToken(token));
     }
 
     public boolean validateToken(String token){
