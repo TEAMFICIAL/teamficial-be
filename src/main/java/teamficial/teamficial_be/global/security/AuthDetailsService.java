@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.repository.UserRepository;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 
 @Service
@@ -20,8 +21,13 @@ public class AuthDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        User user = userRepository.findById(Long.valueOf(userId))
-                .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
-        return new AuthDetails(user);
+        try {
+            Long id = Long.valueOf(userId);
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+            return new AuthDetails(user);
+        } catch (NumberFormatException e){
+            throw new GeneralException(ErrorStatus.TOKEN_INVALID);
+        }
     }
 }

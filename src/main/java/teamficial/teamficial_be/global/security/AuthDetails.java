@@ -46,6 +46,6 @@ public record AuthDetails(User user) implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getDeletedAt().equals(null);
+        return user.getDeletedAt() == null;
     }
 }

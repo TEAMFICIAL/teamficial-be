@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
 import java.io.IOException;
 
@@ -25,11 +27,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = tokenProvider.resolveToken(request);
 
-        if (token != null && tokenProvider.validateToken(token)) {
-            Authentication authentication = tokenProvider.getAuthentication(token);
+        if (token != null) {
+            try{
+                Authentication authentication = tokenProvider.getAuthentication(token);
 
-            if (authentication != null) {
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (authentication != null) {
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }catch (IllegalArgumentException e){
+                throw new GeneralException(ErrorStatus.TOKEN_INVALID);
             }
         }
         filterChain.doFilter(request, response);

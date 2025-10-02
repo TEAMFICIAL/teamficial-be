@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,18 +25,17 @@ public class KakaoUtil {
     private final ObjectMapper objectMapper;
 
     public KakaoDTO.OAuthToken requestToken(String accessCode,String redirect) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", client);
+        params.add("redirect_uri", redirect);
+        params.add("code", accessCode);
+        params.add("client_secret", clientSecret);
+
         String response = restClient.post()
-                        .uri(uriBuilder -> uriBuilder
-                                .scheme("https")
-                                .host("kauth.kakao.com")
-                                .path("/oauth/token")
-                                .queryParam("grant_type", "authorization_code")
-                                .queryParam("client_id",client)
-                                .queryParam("code", accessCode)
-                                .queryParam("redirect_uri", redirect)
-                                .queryParam("client_secret", clientSecret)
-                                .build())
+                .uri("https://kauth.kakao.com/oauth/token")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .body(params)
                 .retrieve()
                 .body(String.class);
 
