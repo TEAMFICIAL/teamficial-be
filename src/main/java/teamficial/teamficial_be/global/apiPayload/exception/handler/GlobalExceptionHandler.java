@@ -74,10 +74,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 //        e.printStackTrace();
 
         WebRequest webRequest = new ServletWebRequest(request);
+        HttpHeaders headersToUse = (headers != null) ? headers : new HttpHeaders();
         return super.handleExceptionInternal(
                 e,
                 body,
-                headers,
+                headersToUse,
                 reason.getHttpStatus(),
                 webRequest
         );
