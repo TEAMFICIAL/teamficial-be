@@ -52,7 +52,7 @@ public class AuthService {
 
         User user =User.builder()
                 .email(email)
-                .userName(name)
+                .name(name)
                 .password(passwordEncoder.encode(rawPassword))
                 .userRole(UserRole.USER)
                 .build();
