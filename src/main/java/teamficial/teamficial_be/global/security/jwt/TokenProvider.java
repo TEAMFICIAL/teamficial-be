@@ -1,4 +1,4 @@
-package teamficial.teamficial_be.global.security;
+package teamficial.teamficial_be.global.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
