@@ -12,6 +12,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import teamficial.teamficial_be.global.security.google.dto.GoogleDTO;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @Component
 @RequiredArgsConstructor
 public class GoogleUtil {
@@ -26,11 +29,13 @@ public class GoogleUtil {
     private String clientSecret;
 
     public GoogleDTO.OAuthToken requestToken(String accessCode, String redirectUri){
+        String code = URLDecoder.decode(accessCode, StandardCharsets.UTF_8);
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
         params.add("redirect_uri", redirectUri);
-        params.add("code", accessCode);
+        params.add("code", code);
         params.add("client_secret", clientSecret);
 
         String response = restClient.post()
