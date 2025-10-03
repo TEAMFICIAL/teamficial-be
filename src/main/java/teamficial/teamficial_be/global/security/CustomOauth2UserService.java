@@ -45,6 +45,8 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
                     .password(passwordEncoder.encode(rawPassword))
                     .build();
 
+            userRepository.save(newUser);
+
             return new AuthDetails(newUser, oAuth2User.getAttributes());
         } else {
             return new AuthDetails(user.get(), oAuth2User.getAttributes());

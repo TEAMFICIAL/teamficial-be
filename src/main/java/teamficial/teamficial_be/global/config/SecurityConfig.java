@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
                 .oauth2Login(oauth2Login -> oauth2Login
-                        .defaultSuccessUrl("/google-login")
+                        //.defaultSuccessUrl("/")
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(customOauth2UserService)
                         )

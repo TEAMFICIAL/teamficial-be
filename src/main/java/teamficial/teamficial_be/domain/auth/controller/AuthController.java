@@ -19,13 +19,13 @@ public class AuthController {
 
     @PostMapping("/auth/kakao")
     @Operation(summary = "카카오 로그인", description = "인가 코드를 통해 토큰을 발급받는 카카오 로그인 API입니다.")
-    public ApiResponse<LoginResponseDTO.LoginTokenResponseDto> kakaoLogin(@RequestParam("code")String accessCode, @RequestParam("redirectUri") String redirectUri){
+    public ApiResponse<LoginResponseDTO.LoginTokenResponseDto> kakaoLogin(@RequestParam String accessCode, @RequestParam String redirectUri){
         return ApiResponse.onSuccess(authService.kakaoLogin(accessCode,redirectUri));
     }
 
     @PostMapping("/auth/google")
-    @Operation(summary = "구글 로그인",description = "인가 코드를 통해 토큰을 발급받는 카카오 로그인 API입니다.")
-    public ApiResponse<LoginResponseDTO.LoginTokenResponseDto> googleLogin(@RequestParam("code")String accessCode, @RequestParam("redirectUri") String redirectUri){
+    @Operation(summary = "구글 로그인",description = "인가 코드를 통해 토큰을 발급받는 구글 로그인 API입니다.")
+    public ApiResponse<LoginResponseDTO.LoginTokenResponseDto> googleLogin(@RequestParam String accessCode, @RequestParam String redirectUri){
         return ApiResponse.onSuccess(authService.googleLogin(accessCode,redirectUri));
     }
 
