@@ -3,15 +3,27 @@ package teamficial.teamficial_be.global.security;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import teamficial.teamficial_be.domain.user.entity.User;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public record AuthDetails(User user) implements UserDetails {
+public record AuthDetails(User user, Map<String, Object> attributes) implements UserDetails, OAuth2User {
 
     public AuthDetails(User user) {
-        this.user = user;
+        this(user, Map.of());
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return user.getName();
     }
 
     @Override

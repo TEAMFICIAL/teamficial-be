@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import teamficial.teamficial_be.global.security.CustomOauth2UserService;
 import teamficial.teamficial_be.global.security.jwt.JwtAuthenticationFilter;
 import teamficial.teamficial_be.global.security.jwt.JwtExceptionFilter;
 
@@ -28,6 +29,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
+    private final CustomOauth2UserService customOauth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,6 +40,12 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
+                .oauth2Login(oauth2Login -> oauth2Login
+                        //.defaultSuccessUrl("/")
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                                .userService(customOauth2UserService)
+                        )
+                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
@@ -72,7 +80,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
