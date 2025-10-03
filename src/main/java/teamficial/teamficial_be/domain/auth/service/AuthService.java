@@ -10,7 +10,7 @@ import teamficial.teamficial_be.domain.user.entity.UserRole;
 import teamficial.teamficial_be.domain.user.repository.UserRepository;
 import teamficial.teamficial_be.global.security.dto.TokenResponse;
 import teamficial.teamficial_be.global.security.google.GoogleUtil;
-import teamficial.teamficial_be.global.security.google.dto.GoogleDTO;
+import teamficial.teamficial_be.global.security.google.GoogleDTO;
 import teamficial.teamficial_be.global.security.jwt.TokenProvider;
 import teamficial.teamficial_be.global.security.kakao.KakaoDTO;
 import teamficial.teamficial_be.global.security.kakao.KakaoUtil;

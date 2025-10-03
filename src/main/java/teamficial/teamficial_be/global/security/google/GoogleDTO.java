@@ -1,4 +1,4 @@
-package teamficial.teamficial_be.global.security.google.dto;
+package teamficial.teamficial_be.global.security.google;
 
 import lombok.Getter;
 
