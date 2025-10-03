@@ -21,7 +21,8 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_FOUND_TOKEN(HttpStatus.NOT_FOUND,"TOKEN404","토큰을 찾을 수 없습니다."),
 
     //로그인 관련 응답
-    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "TOKEN4001", "토큰이 유효하지 않습니다."),
+    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "LOGIN4001", "토큰이 유효하지 않습니다."),
+    LOGIN_TYPE_INVALID(HttpStatus.BAD_REQUEST,"LOGIN4002","로그인 타입이 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -30,5 +30,8 @@ public class User extends BaseEntity {
     @Column(name = "user_role")
     private UserRole userRole;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_type")
+    private LoginType loginType;
 
 }
