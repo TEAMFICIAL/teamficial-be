@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor
@@ -47,9 +46,6 @@ public class KakaoUtil {
     }
 
     public KakaoDTO.KakaoProfile requestProfile(KakaoDTO.OAuthToken oAuthToken) {
-        RestTemplate restTemplate2 = new RestTemplate();
-        HttpHeaders headers2 = new HttpHeaders();
-
         String response = restClient.get()
                 .uri(userInfoUri)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + oAuthToken.getAccess_token())
@@ -60,7 +56,7 @@ public class KakaoUtil {
             KakaoDTO.KakaoProfile kakaoProfile = objectMapper.readValue(response, KakaoDTO.KakaoProfile.class);
             return kakaoProfile;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse Kakao access token", e);
+            throw new RuntimeException("Failed to parse Kakao user Profile response", e);
         }
     }
 
