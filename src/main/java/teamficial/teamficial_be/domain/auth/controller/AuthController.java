@@ -33,7 +33,7 @@ public class AuthController {
 
         @PostMapping("/auth/naver")
         @Operation(summary = "네이버 로그인", description = "인가 코드를 통해 토큰을 발급받는 네이버 로그인 API입니다.")
-        public ApiResponse<NaverResponseDTO.LoginTokenResponseDto> naverLogin (
+        public ApiResponse<LoginResponseDTO.LoginTokenResponseDto> naverLogin (
                 @RequestParam("code") String accessCode,
                 @RequestParam("state") String state,
                 @RequestParam("redirectUri") String redirectUri

@@ -96,7 +96,7 @@ public class AuthService {
         );
     }
 
-    public NaverResponseDTO.LoginTokenResponseDto naverLogin(String accessCode, String state, String redirectUri) {
+    public LoginResponseDTO.LoginTokenResponseDto naverLogin(String accessCode, String state, String redirectUri) {
         NaverDTO.OAuthToken oAuthToken = naverUtil.requestToken(accessCode, state, redirectUri);
         NaverDTO.NaverProfile naverProfile = naverUtil.requestProfile(oAuthToken);
 
@@ -115,7 +115,7 @@ public class AuthService {
         TokenResponse tokenResponse = tokenProvider.createToken(user);
         redisService.setRefreshToken(user.getEmail(), tokenResponse.getRefreshToken());
 
-        return NaverResponseDTO.LoginTokenResponseDto.of(
+        return LoginResponseDTO.LoginTokenResponseDto.of(
                 user.getId(),
                 tokenResponse.getAccessToken(),
                 tokenResponse.getRefreshToken(),
