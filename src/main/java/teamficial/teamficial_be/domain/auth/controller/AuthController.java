@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import teamficial.teamficial_be.domain.auth.dto.LoginResponseDTO;
-import teamficial.teamficial_be.domain.auth.dto.NaverResponseDTO;
 import teamficial.teamficial_be.domain.auth.service.AuthService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.security.jwt.TokenProvider;

@@ -5,7 +5,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import teamficial.teamficial_be.domain.auth.dto.LoginResponseDTO;
 import teamficial.teamficial_be.domain.user.entity.LoginType;
-import teamficial.teamficial_be.domain.auth.dto.NaverResponseDTO;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.entity.UserRole;
 import teamficial.teamficial_be.domain.user.repository.UserRepository;
