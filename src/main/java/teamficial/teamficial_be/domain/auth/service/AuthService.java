@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import teamficial.teamficial_be.domain.auth.dto.LoginResponseDTO;
@@ -8,7 +9,10 @@ import teamficial.teamficial_be.domain.user.entity.LoginType;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.entity.UserRole;
 import teamficial.teamficial_be.domain.user.repository.UserRepository;
+import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.security.dto.TokenResponse;
+import teamficial.teamficial_be.global.security.dto.TokenResponseDTO;
 import teamficial.teamficial_be.global.security.google.GoogleUtil;
 import teamficial.teamficial_be.global.security.google.GoogleDTO;
 import teamficial.teamficial_be.global.security.jwt.TokenProvider;
@@ -32,6 +36,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
 
+    private static final String REFRESH_TOKEN_PREFIX = "refresh:";
+
+    @Value("${jwt.token.refresh-expiration-time}")
+    private long refreshExpirationTime;
+
     public LoginResponseDTO.LoginTokenResponseDto kakaoLogin(String accessCode, String redirectUri) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode,redirectUri);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
@@ -39,22 +48,73 @@ public class AuthService {
         String email = kakaoProfile.getKakao_account().getEmail();
         String name = kakaoProfile.getProperties().getNickname();
 
+        return loginUser(email,name,LoginType.KAKAO);
+    }
+
+    public LoginResponseDTO.LoginTokenResponseDto googleLogin(String accessCode, String redirectUri) {
+        GoogleDTO.OAuthToken oAuthToken = googleUtil.requestToken(accessCode, redirectUri);
+        GoogleDTO.GoogleProfile googleProfile = googleUtil.getProfile(oAuthToken);
+
+        String email = googleProfile.getEmail();
+        String name = googleProfile.getName();
+
+        return loginUser(email,name,LoginType.GOOGLE);
+    }
+
+    public LoginResponseDTO.LoginTokenResponseDto naverLogin(String accessCode, String state, String redirectUri) {
+        NaverDTO.OAuthToken oAuthToken = naverUtil.requestToken(accessCode, state, redirectUri);
+        NaverDTO.NaverProfile naverProfile = naverUtil.requestProfile(oAuthToken);
+
+        String email = naverProfile.getResponse().getEmail();
+        String name = naverProfile.getResponse().getName();
+
+        return loginUser(email,name,LoginType.NAVER);
+    }
+
+    public LoginResponseDTO.LoginTokenResponseDto loginUser(String email, String name, LoginType loginType) {
         AtomicBoolean isFirst = new AtomicBoolean(false);
 
         User user = userRepository.findByEmailAndDeletedAtIsNull(email)
                 .map(existingUser -> existingUser)
                 .orElseGet(() -> {
                     isFirst.set(true);
-                    return createUser(email, name,LoginType.KAKAO);
+                    return createUser(email, name, loginType);
                 });
 
-        TokenResponse tokenResponse = tokenProvider.createToken(user);
-        redisService.setRefreshToken(user.getEmail(),tokenResponse.getRefreshToken());
+        TokenResponse tokenResponse = tokenProvider.createToken(user.getId());
+        String key = REFRESH_TOKEN_PREFIX + user.getId();
+        redisService.setValue(key, tokenResponse.getRefreshToken(), refreshExpirationTime);
 
-        return LoginResponseDTO.LoginTokenResponseDto.of(user.getId(),tokenResponse.getAccessToken(),tokenResponse.getRefreshToken(),isFirst.get());
+        return LoginResponseDTO.LoginTokenResponseDto.of(
+                user.getId(),
+                tokenResponse.getAccessToken(),
+                tokenResponse.getRefreshToken(),
+                isFirst.get()
+        );
     }
 
-    public User createUser(String email, String name, LoginType loginType) {
+    public LoginResponseDTO.RecreateTokenResponseDto recreateToken(String refreshToken) {
+        tokenProvider.validateToken(refreshToken);
+
+        Long userId = Long.valueOf(tokenProvider.getUserIdFromToken(refreshToken));
+
+        String key = REFRESH_TOKEN_PREFIX + userId;
+        String storedToken = redisService.getValue(key);
+        if (storedToken == null || !storedToken.equals(refreshToken)) {
+            throw new GeneralException(ErrorStatus.TOKEN_INVALID);
+        }
+
+        TokenResponseDTO.RefreshTokenResponseDto newTokenDTO = tokenProvider.recreate(userId);
+        redisService.setValue(key, newTokenDTO.getRefreshToken(),refreshExpirationTime);
+
+        return LoginResponseDTO.RecreateTokenResponseDto.of(
+                userId,
+                newTokenDTO.getAccessToken(),
+                newTokenDTO.getRefreshToken()
+        );
+    }
+
+    private User createUser(String email, String name, LoginType loginType) {
         String rawPassword = UUID.randomUUID().toString();
 
         User user =User.builder()
@@ -66,59 +126,5 @@ public class AuthService {
                 .build();
 
         return userRepository.save(user);
-    }
-
-    public LoginResponseDTO.LoginTokenResponseDto googleLogin(String accessCode, String redirectUri) {
-        GoogleDTO.OAuthToken oAuthToken = googleUtil.requestToken(accessCode, redirectUri);
-        GoogleDTO.GoogleProfile googleProfile = googleUtil.getProfile(oAuthToken);
-
-        String email = googleProfile.getEmail();
-        String name = googleProfile.getName();
-
-        AtomicBoolean isFirst = new AtomicBoolean(false);
-
-        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
-                .map(existingUser -> existingUser)
-                .orElseGet(() -> {
-                    isFirst.set(true);
-                    return createUser(email, name, LoginType.GOOGLE);
-                });
-
-        TokenResponse tokenResponse = tokenProvider.createToken(user);
-        redisService.setRefreshToken(user.getEmail(), tokenResponse.getRefreshToken());
-
-        return LoginResponseDTO.LoginTokenResponseDto.of(
-                user.getId(),
-                tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(),
-                isFirst.get()
-        );
-    }
-
-    public LoginResponseDTO.LoginTokenResponseDto naverLogin(String accessCode, String state, String redirectUri) {
-        NaverDTO.OAuthToken oAuthToken = naverUtil.requestToken(accessCode, state, redirectUri);
-        NaverDTO.NaverProfile naverProfile = naverUtil.requestProfile(oAuthToken);
-
-        String email = naverProfile.getResponse().getEmail();
-        String name = naverProfile.getResponse().getName();
-
-        AtomicBoolean isFirst = new AtomicBoolean(false);
-
-        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
-                .map(existingUser -> existingUser)
-                .orElseGet(() -> {
-                    isFirst.set(true);
-                    return createUser(email, name, LoginType.NAVER);
-                });
-
-        TokenResponse tokenResponse = tokenProvider.createToken(user);
-        redisService.setRefreshToken(user.getEmail(), tokenResponse.getRefreshToken());
-
-        return LoginResponseDTO.LoginTokenResponseDto.of(
-                user.getId(),
-                tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(),
-                isFirst.get()
-        );
     }
 }
