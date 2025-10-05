@@ -1,0 +1,63 @@
+name: Teamficial CI/CD with Gradle
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      ## jdk setting
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      ## gradle caching
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: make application.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
+        shell: bash
+
+      - name:  Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+        shell: bash
+
+        ##cd 시작
+
+      - name: Connect To NCP Container Registry, docker image build & push to NCP Container Registry
+        run: |
+          docker login -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }} ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}
+          docker build -f Dockerfile -t ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ NCP_CONTAINER_REGISTRY_IMAGE_NAME }} .
+          docker push ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ NCP_CONTAINER_REGISTRY_IMAGE_NAME }}
+
+      ## deploy to production
+      - name: Image Pull & Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.DEV_USERNAME }}
+          host: ${{ secrets.DEV_HOST }}
+          password: ${{ secrets.DEV_PASSWORD }}
+          script: |
+            sudo docker pull ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ secrets.NCP_CONTAINER_REGISTRY_IMAGE_NAME }}
+            sudo docker rm -f $(docker ps -qa) 
+            docker compose up -d
+            docker image prune -f
