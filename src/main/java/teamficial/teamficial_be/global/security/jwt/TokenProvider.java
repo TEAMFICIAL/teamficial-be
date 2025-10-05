@@ -3,6 +3,7 @@ package teamficial.teamficial_be.global.security.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.security.dto.TokenResponse;
@@ -42,51 +42,51 @@ public class TokenProvider implements InitializingBean {
     private final UserDetailsService userDetailsService;
     private final RedisService redisService;
 
+    private static final String REFRESH_TOKEN_PREFIX = "refresh:";
+
+
     @Override
     public void afterPropertiesSet(){
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createAccessToken(User user) {
+    public String createAccessToken(Long userId) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + accessExpirationTime);
 
         return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(now)
                 .setExpiration(expiration)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public String createRefreshToken(User user) {
+    public String createRefreshToken(Long userId) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + refreshExpirationTime);
 
         return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(now)
                 .setExpiration(expiration)
                 .signWith(key,SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public TokenResponse createToken(User user) {
+    public TokenResponse createToken(Long userId) {
         return TokenResponse.builder()
-                .accessToken(createAccessToken(user))
-                .refreshToken(createRefreshToken(user))
+                .accessToken(createAccessToken(userId))
+                .refreshToken(createRefreshToken(userId))
                 .build();
     }
 
-    public TokenResponseDTO.RefreshTokenResponseDto recreate(User user, String refreshToken) {
-        String accessToken = createAccessToken(user);
+    public TokenResponseDTO.RefreshTokenResponseDto recreate(Long userId) {
+        String accessToken = createAccessToken(userId);
+        String newRefreshToken = createRefreshToken(userId);
 
-        if(getExpirationTime(refreshToken) <= getExpirationTime(accessToken)) {
-            refreshToken = createRefreshToken(user);
-        }
-
-        return TokenResponseDTO.RefreshTokenResponseDto.of(user.getId(),accessToken,refreshToken);
+        return TokenResponseDTO.RefreshTokenResponseDto.of(userId,accessToken,newRefreshToken);
     }
 
     public Long getExpirationTime(String token) {
@@ -130,7 +130,7 @@ public class TokenProvider implements InitializingBean {
         if (!validateToken(token)) {
             throw new GeneralException(ErrorStatus.TOKEN_INVALID);
         }
-        redisService.deleteValue(getUserIdFromToken(token));
+        redisService.deleteValue(REFRESH_TOKEN_PREFIX+getUserIdFromToken(token));
     }
 
     public boolean validateToken(String token){
