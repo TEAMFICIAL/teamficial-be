@@ -46,8 +46,8 @@ jobs:
       - name: Connect To NCP Container Registry, docker image build & push to NCP Container Registry
         run: |
           docker login -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }} ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}
-          docker build -f Dockerfile -t ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ NCP_CONTAINER_REGISTRY_IMAGE_NAME }} .
-          docker push ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ NCP_CONTAINER_REGISTRY_IMAGE_NAME }}
+          docker build -f Dockerfile -t ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ secrets.NCP_CONTAINER_REGISTRY_IMAGE_NAME }} .
+          docker push ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ secrets.NCP_CONTAINER_REGISTRY_IMAGE_NAME }}
 
       ## deploy to production
       - name: Image Pull & Deploy
