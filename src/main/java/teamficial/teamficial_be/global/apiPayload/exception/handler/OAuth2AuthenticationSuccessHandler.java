@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,6 +22,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final RedisService redisService;
     private final CookieUtil cookieUtil;
 
+    private static final String REFRESH_TOKEN_PREFIX = "refresh:";
+
+    @Value("${jwt.token.refresh-expiration-time}")
+    private long refreshExpirationTime;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication){
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
@@ -30,7 +36,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         TokenResponse tokens = tokenProvider.createToken(user.getId());
 
         // Redis에 저장
-        redisService.setRefreshToken(user.getId(), tokens.getRefreshToken());
+        redisService.setValue(REFRESH_TOKEN_PREFIX+user.getId(), tokens.getRefreshToken(),refreshExpirationTime);
 
         // 쿠키 세팅
         Cookie refreshCookie = cookieUtil.createCookie(tokens.getRefreshToken());

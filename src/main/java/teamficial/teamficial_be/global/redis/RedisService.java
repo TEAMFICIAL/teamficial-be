@@ -1,7 +1,6 @@
 package teamficial.teamficial_be.global.redis;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -15,16 +14,10 @@ import java.time.Duration;
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @Value("${jwt.token.refresh-expiration-time}")
-    private long refreshTokenExpirationTime;
-
-    @Value("${jwt.token.access-expiration-time}")
-    private long accessExpirationTime;
-
-    public void setRefreshToken(String key, String value) {
+    public void setValue(String key, String value, long ttlMillis) {
         try {
             ValueOperations<String, Object> values = redisTemplate.opsForValue();
-            values.set(key, value, Duration.ofMillis(refreshTokenExpirationTime));
+            values.set(key, value, Duration.ofMillis(ttlMillis));
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.REDIS_ERROR);
         }
