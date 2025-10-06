@@ -60,14 +60,15 @@ public class AuthController {
 
     @PostMapping("/auth/logout")
     @Operation(summary = "로그아웃", description = "로그아웃을 하는 API입니다.")
-    public ApiResponse<String> logout(HttpServletRequest request, HttpServletResponse response, @AuthenticationPrincipal AuthDetails authDetails) {
+    public ApiResponse<String> logout(HttpServletResponse response, @AuthenticationPrincipal AuthDetails authDetails) {
+
+        if (authDetails == null || authDetails.user() == null) {
+            throw new GeneralException(ErrorStatus._UNAUTHORIZED);
+        }
+
+        authService.logout(authDetails.user());
         cookieUtil.deleteCookie(response);
 
-        String token = tokenProvider.resolveToken(request);
-        if (token == null || token.isEmpty()) {
-            throw new GeneralException(ErrorStatus.NOT_FOUND_TOKEN);
-        }
-        authService.logout(authDetails.user());
         return ApiResponse.onSuccess("로그아웃이 성공했습니다.");
     }
 }
