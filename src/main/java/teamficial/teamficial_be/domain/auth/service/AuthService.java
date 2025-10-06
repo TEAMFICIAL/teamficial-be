@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.auth.dto.LoginResponseDTO;
 import teamficial.teamficial_be.domain.user.entity.LoginType;
 import teamficial.teamficial_be.domain.user.entity.User;
@@ -15,6 +16,7 @@ import teamficial.teamficial_be.global.security.dto.TokenResponse;
 import teamficial.teamficial_be.global.security.dto.TokenResponseDTO;
 import teamficial.teamficial_be.global.security.google.GoogleUtil;
 import teamficial.teamficial_be.global.security.google.GoogleDTO;
+import teamficial.teamficial_be.global.security.jwt.CookieUtil;
 import teamficial.teamficial_be.global.security.jwt.TokenProvider;
 import teamficial.teamficial_be.global.security.kakao.KakaoDTO;
 import teamficial.teamficial_be.global.security.kakao.KakaoUtil;
@@ -112,6 +114,11 @@ public class AuthService {
                 newTokenDTO.getAccessToken(),
                 newTokenDTO.getRefreshToken()
         );
+    }
+
+
+    public void logout(User user) {
+        redisService.deleteValue(REFRESH_TOKEN_PREFIX + user.getId());
     }
 
     private User createUser(String email, String name, LoginType loginType) {

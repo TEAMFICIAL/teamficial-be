@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.global.security.jwt;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +19,18 @@ public class CookieUtil {
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge((int) refreshExpirationTime/1000);
+        cookie.setAttribute("SameSite", "None");
 
         return cookie;
     }
 
+    public void deleteCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        cookie.setAttribute("SameSite", "None");
+        response.addCookie(cookie);
+    }
 }
