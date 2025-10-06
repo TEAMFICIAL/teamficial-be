@@ -2,7 +2,9 @@ package teamficial.teamficial_be.domain.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +14,8 @@ import teamficial.teamficial_be.domain.auth.service.AuthService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
+import teamficial.teamficial_be.global.security.AuthDetails;
+import teamficial.teamficial_be.global.security.jwt.CookieUtil;
 import teamficial.teamficial_be.global.security.jwt.TokenProvider;
 
 @RestController
@@ -20,6 +24,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final TokenProvider tokenProvider;
+    private final CookieUtil cookieUtil;
 
     @PostMapping("/auth/kakao")
     @Operation(summary = "카카오 로그인", description = "인가 코드를 통해 토큰을 발급받는 카카오 로그인 API입니다.")
@@ -53,5 +58,17 @@ public class AuthController {
         return ApiResponse.onSuccess(authService.recreateToken(token));
     }
 
+    @PostMapping("/auth/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃을 하는 API입니다.")
+    public ApiResponse<String> logout(HttpServletRequest request, HttpServletResponse response, @AuthenticationPrincipal AuthDetails authDetails) {
+        cookieUtil.deleteCookie(response);
+
+        String token = tokenProvider.resolveToken(request);
+        if (token == null || token.isEmpty()) {
+            throw new GeneralException(ErrorStatus.NOT_FOUND_TOKEN);
+        }
+        authService.logout(authDetails.user());
+        return ApiResponse.onSuccess("로그아웃이 성공했습니다.");
+    }
 }
 
