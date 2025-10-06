@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.OAuth2AuthenticationSuccessHandler;
 import teamficial.teamficial_be.global.security.CustomOauth2UserService;
+import teamficial.teamficial_be.global.security.jwt.CookieUtil;
 import teamficial.teamficial_be.global.security.jwt.JwtAuthenticationFilter;
 import teamficial.teamficial_be.global.security.jwt.JwtExceptionFilter;
 
@@ -51,7 +52,9 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .logoutSuccessHandler(logoutSuccessHandler())
+                        .deleteCookies(CookieUtil.REFRESH_TOKEN_COOKIE_NAME)
                         .clearAuthentication(true)
+                        .invalidateHttpSession(false)
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
