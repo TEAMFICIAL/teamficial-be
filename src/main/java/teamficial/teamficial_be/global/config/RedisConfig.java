@@ -1,5 +1,6 @@
 package teamficial.teamficial_be.global.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+@Slf4j
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig {
@@ -21,6 +23,7 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+        log.info("Redis host: {}",host);
         return new LettuceConnectionFactory(host, port);
     }
 

@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.global.redis;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
 import java.time.Duration;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RedisService {
@@ -19,6 +21,7 @@ public class RedisService {
             ValueOperations<String, Object> values = redisTemplate.opsForValue();
             values.set(key, value, Duration.ofMillis(ttlMillis));
         } catch (Exception e) {
+            log.error("Redis set 오류 — key: {}, value: {}, ttl: {}, 예외: {}", key, value, ttlMillis, e.toString(), e);
             throw new GeneralException(ErrorStatus.REDIS_ERROR);
         }
     }
