@@ -58,6 +58,6 @@ jobs:
           password: ${{ secrets.DEV_PASSWORD }}
           script: |
             sudo docker pull ${{ secrets.NCP_CONTAINER_REGISTRY_PUBLIC_ENDPOINT }}/${{ secrets.NCP_CONTAINER_REGISTRY_IMAGE_NAME }}
-            sudo docker rm -f $(docker ps -qa) 
+            cd /root/docker-compose.yml
+            docker compose down --remove-orphans || true
             docker compose up -d
-            docker image prune -f

@@ -43,6 +43,7 @@ public class AuthService {
     @Value("${jwt.token.refresh-expiration-time}")
     private long refreshExpirationTime;
 
+    @Transactional
     public LoginResponseDTO.LoginTokenResponseDto kakaoLogin(String accessCode, String redirectUri) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode,redirectUri);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
@@ -53,6 +54,7 @@ public class AuthService {
         return loginUser(email,name,LoginType.KAKAO);
     }
 
+    @Transactional
     public LoginResponseDTO.LoginTokenResponseDto googleLogin(String accessCode, String redirectUri) {
         GoogleDTO.OAuthToken oAuthToken = googleUtil.requestToken(accessCode, redirectUri);
         GoogleDTO.GoogleProfile googleProfile = googleUtil.getProfile(oAuthToken);
@@ -63,6 +65,7 @@ public class AuthService {
         return loginUser(email,name,LoginType.GOOGLE);
     }
 
+    @Transactional
     public LoginResponseDTO.LoginTokenResponseDto naverLogin(String accessCode, String state, String redirectUri) {
         NaverDTO.OAuthToken oAuthToken = naverUtil.requestToken(accessCode, state, redirectUri);
         NaverDTO.NaverProfile naverProfile = naverUtil.requestProfile(oAuthToken);
@@ -73,6 +76,7 @@ public class AuthService {
         return loginUser(email,name,LoginType.NAVER);
     }
 
+    @Transactional
     public LoginResponseDTO.LoginTokenResponseDto loginUser(String email, String name, LoginType loginType) {
         AtomicBoolean isFirst = new AtomicBoolean(false);
 
@@ -95,6 +99,7 @@ public class AuthService {
         );
     }
 
+    @Transactional
     public LoginResponseDTO.RecreateTokenResponseDto recreateToken(String refreshToken) {
         tokenProvider.validateToken(refreshToken);
 
@@ -116,7 +121,7 @@ public class AuthService {
         );
     }
 
-
+    @Transactional
     public void logout(User user) {
         redisService.deleteValue(REFRESH_TOKEN_PREFIX + user.getId());
     }
