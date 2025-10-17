@@ -21,7 +21,7 @@ public class RedisService {
             ValueOperations<String, Object> values = redisTemplate.opsForValue();
             values.set(key, value, Duration.ofMillis(ttlMillis));
         } catch (Exception e) {
-            log.error("Redis set 오류 — key: {}, value: {}, ttl: {}, 예외: {}", key, value, ttlMillis, e.toString(), e);
+            log.error("Redis set 오류 — key: {}, ttl: {}, 예외: {}", key, ttlMillis, e.toString(), e);
             throw new GeneralException(ErrorStatus.REDIS_ERROR);
         }
     }
