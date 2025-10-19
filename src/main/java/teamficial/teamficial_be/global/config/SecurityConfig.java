@@ -59,7 +59,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api",
+                                "/api/",
                                 "/api/swagger-ui/**"
                         ).permitAll()
                         //.requestMatchers().authenticated()
@@ -72,7 +72,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080","http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080","http://localhost:3000",
+                "http://teamficial.com/", "https://teamficial.com/",
+                "http://api.teamficial.com/","https://api.teamficial.com/",
+                "http://www.teamficial.com/","https://www.teamficial.com/","https://teamficial.vercel.app/"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
