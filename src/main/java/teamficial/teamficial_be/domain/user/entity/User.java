@@ -5,7 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.global.entity.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -33,5 +37,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type")
     private LoginType loginType;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Profile> profiles = new ArrayList<>();
 
 }
