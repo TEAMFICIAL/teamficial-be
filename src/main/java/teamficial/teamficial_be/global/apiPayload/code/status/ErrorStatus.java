@@ -20,10 +20,16 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "USER404", "해당 유저를 찾을 수 없습니다."),
     NOT_FOUND_TOKEN(HttpStatus.NOT_FOUND,"TOKEN404","토큰을 찾을 수 없습니다."),
 
-    //로그인 관련 응답
+    // 로그인 관련 응답
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "LOGIN4001", "토큰이 유효하지 않습니다."),
     LOGIN_TYPE_INVALID(HttpStatus.BAD_REQUEST,"LOGIN4002","로그인 타입이 존재하지 않습니다."),
+
+
+    // 모집글 관련 응답
+    NOT_FOUND_RECRUITING_POST(HttpStatus.NOT_FOUND, "POSTING5001", "해당 모집 글을 찾을 수 없습니다."),
+
     ;
+
 
     private final HttpStatus httpStatus;
     private final String code;

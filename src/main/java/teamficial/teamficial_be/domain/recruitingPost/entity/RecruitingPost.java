@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -56,4 +57,15 @@ public class RecruitingPost extends BaseEntity {
     /** 공고 제목 */
     @Column(name = "title", length = 50, nullable = false)
     private String title;
+
+    public void update(RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+        if (dto.getProgressWay() != null) this.progressWay = dto.getProgressWay();
+        if (dto.getContactWay() != null) this.contactWay = dto.getContactWay();
+        if (dto.getStartDate() != null) this.startDate = dto.getStartDate();
+        if (dto.getPeriod() != null) this.period = dto.getPeriod();
+        if (dto.getDeadline() != null) this.deadline = dto.getDeadline();
+        if (dto.getStatus() != null) this.status = dto.getStatus();
+        if (dto.getContent() != null) this.content = dto.getContent();
+        if (dto.getTitle() != null) this.title = dto.getTitle();
+    }
 }
