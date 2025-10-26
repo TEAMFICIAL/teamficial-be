@@ -30,6 +30,9 @@ public class Profile extends BaseEntity {
     @Column(name = "profile_name", length = 50, nullable = false)
     private String profileName;
 
+    @Column(name = "profile_image", length = 100, nullable = false)
+    private String profileImage;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "position", nullable = false)
     private Position position;
