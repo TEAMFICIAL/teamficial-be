@@ -39,5 +39,15 @@ public class ProfileController {
         return ApiResponse.onSuccess(newProfileImage);
     }
 
+    @DeleteMapping("profile/{profileId}")
+    public ApiResponse<String> deleteProfile(@PathVariable Long profileId) {
+        profileService.deleteProfile(profileId);
+        return ApiResponse.onSuccess("프로필이 삭제되었습니다.");
+    }
 
+    @DeleteMapping("/profile/{profileId}/image")
+    public ApiResponse<String> deleteProfileImage(@PathVariable Long profileId) {
+        profileService.deleteProfileImage(profileId);
+        return ApiResponse.onSuccess("프로필 사진이 삭제되었습니다.");
+    }
 }
