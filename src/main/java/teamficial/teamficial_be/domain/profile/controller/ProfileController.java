@@ -26,4 +26,18 @@ public class ProfileController {
         return ApiResponse.onSuccess(profileResponseDto);
     }
 
+    @PutMapping("/profile/{profileId}")
+    public ApiResponse<ProfileResponseDto> updateProfile(@PathVariable Long profileId,
+                                                         @RequestBody ProfileRequestDto profileRequestDto){
+        ProfileResponseDto profileResponseDto = profileService.updateProfile(profileId, profileRequestDto);
+        return ApiResponse.onSuccess(profileResponseDto);
+    }
+
+    @PutMapping("profile/{profileId}/image")
+    public ApiResponse<String> updateProfileImage(@PathVariable Long profileId, @RequestParam String objectKey) {
+        String newProfileImage = profileService.updateProfileImage(profileId, objectKey);
+        return ApiResponse.onSuccess(newProfileImage);
+    }
+
+
 }
