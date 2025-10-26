@@ -43,6 +43,7 @@ public class ProfileService {
     public ProfileResponseDto updateProfile(Long profileId, ProfileRequestDto requestDto){
         Profile profile = getProfileById(profileId);
         profile.update(requestDto);
+        profileRepository.save(profile);
         return ProfileResponseDto.of(profile);
     }
 
@@ -55,10 +56,10 @@ public class ProfileService {
     @Transactional
     public void deleteProfile(Long profileId) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_PROFILE));
 
         String objectKey = preSignedUrlService.extractKeyFromUrl(profile.getProfileImage());
-        preSignedUrlService.deleteImageByPath(objectKey);
+        preSignedUrlService.deleteByKey(objectKey);
 
         profileRepository.delete(profile);
     }
@@ -71,17 +72,22 @@ public class ProfileService {
             throw new GeneralException(ErrorStatus.ALREADY_DELETED_PROFILE_IMAGE);
         }
 
-        preSignedUrlService.deleteImageByPath(profile.getProfileImage());
+        String objectKey = preSignedUrlService.extractKeyFromUrl(profile.getProfileImage());
+        preSignedUrlService.deleteByKey(objectKey);
+        profile.deleteProfileImage();
+        profileRepository.save(profile);
     }
 
+    @Transactional
     public String updateProfileImage(Long profileId, String objectKey){
         Profile profile = getProfileById(profileId);
         if (profile.getProfileImage() != null) {
             String oldObjectKey = preSignedUrlService.extractKeyFromUrl(profile.getProfileImage());
-            preSignedUrlService.deleteImageByPath(oldObjectKey);
+            preSignedUrlService.deleteByKey(oldObjectKey);
         }
         String imageUrl = preSignedUrlService.getPublicUrl(objectKey);
         profile.updateProfileImage(imageUrl);
+        profileRepository.save(profile);
         return imageUrl;
     }
 

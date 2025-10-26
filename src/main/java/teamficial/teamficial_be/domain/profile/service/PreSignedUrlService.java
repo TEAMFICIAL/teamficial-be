@@ -28,6 +28,9 @@ public class PreSignedUrlService {
     @Value("${ncp.bucket-name}")
     private String bucketName;
 
+    @Value("${ncp.end-point}")
+    private String endpoint;
+
     public String getPreSignedUrl(String imageName) {
         String fileName = createPath(imageName);
 
@@ -58,29 +61,46 @@ public class PreSignedUrlService {
         return expiration;
     }
 
-    private String createFileId() {
-        return UUID.randomUUID().toString();
-    }
-
     private String createPath(String fileName) {
-        String fileId = createFileId();
-        String prefix = "teamficial";
+        String fileId = UUID.randomUUID().toString();
+        String prefix = "profile";
         return String.format("%s/%s", prefix, fileId + fileName);
     }
 
     public String extractKeyFromUrl(String url) {
+        // a) path-style: https://kr.object.ncloudstorage.com/{bucket}/{key}
+        String host = endpoint.replace("https://", "").replace("http://", "");
+        int hostIdx = url.indexOf(host);
+        if (hostIdx >= 0) {
+            int afterHostSlash = url.indexOf('/', hostIdx + host.length());
+            if (afterHostSlash > 0) {
+                String afterHost = url.substring(afterHostSlash + 1); // bucket/...
+                if (afterHost.startsWith(bucketName + "/")) {
+                    String key = afterHost.substring(bucketName.length() + 1); // remove "bucket/"
+                    return stripLeadingSlash(key);
+                }
+            }
+        }
+        // b) virtual-host-style: https://{bucket}.kr.object.ncloudstorage.com/{key}
         String marker = bucketName + ".";
         int idx = url.indexOf(marker);
-        if (idx < 0) {
-            return url.substring(url.lastIndexOf('/') + 1);
+        if (idx >= 0) {
+            String path = url.substring(url.indexOf('/', idx + marker.length())); // "/{key}"
+            return stripLeadingSlash(path);
         }
-        return url.substring(url.indexOf('/', idx + marker.length()));
+        // c) Fallback: 마지막 슬래시 뒤
+        return stripLeadingSlash(url.substring(url.lastIndexOf('/') + 1));
+    }
+
+    private static String stripLeadingSlash(String s) {
+        return (s.startsWith("/")) ? s.substring(1) : s;
     }
 
     @Async
-    public void deleteImageByPath(String imagePath) {
+    public void deleteByKey(String objectKey) {
         try {
-            amazonS3.deleteObject(bucketName, imagePath);
+            log.info(objectKey);
+            amazonS3.deleteObject(bucketName, objectKey);
         } catch (Exception e) {
             log.error("이미지 삭제 실패: {}", e.getMessage(), e);
             throw new GeneralException(ErrorStatus.FAILED_IMAGE_DELETE);
@@ -88,6 +108,6 @@ public class PreSignedUrlService {
     }
 
     public String getPublicUrl(String objectKey) {
-        return "https://" + bucketName + ".kr.object.ncloudstorage.com/" + objectKey;
+        return String.format("%s/%s/%s", endpoint, bucketName, objectKey);
     }
 }
