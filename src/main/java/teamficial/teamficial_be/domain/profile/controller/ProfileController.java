@@ -20,4 +20,10 @@ public class ProfileController {
         return ApiResponse.onSuccess(profileResponseDto);
     }
 
+    @GetMapping("/profile/{profileId}")
+    public ApiResponse<ProfileResponseDto> getProfile(@PathVariable Long profileId) {
+        ProfileResponseDto profileResponseDto = profileService.getProfile(profileId);
+        return ApiResponse.onSuccess(profileResponseDto);
+    }
+
 }
