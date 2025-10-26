@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 import teamficial.teamficial_be.global.enums.Position;
@@ -30,6 +31,9 @@ public class Profile extends BaseEntity {
     @Column(name = "profile_name", length = 50, nullable = false)
     private String profileName;
 
+    @Column(name = "profile_image", length = 255)
+    private String profileImage;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "position", nullable = false)
     private Position position;
@@ -44,4 +48,19 @@ public class Profile extends BaseEntity {
     @Column(name = "contact_way", length = 255)
     private String contactWay;
 
+    public void update(ProfileRequestDto dto) {
+        this.profileName = dto.getProfileName();
+        this.position = dto.getPosition();
+        this.workingTime = dto.getWorkingTime();
+        this.link = dto.getLink();
+        this.contactWay = dto.getContactWay();
+    }
+
+    public void updateProfileImage(String newProfileImage){
+        this.profileImage = newProfileImage;
+    }
+
+    public void deleteProfileImage(){
+        this.profileImage = null;
+    }
 }
