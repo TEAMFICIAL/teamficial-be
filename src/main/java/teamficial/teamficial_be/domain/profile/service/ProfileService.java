@@ -58,8 +58,11 @@ public class ProfileService {
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_PROFILE));
 
-        String objectKey = preSignedUrlService.extractKeyFromUrl(profile.getProfileImage());
-        preSignedUrlService.deleteByKey(objectKey);
+        String image = profile.getProfileImage();
+        if (image != null && !image.isBlank()) {
+            String objectKey = preSignedUrlService.extractKeyFromUrl(image);
+            preSignedUrlService.deleteByKey(objectKey);
+        }
 
         profileRepository.delete(profile);
     }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import teamficial.teamficial_be.domain.profile.dto.response.PreSignedUrlResponseDto;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
@@ -31,12 +32,13 @@ public class PreSignedUrlService {
     @Value("${ncp.end-point}")
     private String endpoint;
 
-    public String getPreSignedUrl(String imageName) {
-        String fileName = createPath(imageName);
+    public PreSignedUrlResponseDto getPreSignedUrl(String imageName) {
+        String objectKey = createPath(imageName);
 
-        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(bucketName, fileName);
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(bucketName, objectKey);
         URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
-        return url.toString();
+        Date expiredAt = generatePresignedUrlRequest.getExpiration();
+        return PreSignedUrlResponseDto.of(url.toString(),objectKey,expiredAt);
     }
 
     private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String bucket, String fileName) {
