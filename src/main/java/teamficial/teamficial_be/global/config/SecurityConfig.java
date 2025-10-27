@@ -62,7 +62,7 @@ public class SecurityConfig {
                                 "/api/",
                                 "/api/swagger-ui/**"
                         ).permitAll()
-                        //.requestMatchers().authenticated()
+                        .requestMatchers("/preSigned-url","/profile/**").authenticated()
                         .anyRequest().permitAll()
                 );
 
