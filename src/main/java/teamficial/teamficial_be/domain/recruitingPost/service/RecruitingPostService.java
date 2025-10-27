@@ -10,6 +10,8 @@ import teamficial.teamficial_be.domain.recruitingDetail.repository.RecruitingDet
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.repository.RecruitingPostRepository;
+import teamficial.teamficial_be.domain.user.entity.User;
+import teamficial.teamficial_be.domain.user.repository.UserRepository;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 
@@ -20,12 +22,15 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RecruitingPostService {
 
+    private final UserRepository userRepository;
     private final RecruitingPostRepository recruitingPostRepository;
     private final ProfileRepository profileRepository; //프로필 여러개 있을때 고르는 과정 때문에 필요
     private final RecruitingDetailRepository recruitingDetailRepository;
 
     @Transactional
-    public RecruitingPostDTO.RecruitingPostResponseDTO createPost(RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+    public RecruitingPostDTO.RecruitingPostResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+
         Profile profile = profileRepository.findById(dto.getProfileId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필 ID입니다."));
 
@@ -57,7 +62,10 @@ public class RecruitingPostService {
         return RecruitingPostDTO.RecruitingPostResponseDTO.from(saved, details);
     }
 
-    public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long postId) {
+    public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+
+
         RecruitingPost post = recruitingPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
         recruitingPostRepository.delete(post);
@@ -67,7 +75,9 @@ public class RecruitingPostService {
     }
 
 
-    public RecruitingPostDTO.RecruitingPostResponseDTO updatePost(Long postId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+    public RecruitingPostDTO.RecruitingPostResponseDTO updatePost(Long userId, Long postId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+
         RecruitingPost post = recruitingPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
 
@@ -105,7 +115,9 @@ public class RecruitingPostService {
 
     }
 
-    public RecruitingPostDTO.RecruitingPostResponseDTO getPost(Long postId) {
+    public RecruitingPostDTO.RecruitingPostResponseDTO getPost(Long userId, Long postId) {
+
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         RecruitingPost post = recruitingPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));

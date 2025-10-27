@@ -27,7 +27,7 @@ public class Application extends BaseEntity {
     private Long id;
 
     @Column(name = "status")
-    private applicationStatus applcationStatus;
+    private ApplicationStatus applcationStatus;
 
     @Lob
     @Column(columnDefinition = "TEXT", nullable = false)

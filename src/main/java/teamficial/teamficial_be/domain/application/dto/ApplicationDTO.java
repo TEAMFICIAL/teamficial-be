@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class applicationDTO {
+public class ApplicationDTO {
 
     @Getter
     @Builder

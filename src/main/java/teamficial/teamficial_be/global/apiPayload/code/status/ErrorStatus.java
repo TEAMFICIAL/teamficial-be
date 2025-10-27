@@ -25,13 +25,15 @@ public enum ErrorStatus implements BaseErrorCode {
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "LOGIN4001", "토큰이 유효하지 않습니다."),
     LOGIN_TYPE_INVALID(HttpStatus.BAD_REQUEST,"LOGIN4002","로그인 타입이 존재하지 않습니다."),
 
+    //프로필 관련 응답,
+    FAILED_IMAGE_DELETE(HttpStatus.BAD_REQUEST,"PROFILE4001","이미지 삭제를 실패했습니다."),
+    ALREADY_DELETED_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE4002" , "프로필 사진이 이미 삭제된 상태입니다."),
 
     // 모집글 관련 응답
     NOT_FOUND_RECRUITING_POST(HttpStatus.NOT_FOUND, "POSTING5001", "해당 모집 글을 찾을 수 없습니다."),
 
-    //프로필 관련 응답
-    FAILED_IMAGE_DELETE(HttpStatus.BAD_REQUEST,"PROFILE4001","이미지 삭제를 실패했습니다."),
-    ALREADY_DELETED_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE4002" , "프로필 사진이 이미 삭제된 상태입니다." )
+    //지원 관련 응답
+    DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST,"APPLICATION6001","이미 지원한 모집 글 입니다.")
     ;
 
 
