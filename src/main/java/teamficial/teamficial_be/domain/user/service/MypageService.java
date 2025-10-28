@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import teamficial.teamficial_be.domain.application.dto.response.ApplicationResponseDto;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
@@ -55,4 +56,24 @@ public class MypageService {
         applicationService.saveApplications(applications);
     }
 
+    @Transactional(readOnly = true)
+    public ApplicationResponseDto getApplicantProfile(User user, Long recruitingPostId,Long applicationId) {
+        RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
+        recruitingPostService.validatePostOwner(user, recruitingPost);
+
+        Application application = applicationService.getApplication(applicationId);
+
+        return ApplicationResponseDto.from(application);
+    }
+
+    @Transactional
+    public void confirmedApplicant(User user, Long recruitingPostId, Long applicationId) {
+        RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
+        recruitingPostService.validatePostOwner(user, recruitingPost);
+
+        Application application = applicationService.getApplication(applicationId);
+
+        application.updateStatus(ApplicationStatus.CONFIRMED);
+        applicationService.saveApplication(application);
+    }
 }
