@@ -37,4 +37,8 @@ public class RecruitingDetail extends BaseEntity {
         String countString = count.toString();
         return positionString + " " + countString + "명";
     }
+
+    public void updateCount(Integer count) {
+        this.count = count;
+    }
 }

@@ -1,11 +1,16 @@
 package teamficial.teamficial_be.domain.application.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 
 import java.util.List;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
+
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM application WHERE user_id = :userId AND recruiting_post_id = :recruitingPostId)", nativeQuery = true)
+    int existsByUserIdAndRecruitingPostId(Long userId, Long recruitingPostId);
+
     List<Application> findAllByRecruitingPost(RecruitingPost recruitingPost);
 }

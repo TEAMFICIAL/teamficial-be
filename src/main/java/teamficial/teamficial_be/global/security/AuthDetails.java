@@ -5,6 +5,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import teamficial.teamficial_be.domain.user.entity.User;
+import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
 import java.util.Collection;
 import java.util.List;
@@ -60,4 +62,5 @@ public record AuthDetails(User user, Map<String, Object> attributes) implements 
     public boolean isEnabled() {
         return user.getDeletedAt() == null;
     }
+
 }

@@ -29,7 +29,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //프로필 관련 응답
     FAILED_IMAGE_DELETE(HttpStatus.BAD_REQUEST,"PROFILE4001","이미지 삭제를 실패했습니다."),
-    ALREADY_DELETED_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE4002" , "프로필 사진이 이미 삭제된 상태입니다.")
+    ALREADY_DELETED_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE4002" , "프로필 사진이 이미 삭제된 상태입니다."),
+
+    //지원 관련 응답
+    DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST,"APPLICATION6001","이미 지원한 모집 글 입니다."),
 
     ;
 

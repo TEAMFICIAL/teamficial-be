@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
+import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
 @Entity
@@ -14,14 +15,18 @@ import teamficial.teamficial_be.global.entity.BaseEntity;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "application")
+@Table(
+        name = "application",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "recruiting_post_id"})
+        }
+)
 public class Application extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "application_id")
     private Long id;
 
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
     private ApplicationStatus applicationStatus;
 
     @Lob
@@ -35,6 +40,11 @@ public class Application extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruiting_post_id", nullable = false)
     private RecruitingPost recruitingPost;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 
     public void updateStatus(ApplicationStatus applicationStatus) {
         this.applicationStatus = applicationStatus;
