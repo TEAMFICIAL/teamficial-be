@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RecruitingStatus {
     OPEN("모집중"),
-    CLOSED("모집완료");
+    CONFIRMED("참여 확정"),
+    CLOSED("모집 마감");
     private final String description;
 }
