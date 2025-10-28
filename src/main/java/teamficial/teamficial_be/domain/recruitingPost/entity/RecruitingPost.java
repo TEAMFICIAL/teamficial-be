@@ -6,9 +6,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -56,4 +59,7 @@ public class RecruitingPost extends BaseEntity {
     /** 공고 제목 */
     @Column(name = "title", length = 50, nullable = false)
     private String title;
+
+    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.ALL)
+    private List<RecruitingDetail> recruitingDetails=new ArrayList<>();
 }

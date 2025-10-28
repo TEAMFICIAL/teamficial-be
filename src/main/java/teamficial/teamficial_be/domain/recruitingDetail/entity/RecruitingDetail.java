@@ -31,4 +31,10 @@ public class RecruitingDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruiting_post_id", nullable = false)
     private RecruitingPost recruitingPost;
+
+    public String getRecruitingDetail() {
+        String positionString = position.getDescription();
+        String countString = count.toString();
+        return positionString + " " + countString + "명";
+    }
 }

@@ -5,8 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
-import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
-import teamficial.teamficial_be.global.enums.Position;
+
 
 import java.time.LocalDateTime;
 

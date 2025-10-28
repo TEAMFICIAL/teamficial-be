@@ -20,6 +20,7 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "USER404", "해당 유저를 찾을 수 없습니다."),
     NOT_FOUND_TOKEN(HttpStatus.NOT_FOUND,"TOKEN404","토큰을 찾을 수 없습니다."),
     NOT_FOUND_PROFILE(HttpStatus.NOT_FOUND,"PROFILE404","해당 프로필을 찾을 수 없습니다."),
+    NOT_FOUND_RECRUITING_POST(HttpStatus.NOT_FOUND,"RECRUITINGPOST404","해당 팀원 모집 글을 찾을 수 없습니다."),
 
     //로그인 관련 응답
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "LOGIN4001", "토큰이 유효하지 않습니다."),
@@ -27,7 +28,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //프로필 관련 응답
     FAILED_IMAGE_DELETE(HttpStatus.BAD_REQUEST,"PROFILE4001","이미지 삭제를 실패했습니다."),
-    ALREADY_DELETED_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE4002" , "프로필 사진이 이미 삭제된 상태입니다." )
+    ALREADY_DELETED_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE4002" , "프로필 사진이 이미 삭제된 상태입니다.")
+
     ;
 
     private final HttpStatus httpStatus;
