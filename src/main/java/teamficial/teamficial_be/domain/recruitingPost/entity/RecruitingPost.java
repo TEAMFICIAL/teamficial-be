@@ -5,10 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,6 +31,12 @@ public class RecruitingPost extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
+
+    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Application> applications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<RecruitingDetail> recruitingDetails = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "progress_way", nullable = false)
@@ -56,4 +67,15 @@ public class RecruitingPost extends BaseEntity {
     /** 공고 제목 */
     @Column(name = "title", length = 50, nullable = false)
     private String title;
+
+    public void update(RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
+        if (dto.getProgressWay() != null) this.progressWay = dto.getProgressWay();
+        if (dto.getContactWay() != null) this.contactWay = dto.getContactWay();
+        if (dto.getStartDate() != null) this.startDate = dto.getStartDate();
+        if (dto.getPeriod() != null) this.period = dto.getPeriod();
+        if (dto.getDeadline() != null) this.deadline = dto.getDeadline();
+        if (dto.getStatus() != null) this.status = dto.getStatus();
+        if (dto.getContent() != null) this.content = dto.getContent();
+        if (dto.getTitle() != null) this.title = dto.getTitle();
+    }
 }

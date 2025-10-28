@@ -31,4 +31,8 @@ public class RecruitingDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruiting_post_id", nullable = false)
     private RecruitingPost recruitingPost;
+
+    public void updateCount(Integer count) {
+        this.count = count;
+    }
 }

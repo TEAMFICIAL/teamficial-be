@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum applicationStatus {
+public enum ApplicationStatus {
     WAITING("대기중"),
     OPEN("모집 미완료"),
     CLOSED("모집 완료");
