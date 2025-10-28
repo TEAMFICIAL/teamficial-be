@@ -4,11 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.user.dto.CurrentApplicationResponseDto;
 import teamficial.teamficial_be.domain.user.service.MypageService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
@@ -30,4 +26,12 @@ public class MypageController {
         CurrentApplicationResponseDto responseDto = mypageService.getCurrentApplication(recruitingPostId,authDetails.user(),position);
         return ApiResponse.onSuccess(responseDto);
     }
+
+    @PatchMapping("/my-page/{recruitingPostId}")
+    @Operation(summary = "팀원 모집 마감", description = "모집 글에서 팀원 모집을 마감하는 API입니다.")
+    public ApiResponse<String> closedApplication(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long recruitingPostId){
+        mypageService.closedApplication(authDetails.user(),recruitingPostId);
+        return ApiResponse.onSuccess("팀원 모집을 마감하였습니다.");
+    }
+
 }

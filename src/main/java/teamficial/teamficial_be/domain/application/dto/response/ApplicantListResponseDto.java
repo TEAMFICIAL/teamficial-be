@@ -18,7 +18,7 @@ public class ApplicantListResponseDto {
                 .applicationId(applicationId)
                 .profileId(profile.getId())
                 .profileName(profile.getProfileName())
-                .profileName(profile.getProfileImage())
+                .profileImage(profile.getProfileImage())
                 .profilePosition(profile.getPosition().getDescription())
                 .build();
     }

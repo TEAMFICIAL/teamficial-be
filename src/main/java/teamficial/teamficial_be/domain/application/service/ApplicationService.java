@@ -16,4 +16,8 @@ public class ApplicationService {
     public List<Application> getApplications(RecruitingPost recruitingPost) {
         return applicationRepository.findAllByRecruitingPost(recruitingPost);
     }
+
+    public void saveApplications(List<Application> applications) {
+        applicationRepository.saveAll(applications);
+    }
 }

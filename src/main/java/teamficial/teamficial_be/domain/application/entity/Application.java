@@ -21,7 +21,8 @@ public class Application extends BaseEntity {
     private Long id;
 
     @Column(name = "status")
-    private applicationStatus applcationStatus;
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus applicationStatus;
 
     @Lob
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -35,4 +36,7 @@ public class Application extends BaseEntity {
     @JoinColumn(name = "recruiting_post_id", nullable = false)
     private RecruitingPost recruitingPost;
 
+    public void updateStatus(ApplicationStatus applicationStatus) {
+        this.applicationStatus = applicationStatus;
+    }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.application.entity.Application;
+import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
@@ -38,4 +39,20 @@ public class MypageService {
 
         return CurrentApplicationResponseDto.from(recruitingPost, applications);
     }
+
+    @Transactional
+    public void closedApplication(User user, Long recruitingPostId) {
+        RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
+
+        recruitingPostService.validatePostOwner(user, recruitingPost);
+
+        recruitingPost.closedRecruitingPost();
+        List<Application> applications = applicationService.getApplications(recruitingPost);
+        applications.stream()
+                .filter(app -> app.getApplicationStatus() == ApplicationStatus.OPEN)
+                .forEach(app -> app.updateStatus(ApplicationStatus.CLOSED));
+
+        applicationService.saveApplications(applications);
+    }
+
 }

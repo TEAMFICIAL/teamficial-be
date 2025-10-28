@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum applicationStatus {
-    WAITING("대기중"),
-    OPEN("모집 미완료"),
-    CLOSED("모집 완료");
+public enum ApplicationStatus {
+    CONFIRMED("참여 확정"),
+    OPEN("모집중"),
+    CLOSED("모집완료");
 
     private final String description;
 }

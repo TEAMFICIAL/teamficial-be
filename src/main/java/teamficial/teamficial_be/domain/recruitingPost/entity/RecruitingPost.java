@@ -62,4 +62,8 @@ public class RecruitingPost extends BaseEntity {
 
     @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.ALL)
     private List<RecruitingDetail> recruitingDetails=new ArrayList<>();
+
+    public void closedRecruitingPost(){
+        this.status = RecruitingStatus.CLOSED;
+    }
 }
