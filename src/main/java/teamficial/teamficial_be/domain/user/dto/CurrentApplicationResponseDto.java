@@ -21,7 +21,7 @@ public class CurrentApplicationResponseDto {
         return CurrentApplicationResponseDto.builder()
                 .recruitingPost(RecruitingPostResponseDto.from(recruitingPost))
                 .applicantList(applications.stream()
-                        .map(application -> ApplicantListResponseDto.from(application.getProfile()))
+                        .map(application -> ApplicantListResponseDto.from(application.getId(), application.getProfile()))
                         .toList()
                 )
                 .build();
