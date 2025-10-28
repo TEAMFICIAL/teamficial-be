@@ -34,7 +34,9 @@ public class ApplicationService {
         RecruitingPost recruitingPost = recruitingPostRepository.findById(req.getRecruitingPostId())
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
 
-        boolean exists = applicationRepository.existsByUserIdAndRecruitingPostId(userId, req.getRecruitingPostId());
+        boolean exists = applicationRepository.existsByUserIdAndRecruitingPostId(userId, req.getRecruitingPostId()) == 1;
+
+
         if (exists) {
             throw new GeneralException(ErrorStatus.DUPLICATE_APPLICATION);
         }

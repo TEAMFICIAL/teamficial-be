@@ -1,8 +1,8 @@
 package teamficial.teamficial_be.domain.recruitingPost.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
@@ -65,7 +65,6 @@ public class RecruitingPostService {
     public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
-
         RecruitingPost post = recruitingPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
         recruitingPostRepository.delete(post);
@@ -75,7 +74,8 @@ public class RecruitingPostService {
     }
 
 
-    public RecruitingPostDTO.RecruitingPostResponseDTO updatePost(Long userId, Long postId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+    @Transactional
+    public RecruitingPostDTO.RecruitingPostModifyResponseDTO updatePost(Long userId, Long postId, RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         RecruitingPost post = recruitingPostRepository.findById(postId)
@@ -109,17 +109,18 @@ public class RecruitingPostService {
             });
         }
 
-        return RecruitingPostDTO.RecruitingPostResponseDTO.from(
+        return RecruitingPostDTO.RecruitingPostModifyResponseDTO.from(
                 post, recruitingDetailRepository.findByRecruitingPostId(postId)
         );
 
     }
 
+    @Transactional(readOnly = true)
     public RecruitingPostDTO.RecruitingPostResponseDTO getPost(Long userId, Long postId) {
 
         userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
-        RecruitingPost post = recruitingPostRepository.findById(postId)
+        RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
 
         List<RecruitingDetail> recruitingDetails =

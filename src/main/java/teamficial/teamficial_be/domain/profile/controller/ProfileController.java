@@ -2,6 +2,7 @@ package teamficial.teamficial_be.domain.profile.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
@@ -17,7 +18,7 @@ public class ProfileController {
     @Operation(summary = "프로필 생성", description = "프로필을 생성하는 API입니다.")
     public ApiResponse<ProfileResponseDto> createProfile(@RequestParam Long userId,
                                                          @RequestBody ProfileRequestDto requestDto,
-                                                         @RequestParam String objectKey) {
+                                                         @RequestParam @Nullable String objectKey) {
         ProfileResponseDto profileResponseDto = profileService.createProfile(userId, requestDto, objectKey);
         return ApiResponse.onSuccess(profileResponseDto);
     }

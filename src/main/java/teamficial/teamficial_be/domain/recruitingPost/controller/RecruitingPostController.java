@@ -45,10 +45,10 @@ public class RecruitingPostController {
 
     @PatchMapping("/{postId}")
     @Operation(summary = "모집 글 수정 API", description = "프로젝트 모집 글 수정 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostResponseDTO> updatePost(
+    public ApiResponse<RecruitingPostDTO.RecruitingPostModifyResponseDTO> updatePost(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long postId,
-            @RequestBody RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+            @RequestBody RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
 
         Long userId = GlobalAuthUtil.extractUserId(authDetails);
 

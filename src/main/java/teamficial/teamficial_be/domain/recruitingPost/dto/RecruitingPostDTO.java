@@ -68,6 +68,7 @@ public class RecruitingPostDTO {
         private RecruitingStatus status;    // 모집 상태
         private String content;             // 프로젝트 설명
         private String title;
+        private LocalDateTime createdAt;
 
         // 모집 직무 & 인원 리스트
         private List<RecruitingPositionDTO> recruitingPositions;
@@ -90,6 +91,7 @@ public class RecruitingPostDTO {
                                     .toList()
                                     : Collections.emptyList()
                     )
+                    .createdAt(post.getCreatedAt())
                     .build();
         }
     }
@@ -110,4 +112,66 @@ public class RecruitingPostDTO {
                     .build();
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class RecruitingPostModifyRequestDTO {
+        private ProgressWay progressWay;
+        private String contactWay;
+        private LocalDateTime startDate;
+        private Period period;
+        private LocalDateTime deadline;
+        private RecruitingStatus status;
+        private String content;
+        private String title;
+
+        // 모집 직무 & 인원 리스트
+        private List<RecruitingPositionDTO> recruitingPositions;
+
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class RecruitingPostModifyResponseDTO {
+        private ProgressWay progressWay;
+        private String contactWay;
+        private LocalDateTime startDate;
+        private Period period;
+        private LocalDateTime deadline;
+        private RecruitingStatus status;
+        private String content;
+        private String title;
+        private LocalDateTime createdAt;
+
+        // 모집 직무 & 인원 리스트
+        private List<RecruitingPositionDTO> recruitingPositions;
+
+        public static RecruitingPostModifyResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails) {
+            return RecruitingPostModifyResponseDTO.builder()
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .progressWay(post.getProgressWay())
+                    .period(post.getPeriod())
+                    .status(post.getStatus())
+                    .deadline(post.getDeadline())
+                    .contactWay(post.getContactWay())
+                    .recruitingPositions(
+                            recruitingDetails != null
+                                    ? recruitingDetails.stream()
+                                    .map(RecruitingPositionDTO::from)
+                                    .toList()
+                                    : Collections.emptyList()
+                    )
+                    .createdAt(post.getCreatedAt())
+                    .build();
+
+        }
+    }
+
+
+
 }
