@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.profile.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Profile 관련 API", description = "피그마 GUI 4.1")
 public class ProfileController {
     private final ProfileService profileService;
 

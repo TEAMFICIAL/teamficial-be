@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import teamficial.teamficial_be.global.security.jwt.TokenProvider;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "로그인 관련 API", description = "소셜로그인, 로그아웃, 토큰재발급")
 public class AuthController {
 
     private final AuthService authService;

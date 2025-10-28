@@ -17,7 +17,7 @@ import teamficial.teamficial_be.global.security.AuthDetails;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Mypage 관련 API (프로필 API는 X)")
+@Tag(name = "Mypage 관련 API", description = "피그마 GUI 4.2, 4.3")
 public class MypageController {
 
     private final MypageService mypageService;
