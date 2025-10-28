@@ -12,6 +12,8 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.domain.user.dto.CurrentApplicationResponseDto;
 import teamficial.teamficial_be.domain.user.entity.User;
+import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.enums.Position;
 
 import java.util.List;
@@ -62,6 +64,9 @@ public class MypageService {
         recruitingPostService.validatePostOwner(user, recruitingPost);
 
         Application application = applicationService.getApplication(applicationId);
+        if (!application.getRecruitingPost().getId().equals(recruitingPostId)) {
+            throw new GeneralException(ErrorStatus._FORBIDDEN);
+        }
 
         return ApplicationResponseDto.from(application);
     }
@@ -72,6 +77,9 @@ public class MypageService {
         recruitingPostService.validatePostOwner(user, recruitingPost);
 
         Application application = applicationService.getApplication(applicationId);
+        if (!application.getRecruitingPost().getId().equals(recruitingPostId)) {
+            throw new GeneralException(ErrorStatus._FORBIDDEN);
+        }
 
         application.updateStatus(ApplicationStatus.CONFIRMED);
         applicationService.saveApplication(application);

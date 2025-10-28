@@ -35,7 +35,7 @@ public class MypageController {
         return ApiResponse.onSuccess("팀원 모집을 마감하였습니다.");
     }
 
-    @GetMapping("my-page/{recruitingPostId}/{applicationId}")
+    @GetMapping("/my-page/{recruitingPostId}/{applicationId}")
     @Operation(summary = "지원자 프로필 조회", description = "지원자의 프로필, 지원 글을 조회하는 API입니다.")
     public ApiResponse<ApplicationResponseDto> getApplicantProfile(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long recruitingPostId, @PathVariable Long applicationId){
         ApplicationResponseDto applicationResponseDto = mypageService.getApplicantProfile(authDetails.user(),recruitingPostId,applicationId);
@@ -43,7 +43,7 @@ public class MypageController {
         return ApiResponse.onSuccess(applicationResponseDto);
     }
 
-    @PatchMapping("my-page/{recruitingPostId}/{applicationId}")
+    @PatchMapping("/my-page/{recruitingPostId}/{applicationId}")
     @Operation(summary = "지원자와 함께하기", description = "지원자를 합격시키는 API입니다.")
     public ApiResponse<String> confirmedApplicant(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long recruitingPostId, @PathVariable Long applicationId){
         mypageService.confirmedApplicant(authDetails.user(),recruitingPostId,applicationId);
