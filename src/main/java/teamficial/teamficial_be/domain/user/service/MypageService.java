@@ -10,6 +10,7 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.domain.user.dto.CurrentApplicationResponseDto;
 import teamficial.teamficial_be.domain.user.entity.User;
+import teamficial.teamficial_be.global.enums.Position;
 
 import java.util.List;
 
@@ -22,12 +23,18 @@ public class MypageService {
     private final ApplicationService applicationService;
 
     @Transactional(readOnly = true)
-    public CurrentApplicationResponseDto getCurrentApplication(Long recruitingPostId, User user) {
+    public CurrentApplicationResponseDto getCurrentApplication(Long recruitingPostId, User user, Position position) {
 
         RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
         recruitingPostService.validatePostOwner(user,recruitingPost);
 
         List<Application> applications = applicationService.getApplications(recruitingPost);
+
+        if (position != null) {
+            applications = applications.stream()
+                    .filter(application -> application.getProfile().getPosition() == position)
+                    .toList();
+        }
 
         return CurrentApplicationResponseDto.from(recruitingPost, applications);
     }
