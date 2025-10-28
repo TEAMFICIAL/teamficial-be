@@ -3,11 +3,15 @@ package teamficial.teamficial_be.domain.profile.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.service.ProfileService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
+import teamficial.teamficial_be.global.security.AuthDetails;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,8 +27,15 @@ public class ProfileController {
         return ApiResponse.onSuccess(profileResponseDto);
     }
 
+    @GetMapping("/profile")
+    @Operation(summary = "프로필리스트 조회", description = "프로필을 조회하는 API입니다.")
+    public ApiResponse<List<ProfileResponseDto>> getProfileList(@AuthenticationPrincipal AuthDetails authDetails) {
+        List<ProfileResponseDto> profileResponseDtos = profileService.getProfileList(authDetails.user());
+        return ApiResponse.onSuccess(profileResponseDtos);
+    }
+
     @GetMapping("/profile/{profileId}")
-    @Operation(summary = "프로필 조회", description = "프로필을 조회하는 API입니다.")
+    @Operation(summary = "프로필 상세 조회", description = "프로필을 조회하는 API입니다.")
     public ApiResponse<ProfileResponseDto> getProfile(@PathVariable Long profileId) {
         ProfileResponseDto profileResponseDto = profileService.getProfile(profileId);
         return ApiResponse.onSuccess(profileResponseDto);

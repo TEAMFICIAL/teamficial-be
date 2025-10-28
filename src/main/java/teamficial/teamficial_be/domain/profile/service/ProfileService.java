@@ -13,6 +13,8 @@ import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
@@ -107,5 +109,13 @@ public class ProfileService {
     public Profile getProfileById(Long profileId){
         return profileRepository.findById(profileId)
                 .orElseThrow(()-> new GeneralException(ErrorStatus.NOT_FOUND_PROFILE));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProfileResponseDto> getProfileList(User user) {
+        List<Profile> profiles = profileRepository.findAllByUser(user);
+        return profiles.stream()
+                .map(profile -> ProfileResponseDto.of(profile))
+                .toList();
     }
 }
