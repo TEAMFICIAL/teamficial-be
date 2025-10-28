@@ -10,6 +10,9 @@ import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 import teamficial.teamficial_be.global.enums.Position;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -42,8 +45,9 @@ public class Profile extends BaseEntity {
     @Column(name = "working_time", nullable = false)
     private WorkingTime workingTime;
 
-    @Column(name = "link", length = 255)
-    private String link;
+    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true)
+    @Builder.Default
+    private List<ProfileLink> profileLinks= new ArrayList<>();
 
     @Column(name = "contact_way", length = 255)
     private String contactWay;
@@ -52,7 +56,6 @@ public class Profile extends BaseEntity {
         this.profileName = dto.getProfileName();
         this.position = dto.getPosition();
         this.workingTime = dto.getWorkingTime();
-        this.link = dto.getLink();
         this.contactWay = dto.getContactWay();
     }
 
@@ -62,5 +65,16 @@ public class Profile extends BaseEntity {
 
     public void deleteProfileImage(){
         this.profileImage = null;
+    }
+    public void addLink(String link) {
+        ProfileLink newProfileLink = ProfileLink.builder()
+                .profile(this)
+                .link(link)
+                .build();
+        profileLinks.add(newProfileLink);
+    }
+
+    public void clearLinks() {
+        this.profileLinks.clear();
     }
 }
