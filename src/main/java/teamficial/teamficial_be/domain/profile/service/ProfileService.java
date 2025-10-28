@@ -44,9 +44,11 @@ public class ProfileService {
     }
 
     @Transactional
-    public ProfileResponseDto updateProfile(Long profileId, ProfileRequestDto requestDto){
+    public ProfileResponseDto updateProfile(User user,Long profileId, ProfileRequestDto requestDto){
         Profile profile = getProfileById(profileId);
         profile.update(requestDto);
+
+        validateUserProfile(user, profile);
 
         if (requestDto.getLinks() != null) {
             profile.clearLinks();
@@ -64,9 +66,13 @@ public class ProfileService {
     }
 
     @Transactional
-    public void deleteProfile(Long profileId) {
+    public void deleteProfile(User user,Long profileId) {
+
+
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_PROFILE));
+
+        validateUserProfile(user, profile);
 
         String image = profile.getProfileImage();
         if (image != null && !image.isBlank()) {
@@ -78,8 +84,10 @@ public class ProfileService {
     }
 
     @Transactional
-    public void deleteProfileImage(Long profileId){
+    public void deleteProfileImage(User user,Long profileId){
         Profile profile = getProfileById(profileId);
+
+        validateUserProfile(user, profile);
 
         if(profile.getProfileImage() == null){
             throw new GeneralException(ErrorStatus.ALREADY_DELETED_PROFILE_IMAGE);
@@ -92,8 +100,11 @@ public class ProfileService {
     }
 
     @Transactional
-    public String updateProfileImage(Long profileId, String objectKey){
+    public String updateProfileImage(User user,Long profileId, String objectKey){
         Profile profile = getProfileById(profileId);
+
+        validateUserProfile(user, profile);
+
         if (profile.getProfileImage() != null) {
             String oldObjectKey = preSignedUrlService.extractKeyFromUrl(profile.getProfileImage());
             preSignedUrlService.deleteByKey(oldObjectKey);
@@ -115,5 +126,11 @@ public class ProfileService {
         return profiles.stream()
                 .map(profile -> ProfileResponseDto.of(profile))
                 .toList();
+    }
+
+    private void validateUserProfile(User user,Profile profile) {
+        if(!user.getId().equals(profile.getUser().getId())) {
+            throw new GeneralException(ErrorStatus._FORBIDDEN);
+        }
     }
 }
