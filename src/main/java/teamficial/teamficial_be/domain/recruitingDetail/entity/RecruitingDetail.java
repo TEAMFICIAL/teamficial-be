@@ -32,6 +32,12 @@ public class RecruitingDetail extends BaseEntity {
     @JoinColumn(name = "recruiting_post_id", nullable = false)
     private RecruitingPost recruitingPost;
 
+    public String getRecruitingDetail() {
+        String positionString = position.getDescription();
+        String countString = count.toString();
+        return positionString + " " + countString + "명";
+    }
+
     public void updateCount(Integer count) {
         this.count = count;
     }

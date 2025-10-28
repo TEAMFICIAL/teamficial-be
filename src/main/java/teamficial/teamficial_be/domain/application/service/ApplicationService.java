@@ -16,6 +16,8 @@ import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ApplicationService {
@@ -41,19 +43,20 @@ public class ApplicationService {
             throw new GeneralException(ErrorStatus.DUPLICATE_APPLICATION);
         }
 
+
         Application application = Application.builder()
                 .user(user)
                 .profile(profile)
                 .recruitingPost(recruitingPost)
                 .content(req.getContent())
-                .applcationStatus(ApplicationStatus.WAITING)
+                .applicationStatus(ApplicationStatus.OPEN)
                 .build();
 
         Application saved = applicationRepository.save(application);
 
         return ApplicationDTO.ApplicationResponseDTO.builder()
                 .applicationId(saved.getId())
-                .status(saved.getApplcationStatus().name())
+                .status(saved.getApplicationStatus().name())
                 .userId(saved.getUser().getId())
                 .profileId(saved.getProfile().getId())
                 .recruitingPostId(saved.getRecruitingPost().getId())
@@ -61,5 +64,22 @@ public class ApplicationService {
                 .build();
 
 
+    }
+
+    public Application getApplication(Long applicationId) {
+        return applicationRepository.findById(applicationId)
+                .orElseThrow(()->new NotFoundHandler(ErrorStatus.NOT_FOUND_APPLICAION));
+    }
+
+    public List<Application> getApplications(RecruitingPost recruitingPost) {
+        return applicationRepository.findAllByRecruitingPost(recruitingPost);
+    }
+
+    public void saveApplication(Application application) {
+        applicationRepository.save(application);
+    }
+
+    public void saveApplications(List<Application> applications) {
+        applicationRepository.saveAll(applications);
     }
 }

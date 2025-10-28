@@ -35,9 +35,6 @@ public class RecruitingPost extends BaseEntity {
     @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Application> applications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<RecruitingDetail> recruitingDetails = new ArrayList<>();
-
     @Enumerated(EnumType.STRING)
     @Column(name = "progress_way", nullable = false)
     private ProgressWay progressWay;
@@ -67,6 +64,13 @@ public class RecruitingPost extends BaseEntity {
     /** 공고 제목 */
     @Column(name = "title", length = 50, nullable = false)
     private String title;
+
+    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE,orphanRemoval = true)
+    private List<RecruitingDetail> recruitingDetails=new ArrayList<>();
+
+    public void closedRecruitingPost(){
+        this.status = RecruitingStatus.CLOSED;
+    }
 
     public void update(RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
         if (dto.getProgressWay() != null) this.progressWay = dto.getProgressWay();

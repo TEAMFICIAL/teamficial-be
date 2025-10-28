@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.profile.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Profile 관련 API", description = "피그마 GUI 4.1")
 public class ProfileController {
     private final ProfileService profileService;
 
@@ -43,30 +45,31 @@ public class ProfileController {
 
     @PutMapping("/profile/{profileId}")
     @Operation(summary = "프로필 수정", description = "프로필을 수정하는 API입니다.")
-    public ApiResponse<ProfileResponseDto> updateProfile(@PathVariable Long profileId,
+    public ApiResponse<ProfileResponseDto> updateProfile(@AuthenticationPrincipal AuthDetails authDetails,
+                                                         @PathVariable Long profileId,
                                                          @RequestBody ProfileRequestDto profileRequestDto){
-        ProfileResponseDto profileResponseDto = profileService.updateProfile(profileId, profileRequestDto);
+        ProfileResponseDto profileResponseDto = profileService.updateProfile(authDetails.user(),profileId, profileRequestDto);
         return ApiResponse.onSuccess(profileResponseDto);
     }
 
     @PutMapping("profile/{profileId}/image")
     @Operation(summary = "프로필 사진 수정", description = "프로필 사진을 수정하는 API입니다.")
-    public ApiResponse<String> updateProfileImage(@PathVariable Long profileId, @RequestParam String objectKey) {
-        String newProfileImage = profileService.updateProfileImage(profileId, objectKey);
+    public ApiResponse<String> updateProfileImage(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long profileId, @RequestParam String objectKey) {
+        String newProfileImage = profileService.updateProfileImage(authDetails.user(),profileId, objectKey);
         return ApiResponse.onSuccess(newProfileImage);
     }
 
     @DeleteMapping("profile/{profileId}")
     @Operation(summary = "프로필 삭제", description = "프로필을 삭제하는 API입니다.")
-    public ApiResponse<String> deleteProfile(@PathVariable Long profileId) {
-        profileService.deleteProfile(profileId);
+    public ApiResponse<String> deleteProfile(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long profileId) {
+        profileService.deleteProfile(authDetails.user(),profileId);
         return ApiResponse.onSuccess("프로필이 삭제되었습니다.");
     }
 
     @DeleteMapping("/profile/{profileId}/image")
     @Operation(summary = "프로필 사진 삭제", description = "프로필 사진을 삭제하는 API입니다.")
-    public ApiResponse<String> deleteProfileImage(@PathVariable Long profileId) {
-        profileService.deleteProfileImage(profileId);
+    public ApiResponse<String> deleteProfileImage(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long profileId) {
+        profileService.deleteProfileImage(authDetails.user(),profileId);
         return ApiResponse.onSuccess("프로필 사진이 삭제되었습니다.");
     }
 }

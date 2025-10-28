@@ -27,7 +27,7 @@ public class Application extends BaseEntity {
     private Long id;
 
     @Column(name = "status")
-    private ApplicationStatus applcationStatus;
+    private ApplicationStatus applicationStatus;
 
     @Lob
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -46,4 +46,7 @@ public class Application extends BaseEntity {
     private User user;
 
 
+    public void updateStatus(ApplicationStatus applicationStatus) {
+        this.applicationStatus = applicationStatus;
+    }
 }

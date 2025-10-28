@@ -60,7 +60,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/",
-                                "/api/swagger-ui/**"
+                                "/api/swagger-ui/**",
+                                "/profile/{profileId}"
                         ).permitAll()
                         .requestMatchers("/preSigned-url","/profile/**").authenticated()
                         .anyRequest().permitAll()

@@ -13,6 +13,7 @@ import teamficial.teamficial_be.domain.recruitingPost.repository.RecruitingPostR
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.repository.UserRepository;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 
 import java.util.List;
@@ -74,6 +75,12 @@ public class RecruitingPostService {
     }
 
 
+    public RecruitingPost getRecruitingPostById(Long recruitingPostId) {
+        return recruitingPostRepository.findById(recruitingPostId)
+                .orElseThrow(()-> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
+    }
+
+
     @Transactional
     public RecruitingPostDTO.RecruitingPostModifyResponseDTO updatePost(Long userId, Long postId, RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
@@ -127,5 +134,12 @@ public class RecruitingPostService {
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
         return RecruitingPostDTO.RecruitingPostResponseDTO.from(post, recruitingDetails);
+    }
+
+    public void validatePostOwner(User user, RecruitingPost recruitingPost) {
+        Long writerId = recruitingPost.getProfile().getUser().getId();
+        if (!user.getId().equals(writerId)) {
+            throw new GeneralException(ErrorStatus._FORBIDDEN);
+        }
     }
 }
