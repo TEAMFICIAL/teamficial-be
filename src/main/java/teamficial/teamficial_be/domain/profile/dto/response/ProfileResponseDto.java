@@ -5,10 +5,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
 import teamficial.teamficial_be.global.enums.Position;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -25,16 +28,20 @@ public class ProfileResponseDto {
     private String profileName;
     @Schema(description = "프로필 파트", example="프론트엔드")
     private String position;
-    @Schema(description = "사용자 id", example="아침")
+    @Schema(description = "근무 시간대", example="아침")
     private String workingTime;
     @Schema(description = "관련 링크")
-    private String link;
+    private List<String> links;
     @Schema(description = "연락 수단", example="오픈채팅방 링크")
     private String contactWay;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
     public static ProfileResponseDto of(Profile profile) {
+        List<String> linkList = profile.getProfileLinks().stream()
+                .map(ProfileLink::getLink)
+                .collect(Collectors.toList());
+
         return ProfileResponseDto.builder()
                 .profileId(profile.getId())
                 .userId(profile.getUser().getId())
@@ -43,7 +50,7 @@ public class ProfileResponseDto {
                 .profileImageUrl(profile.getProfileImage())
                 .position(profile.getPosition().getDescription())
                 .workingTime(profile.getWorkingTime().getDescription())
-                .link(profile.getLink())
+                .links(linkList)
                 .contactWay(profile.getContactWay())
                 .createdAt(profile.getCreatedAt())
                 .modifiedAt(profile.getUpdatedAt())

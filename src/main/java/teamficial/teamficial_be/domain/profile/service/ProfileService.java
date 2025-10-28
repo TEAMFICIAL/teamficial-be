@@ -6,22 +6,23 @@ import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private final PreSignedUrlService preSignedUrlService;
-    private final UserService userService;
 
     @Transactional
-    public ProfileResponseDto createProfile(Long userId, ProfileRequestDto requestDto, String objectKey){
-        User user = userService.getUserById(userId);
+    public ProfileResponseDto createProfile(User user, ProfileRequestDto requestDto, String objectKey){
         String imageUrl = preSignedUrlService.getPublicUrl(objectKey);
 
         Profile profile = Profile.builder()
@@ -31,9 +32,12 @@ public class ProfileService {
                 .workingTime(requestDto.getWorkingTime())
                 .profileName(requestDto.getProfileName())
                 .contactWay(requestDto.getContactWay())
-                .link(requestDto.getLink())
                 .profileImage(imageUrl)
                 .build();
+
+        if (requestDto.getLinks() != null) {
+            requestDto.getLinks().forEach(link -> profile.addLink(link));
+        }
 
         profileRepository.save(profile);
         return ProfileResponseDto.of(profile);
@@ -43,6 +47,12 @@ public class ProfileService {
     public ProfileResponseDto updateProfile(Long profileId, ProfileRequestDto requestDto){
         Profile profile = getProfileById(profileId);
         profile.update(requestDto);
+
+        if (requestDto.getLinks() != null) {
+            profile.clearLinks();
+            requestDto.getLinks().forEach(link -> profile.addLink(link));
+        }
+
         profileRepository.save(profile);
         return ProfileResponseDto.of(profile);
     }
@@ -97,5 +107,13 @@ public class ProfileService {
     public Profile getProfileById(Long profileId){
         return profileRepository.findById(profileId)
                 .orElseThrow(()-> new GeneralException(ErrorStatus.NOT_FOUND_PROFILE));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProfileResponseDto> getProfileList(User user) {
+        List<Profile> profiles = profileRepository.findAllByUser(user);
+        return profiles.stream()
+                .map(profile -> ProfileResponseDto.of(profile))
+                .toList();
     }
 }
