@@ -20,10 +20,10 @@ public class ProfileController {
 
     @PostMapping("/profile")
     @Operation(summary = "프로필 생성", description = "프로필을 생성하는 API입니다.")
-    public ApiResponse<ProfileResponseDto> createProfile(@RequestParam Long userId,
+    public ApiResponse<ProfileResponseDto> createProfile(@AuthenticationPrincipal AuthDetails authDetails,
                                                          @RequestBody ProfileRequestDto requestDto,
                                                          @Nullable @RequestParam String objectKey) {
-        ProfileResponseDto profileResponseDto = profileService.createProfile(userId, requestDto, objectKey);
+        ProfileResponseDto profileResponseDto = profileService.createProfile(authDetails.user(), requestDto, objectKey);
         return ApiResponse.onSuccess(profileResponseDto);
     }
 

@@ -21,7 +21,4 @@ public class ProfileLink {
     @Column(name = "link", length = 255)
     private String link;
 
-    public void clearProfile() {
-        this.profile = null;
-    }
 }

@@ -28,7 +28,7 @@ public class ProfileResponseDto {
     private String profileName;
     @Schema(description = "프로필 파트", example="프론트엔드")
     private String position;
-    @Schema(description = "사용자 id", example="아침")
+    @Schema(description = "근무 시간대", example="아침")
     private String workingTime;
     @Schema(description = "관련 링크")
     private List<String> links;

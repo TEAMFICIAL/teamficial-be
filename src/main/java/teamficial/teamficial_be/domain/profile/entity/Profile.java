@@ -75,7 +75,6 @@ public class Profile extends BaseEntity {
     }
 
     public void clearLinks() {
-        this.profileLinks.forEach(pl -> pl.clearProfile());
         this.profileLinks.clear();
     }
 }

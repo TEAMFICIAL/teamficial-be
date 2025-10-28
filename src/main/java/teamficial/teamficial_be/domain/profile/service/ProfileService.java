@@ -20,11 +20,9 @@ import java.util.List;
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private final PreSignedUrlService preSignedUrlService;
-    private final UserService userService;
 
     @Transactional
-    public ProfileResponseDto createProfile(Long userId, ProfileRequestDto requestDto, String objectKey){
-        User user = userService.getUserById(userId);
+    public ProfileResponseDto createProfile(User user, ProfileRequestDto requestDto, String objectKey){
         String imageUrl = preSignedUrlService.getPublicUrl(objectKey);
 
         Profile profile = Profile.builder()
@@ -50,8 +48,8 @@ public class ProfileService {
         Profile profile = getProfileById(profileId);
         profile.update(requestDto);
 
-        profile.clearLinks();
         if (requestDto.getLinks() != null) {
+            profile.clearLinks();
             requestDto.getLinks().forEach(link -> profile.addLink(link));
         }
 
