@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.service.UserService;
@@ -31,9 +32,12 @@ public class ProfileService {
                 .workingTime(requestDto.getWorkingTime())
                 .profileName(requestDto.getProfileName())
                 .contactWay(requestDto.getContactWay())
-                .link(requestDto.getLink())
                 .profileImage(imageUrl)
                 .build();
+
+        if (requestDto.getLinks() != null) {
+            requestDto.getLinks().forEach(link -> profile.addLink(link));
+        }
 
         profileRepository.save(profile);
         return ProfileResponseDto.of(profile);
@@ -43,6 +47,12 @@ public class ProfileService {
     public ProfileResponseDto updateProfile(Long profileId, ProfileRequestDto requestDto){
         Profile profile = getProfileById(profileId);
         profile.update(requestDto);
+
+        profile.clearLinks();
+        if (requestDto.getLinks() != null) {
+            requestDto.getLinks().forEach(link -> profile.addLink(link));
+        }
+
         profileRepository.save(profile);
         return ProfileResponseDto.of(profile);
     }
