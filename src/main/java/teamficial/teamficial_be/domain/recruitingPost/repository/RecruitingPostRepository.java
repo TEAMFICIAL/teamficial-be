@@ -17,5 +17,8 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "WHERE rp.id = :id")
     Optional<RecruitingPost> findByIdWithProfile(@Param("id") Long id);
 
+    @Query("SELECT rp FROM RecruitingPost rp " +
+            "LEFT JOIN FETCH rp.applications " +
+            "WHERE rp.profile.user.id = :userId")
     Page<RecruitingPost> findAllByProfile_User_Id(Long userId, Pageable pageable);
 }

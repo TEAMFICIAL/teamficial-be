@@ -35,7 +35,7 @@ public class MypageService {
 
     @Transactional(readOnly = true)
     public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recruitingPost.createdAt"));
 
         Page<Application> applicationPage = applicationService.getApplicationsByUser(user,pageable);
 
