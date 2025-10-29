@@ -9,7 +9,7 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import java.util.Optional;
 
 @Repository
-public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, Long> {
+public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, Long>, RecruitingPostRepositoryCustom  {
     @Query("SELECT rp FROM RecruitingPost rp " +
             "JOIN FETCH rp.profile " +
             "WHERE rp.id = :id")
