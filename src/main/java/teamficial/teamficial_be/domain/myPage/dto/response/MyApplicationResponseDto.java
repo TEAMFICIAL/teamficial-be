@@ -12,6 +12,7 @@ import java.util.List;
 public class MyApplicationResponseDto {
     private Long recruitingPostId;
     private String writerName;
+    private String profileImage;
     private String title;
     private List<String> tags;
     private String status;
@@ -27,8 +28,9 @@ public class MyApplicationResponseDto {
         return MyApplicationResponseDto.builder()
                 .recruitingPostId(recruitingPost.getId())
                 .title(recruitingPost.getTitle())
-                .writerName(recruitingPost.getProfile().getProfileName())
+                .writerName(recruitingPost.getProfile().getUserName())
                 .status(recruitingPost.getStatus().getDescription())
+                .profileImage(recruitingPost.getProfile().getProfileImage())
                 .tags(tags)
                 .period(recruitingPost.getPeriod().getDescription())
                 .deadline(recruitingPost.getDeadline())

@@ -12,6 +12,7 @@ import java.util.List;
 public class CurrentApplicantResponseDto {
     private Long recruitingPostId;
     private String writerName;
+    private String profileImage;
     private String title;
     private List<String> tags;
     private LocalDateTime deadline;
@@ -26,7 +27,8 @@ public class CurrentApplicantResponseDto {
         return CurrentApplicantResponseDto.builder()
                 .recruitingPostId(recruitingPost.getId())
                 .title(recruitingPost.getTitle())
-                .writerName(recruitingPost.getProfile().getProfileName())
+                .profileImage(recruitingPost.getProfile().getProfileImage())
+                .writerName(recruitingPost.getProfile().getUserName())
                 .totalApplicants(recruitingPost.getTotalApplicants())
                 .tags(tags)
                 .deadline(recruitingPost.getDeadline())
