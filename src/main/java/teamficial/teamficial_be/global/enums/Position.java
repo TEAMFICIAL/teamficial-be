@@ -16,8 +16,7 @@ public enum Position {
     MARKETER("마케터"),
     PM("PM"),
     CLOUD_INFRA("클라우드/인프라"),
-    DEV_OPS("데브옵스"),
-    ETC("기타");
+    DEV_OPS("데브옵스");
 
     private final String description;
 }

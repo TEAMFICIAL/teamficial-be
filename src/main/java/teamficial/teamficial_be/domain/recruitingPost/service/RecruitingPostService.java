@@ -1,6 +1,8 @@
 package teamficial.teamficial_be.domain.recruitingPost.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
@@ -8,13 +10,16 @@ import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
 import teamficial.teamficial_be.domain.recruitingDetail.repository.RecruitingDetailRepository;
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
+import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.repository.RecruitingPostRepository;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.repository.UserRepository;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
+import teamficial.teamficial_be.global.enums.Position;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +32,7 @@ public class RecruitingPostService {
     private final RecruitingPostRepository recruitingPostRepository;
     private final ProfileRepository profileRepository; //프로필 여러개 있을때 고르는 과정 때문에 필요
     private final RecruitingDetailRepository recruitingDetailRepository;
+
 
     @Transactional
     public RecruitingPostDTO.RecruitingPostResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
@@ -141,5 +147,18 @@ public class RecruitingPostService {
         if (!user.getId().equals(writerId)) {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
         }
+    }
+
+
+    public Page<RecruitingPostDTO.RecruitingPostResponseDTO> getRecruitingPosts(
+            RecruitingStatus status,
+            Position position,
+            ProgressWay progressWay,
+            Pageable pageable) {
+
+        Page<RecruitingPost> posts =
+                recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
+
+        return posts.map(RecruitingPostDTO.RecruitingPostResponseDTO::from);
     }
 }

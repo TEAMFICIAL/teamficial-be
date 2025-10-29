@@ -11,6 +11,7 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.global.enums.Position;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +85,7 @@ public class RecruitingPostDTO {
                     .status(post.getStatus())
                     .deadline(post.getDeadline())
                     .contactWay(post.getContactWay())
+                    .startDate(post.getStartDate())
                     .recruitingPositions(
                             recruitingDetails != null
                                     ? recruitingDetails.stream()
@@ -93,6 +95,10 @@ public class RecruitingPostDTO {
                     )
                     .createdAt(post.getCreatedAt())
                     .build();
+        }
+
+        public static RecruitingPostResponseDTO from(RecruitingPost post) {
+            return from(post, post.getRecruitingDetails());
         }
     }
 
