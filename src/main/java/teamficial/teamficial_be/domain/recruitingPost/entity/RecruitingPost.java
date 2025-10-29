@@ -65,8 +65,8 @@ public class RecruitingPost extends BaseEntity {
     @Column(name = "title", length = 50, nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE,orphanRemoval = true)
-    private List<RecruitingDetail> recruitingDetails=new ArrayList<>();
+    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE,orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RecruitingDetail> recruitingDetails = new ArrayList<>();
 
     public void closedRecruitingPost(){
         this.status = RecruitingStatus.CLOSED;
