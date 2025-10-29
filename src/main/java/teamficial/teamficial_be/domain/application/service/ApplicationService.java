@@ -1,6 +1,8 @@
 package teamficial.teamficial_be.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import teamficial.teamficial_be.domain.application.dto.ApplicationDTO;
 import teamficial.teamficial_be.domain.application.entity.Application;
@@ -71,8 +73,12 @@ public class ApplicationService {
                 .orElseThrow(()->new NotFoundHandler(ErrorStatus.NOT_FOUND_APPLICAION));
     }
 
-    public List<Application> getApplications(RecruitingPost recruitingPost) {
+    public List<Application> getApplicationsByRecruitingPost(RecruitingPost recruitingPost) {
         return applicationRepository.findAllByRecruitingPost(recruitingPost);
+    }
+
+    public Page<Application> getApplicationsByUser(User user, Pageable pageable) {
+        return applicationRepository.findAllByUser(user,pageable);
     }
 
     public void saveApplication(Application application) {

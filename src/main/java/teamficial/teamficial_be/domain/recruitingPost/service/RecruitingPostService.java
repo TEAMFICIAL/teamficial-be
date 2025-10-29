@@ -149,6 +149,11 @@ public class RecruitingPostService {
         }
     }
 
+    public Page<RecruitingPost> getAllRecruitingPostsByUser(Long userId,Pageable pageable) {
+
+        return recruitingPostRepository.findAllByProfile_User_Id(userId,pageable);
+    }
+
 
     public Page<RecruitingPostDTO.RecruitingPostResponseDTO> getRecruitingPosts(
             RecruitingStatus status,

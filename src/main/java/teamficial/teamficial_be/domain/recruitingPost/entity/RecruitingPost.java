@@ -72,6 +72,10 @@ public class RecruitingPost extends BaseEntity {
         this.status = RecruitingStatus.CLOSED;
     }
 
+    public int getTotalApplicants(){
+        return this.applications.size();
+    }
+
     public void update(RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
         if (dto.getProgressWay() != null) this.progressWay = dto.getProgressWay();
         if (dto.getContactWay() != null) this.contactWay = dto.getContactWay();
