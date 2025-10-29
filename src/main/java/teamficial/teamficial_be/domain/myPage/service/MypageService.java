@@ -40,7 +40,7 @@ public class MypageService {
         Page<Application> applicationPage = applicationService.getApplicationsByUser(user,pageable);
 
         Page<MyApplicationResponseDto> dtoPage = applicationPage
-                .map(application -> MyApplicationResponseDto.of(application.getRecruitingPost()));
+                .map(application -> MyApplicationResponseDto.of(application.getRecruitingPost(),application.getApplicationStatus().getDescription()));
 
         return PagedResponse.of(dtoPage);
     }
