@@ -31,7 +31,14 @@ public class MypageController {
         return ApiResponse.onSuccess(responseDtos);
     }
 
-
+    @GetMapping("/my-page/current-applicants")
+    @Operation(summary = "작성한 모집 글들의 지원자 현황 조회하기", description = "마이페이지에서 작성한 모집 글들의 지원자 현황 조회하는 API입니다.")
+    public ApiResponse<PagedResponse<CurrentApplicantResponseDto>> getAllCurrentApplication(@AuthenticationPrincipal AuthDetails authDetails,
+                                                                                            @RequestParam(defaultValue = "0") int page,
+                                                                                            @RequestParam(defaultValue = "3") int size) {
+        PagedResponse<CurrentApplicantResponseDto> responseDtos = mypageService.getAllCurrentApplication(authDetails.user(),page,size);
+        return ApiResponse.onSuccess(responseDtos);
+    }
 
     @GetMapping("/my-page/{recruitingPostId}/current-applicants")
     @Operation(summary = "지원자 현황 조회", description = "마이페이지에서 지원자 현황을 조회하는 API입니다.")

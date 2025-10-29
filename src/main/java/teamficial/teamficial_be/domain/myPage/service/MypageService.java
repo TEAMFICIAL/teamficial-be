@@ -45,7 +45,17 @@ public class MypageService {
         return PagedResponse.of(dtoPage);
     }
 
+    @Transactional(readOnly = true)
+    public PagedResponse<CurrentApplicantResponseDto> getAllCurrentApplication(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "deadline"));
 
+        Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUser(user.getId(),pageable);
+
+        Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage
+                .map(CurrentApplicantResponseDto::of);
+
+        return PagedResponse.of(dtoPage);
+    }
 
     @Transactional(readOnly = true)
     public CurrentApplicationDetailResponseDto getCurrentApplication(Long recruitingPostId, User user, Position position) {
