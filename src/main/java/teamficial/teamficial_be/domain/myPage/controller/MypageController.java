@@ -1,4 +1,4 @@
-package teamficial.teamficial_be.domain.user.controller;
+package teamficial.teamficial_be.domain.myPage.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -6,11 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.application.dto.response.ApplicationResponseDto;
-import teamficial.teamficial_be.domain.user.dto.CurrentApplicationResponseDto;
-import teamficial.teamficial_be.domain.user.service.MypageService;
+import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicantResponseDto;
+import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicationDetailResponseDto;
+import teamficial.teamficial_be.domain.myPage.dto.response.MyApplicationResponseDto;
+import teamficial.teamficial_be.domain.myPage.service.MypageService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.enums.Position;
 import teamficial.teamficial_be.global.security.AuthDetails;
+import teamficial.teamficial_be.global.util.PagedResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,12 +22,23 @@ public class MypageController {
 
     private final MypageService mypageService;
 
-    @GetMapping("/my-page/{recruitingPostId}/current-application")
+    @GetMapping("/my-page/applications")
+    @Operation(summary = "내가 지원한 팀 리스트 조회하기", description = "마이페이지에서 내가 지원한 팀들을 조회하는 API입니다.")
+    public ApiResponse<PagedResponse<MyApplicationResponseDto>> getMyPageApplications(@AuthenticationPrincipal AuthDetails authDetails,
+                                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                                      @RequestParam(defaultValue = "3") int size) {
+        PagedResponse<MyApplicationResponseDto> responseDtos = mypageService.getAllApplications(authDetails.user(),page,size);
+        return ApiResponse.onSuccess(responseDtos);
+    }
+
+
+
+    @GetMapping("/my-page/{recruitingPostId}/current-applicants")
     @Operation(summary = "지원자 현황 조회", description = "마이페이지에서 지원자 현황을 조회하는 API입니다.")
-    public ApiResponse<CurrentApplicationResponseDto> getCurrentApplication(@PathVariable Long recruitingPostId,
-                                                                            @AuthenticationPrincipal AuthDetails authDetails,
-                                                                            @RequestParam(required = false) Position position) {
-        CurrentApplicationResponseDto responseDto = mypageService.getCurrentApplication(recruitingPostId,authDetails.user(),position);
+    public ApiResponse<CurrentApplicationDetailResponseDto> getCurrentApplication(@PathVariable Long recruitingPostId,
+                                                                                  @AuthenticationPrincipal AuthDetails authDetails,
+                                                                                  @RequestParam(required = false) Position position) {
+        CurrentApplicationDetailResponseDto responseDto = mypageService.getCurrentApplication(recruitingPostId,authDetails.user(),position);
         return ApiResponse.onSuccess(responseDto);
     }
 

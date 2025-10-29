@@ -1,6 +1,8 @@
 package teamficial.teamficial_be.domain.recruitingPost.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
@@ -141,5 +143,10 @@ public class RecruitingPostService {
         if (!user.getId().equals(writerId)) {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
         }
+    }
+
+    public Page<RecruitingPost> getAllRecruitingPostsByUser(Long userId,Pageable pageable) {
+
+        return recruitingPostRepository.findAllByProfile_User_Id(userId,pageable);
     }
 }
