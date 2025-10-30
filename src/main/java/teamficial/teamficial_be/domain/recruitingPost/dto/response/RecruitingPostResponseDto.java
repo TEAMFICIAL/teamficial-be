@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,12 +23,12 @@ public class RecruitingPostResponseDto {
     private String progressWay;
     @Schema(description = "연락 방식", example="{오픈채팅 링크}")
     private String contactWay;
-    @Schema(description = "시작 예정일", example="2025-10-28T06:38:03.179Z")
-    private LocalDateTime startDate;
+    @Schema(description = "시작 예정일", example="2025-10-28")
+    private LocalDate startDate;
     @Schema(description = "프로젝트 진행 기간", example="1개월 이내")
     private String period;
     @Schema(description = "공고 마감일", example="2025-10-28T06:38:03.179Z")
-    private LocalDateTime deadline;
+    private LocalDate deadline;
     @Schema(description = "모집 분야/인원", example="[\"프론트엔드 3명\",\n\"백엔드 3명\"]")
     private List<String> recruitingDetails;
 

@@ -47,7 +47,7 @@ public class RecruitingPostController {
 
         Long userId = GlobalAuthUtil.extractUserId(authDetails);
 
-        return ApiResponse.onSuccess(recruitingPostService.deletePost(postId, userId));
+        return ApiResponse.onSuccess(recruitingPostService.deletePost(userId, postId));
     }
 
     @PatchMapping("/{postId}")

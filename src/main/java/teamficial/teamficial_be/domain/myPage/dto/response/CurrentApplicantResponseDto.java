@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class CurrentApplicantResponseDto {
     @Schema(description = "작성 글의 모집 파트", example="[\"프론트엔드\",\n\"백엔드\"]")
     private List<String> tags;
     @Schema(description = "공고 마감일", example="2025-10-28T06:38:03.179Z")
-    private LocalDateTime deadline;
+    private LocalDate deadline;
     @Schema(description = "총 지원자 수", example="3")
     private int totalApplicants;
     @Schema(description = "글 작성일", example="2025-10-28T06:38:03.179Z")

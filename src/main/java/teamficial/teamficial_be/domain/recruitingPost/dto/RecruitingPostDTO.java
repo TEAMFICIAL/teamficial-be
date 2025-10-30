@@ -26,9 +26,9 @@ public class RecruitingPostDTO {
         private Long profileId;
         private ProgressWay progressWay;
         private String contactWay;
-        private LocalDateTime startDate;
+        private LocalDate startDate;
         private Period period;
-        private LocalDateTime deadline;
+        private LocalDate deadline;
         private RecruitingStatus status;
         private String content;
         private String title;
@@ -63,9 +63,9 @@ public class RecruitingPostDTO {
         private String profileName;         // 작성자 프로필 이름
         private ProgressWay progressWay;    // 진행 방식
         private String contactWay;          // 연락 방법
-        private LocalDateTime startDate;    // 시작일
+        private LocalDate startDate;    // 시작일
         private Period period;              // 진행 기간
-        private LocalDateTime deadline;     // 모집 마감일
+        private LocalDate deadline;     // 모집 마감일
         private RecruitingStatus status;    // 모집 상태
         private String content;             // 프로젝트 설명
         private String title;
@@ -126,9 +126,9 @@ public class RecruitingPostDTO {
     public static class RecruitingPostModifyRequestDTO {
         private ProgressWay progressWay;
         private String contactWay;
-        private LocalDateTime startDate;
+        private LocalDate startDate;
         private Period period;
-        private LocalDateTime deadline;
+        private LocalDate deadline;
         private RecruitingStatus status;
         private String content;
         private String title;
@@ -145,9 +145,9 @@ public class RecruitingPostDTO {
     public static class RecruitingPostModifyResponseDTO {
         private ProgressWay progressWay;
         private String contactWay;
-        private LocalDateTime startDate;
+        private LocalDate startDate;
         private Period period;
-        private LocalDateTime deadline;
+        private LocalDate deadline;
         private RecruitingStatus status;
         private String content;
         private String title;
