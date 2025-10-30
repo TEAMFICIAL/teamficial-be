@@ -95,6 +95,7 @@ public class AuthService {
                 user.getId(),
                 tokenResponse.getAccessToken(),
                 tokenResponse.getRefreshToken(),
+                user.getUuid(),
                 isFirst.get()
         );
     }
