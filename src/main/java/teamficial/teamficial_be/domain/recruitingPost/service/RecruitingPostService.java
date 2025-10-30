@@ -36,13 +36,14 @@ public class RecruitingPostService {
 
     @Transactional
     public RecruitingPostDTO.RecruitingPostResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         Profile profile = profileRepository.findById(dto.getProfileId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필 ID입니다."));
 
         RecruitingPost post = RecruitingPost.builder()
                 .profile(profile)
+                .user(user)
                 .progressWay(dto.getProgressWay())
                 .contactWay(dto.getContactWay())
                 .startDate(dto.getStartDate())
@@ -70,10 +71,15 @@ public class RecruitingPostService {
     }
 
     public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         RecruitingPost post = recruitingPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
+
+        if (!post.getUser().getId().equals(user.getId())) {
+            throw new GeneralException(ErrorStatus._FORBIDDEN); // 권한 없음
+        }
+
         recruitingPostRepository.delete(post);
 
         return RecruitingPostDTO.RecruitingPostDeleteResponseDTO.of(postId, "게시글이 성공적으로 삭제되었습니다.");
@@ -89,10 +95,14 @@ public class RecruitingPostService {
 
     @Transactional
     public RecruitingPostDTO.RecruitingPostModifyResponseDTO updatePost(Long userId, Long postId, RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         RecruitingPost post = recruitingPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
+
+        if (!post.getUser().getId().equals(user.getId())) {
+            throw new GeneralException(ErrorStatus._FORBIDDEN); // 권한 없음
+        }
 
         post.update(dto);
 

@@ -9,6 +9,7 @@ import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
+import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
 import java.time.LocalDate;
@@ -32,6 +33,10 @@ public class RecruitingPost extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Application> applications = new ArrayList<>();
