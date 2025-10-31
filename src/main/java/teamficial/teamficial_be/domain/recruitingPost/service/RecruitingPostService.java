@@ -159,9 +159,12 @@ public class RecruitingPostService {
         }
     }
 
-    public Page<RecruitingPost> getAllRecruitingPostsByUser(Long userId,Pageable pageable) {
-
-        return recruitingPostRepository.findAllByProfile_User_Id(userId,pageable);
+    public Page<RecruitingPost> getAllRecruitingPostsByUserAndStatus(Long userId, Pageable pageable,RecruitingStatus recruitingStatus) {
+        if (recruitingStatus ==null){
+            return recruitingPostRepository.findAllByProfile_User_Id(userId,pageable);
+        } else {
+            return recruitingPostRepository.findAllByProfile_User_IdAndStatus(userId,pageable,recruitingStatus);
+        }
     }
 
 

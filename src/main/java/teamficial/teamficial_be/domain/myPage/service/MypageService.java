@@ -15,6 +15,7 @@ import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicantResponseDto;
 import teamficial.teamficial_be.domain.myPage.dto.response.MyApplicationResponseDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicationDetailResponseDto;
 import teamficial.teamficial_be.domain.user.entity.User;
@@ -34,10 +35,10 @@ public class MypageService {
     private final ApplicationService applicationService;
 
     @Transactional(readOnly = true)
-    public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size) {
+    public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size,ApplicationStatus applicationStatus) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recruitingPost.createdAt"));
 
-        Page<Application> applicationPage = applicationService.getApplicationsByUser(user,pageable);
+        Page<Application> applicationPage = applicationService.getApplicationsByUserAndStatus(user,pageable,applicationStatus);
 
         Page<MyApplicationResponseDto> dtoPage = applicationPage
                 .map(application -> MyApplicationResponseDto.of(application.getRecruitingPost(),application.getApplicationStatus().getDescription()));
@@ -46,10 +47,10 @@ public class MypageService {
     }
 
     @Transactional(readOnly = true)
-    public PagedResponse<CurrentApplicantResponseDto> getAllCurrentApplication(User user, int page, int size) {
+    public PagedResponse<CurrentApplicantResponseDto> getAllCurrentApplication(User user, int page, int size, RecruitingStatus recruitingStatus) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "deadline"));
 
-        Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUser(user.getId(),pageable);
+        Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUserAndStatus(user.getId(),pageable,recruitingStatus);
 
         Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage
                 .map(CurrentApplicantResponseDto::of);

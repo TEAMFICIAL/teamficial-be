@@ -77,8 +77,12 @@ public class ApplicationService {
         return applicationRepository.findAllByRecruitingPost(recruitingPost);
     }
 
-    public Page<Application> getApplicationsByUser(User user, Pageable pageable) {
-        return applicationRepository.findAllByUser(user,pageable);
+    public Page<Application> getApplicationsByUserAndStatus(User user, Pageable pageable,ApplicationStatus status) {
+        if (status == null){
+            return applicationRepository.findAllByUser(user,pageable);
+        } else {
+            return applicationRepository.findAllByUserAndApplicationStatus(user,pageable,status);
+        }
     }
 
     public void saveApplication(Application application) {

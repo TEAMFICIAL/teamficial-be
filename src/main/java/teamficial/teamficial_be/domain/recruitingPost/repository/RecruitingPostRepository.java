@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 
 import java.util.Optional;
 
@@ -21,4 +22,9 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "LEFT JOIN FETCH rp.applications " +
             "WHERE rp.profile.user.id = :userId")
     Page<RecruitingPost> findAllByProfile_User_Id(Long userId, Pageable pageable);
+
+    @Query("SELECT rp FROM RecruitingPost rp " +
+            "LEFT JOIN FETCH rp.applications " +
+            "WHERE rp.profile.user.id = :userId AND rp.status = :recruitingStatus")
+    Page<RecruitingPost> findAllByProfile_User_IdAndStatus(Long userId, Pageable pageable, RecruitingStatus recruitingStatus);
 }
