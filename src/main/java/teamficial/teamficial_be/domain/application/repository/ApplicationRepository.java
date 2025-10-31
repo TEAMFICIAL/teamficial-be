@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import teamficial.teamficial_be.domain.application.entity.Application;
+import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.user.entity.User;
 
@@ -20,4 +21,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     @EntityGraph(attributePaths = {"user"})
     Page<Application> findAllByUser(User user, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"user"})
+    Page<Application> findAllByUserAndApplicationStatus(User user, Pageable pageable, ApplicationStatus status);
 }

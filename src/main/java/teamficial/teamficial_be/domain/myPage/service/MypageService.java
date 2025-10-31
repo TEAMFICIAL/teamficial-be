@@ -35,10 +35,10 @@ public class MypageService {
     private final ApplicationService applicationService;
 
     @Transactional(readOnly = true)
-    public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size) {
+    public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size,ApplicationStatus applicationStatus) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recruitingPost.createdAt"));
 
-        Page<Application> applicationPage = applicationService.getApplicationsByUser(user,pageable);
+        Page<Application> applicationPage = applicationService.getApplicationsByUserAndStatus(user,pageable,applicationStatus);
 
         Page<MyApplicationResponseDto> dtoPage = applicationPage
                 .map(application -> MyApplicationResponseDto.of(application.getRecruitingPost(),application.getApplicationStatus().getDescription()));
