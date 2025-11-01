@@ -71,11 +71,12 @@ public class RecruitingPostDTO {
         private String content;             // 프로젝트 설명
         private String title;
         private LocalDateTime createdAt;
+        private long dDay;
 
         // 모집 직무 & 인원 리스트
         private List<RecruitingPositionDTO> recruitingPositions;
 
-        public static RecruitingPostResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails) {
+        public static RecruitingPostResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay) {
             return RecruitingPostResponseDTO.builder()
                     .postId(post.getId())
                     .profileId(post.getProfile().getId())
@@ -96,11 +97,12 @@ public class RecruitingPostDTO {
                                     : Collections.emptyList()
                     )
                     .createdAt(post.getCreatedAt())
+                    .dDay(dDay)
                     .build();
         }
 
-        public static RecruitingPostResponseDTO from(RecruitingPost post) {
-            return from(post, post.getRecruitingDetails());
+        public static RecruitingPostResponseDTO from(RecruitingPost post, long dDay) {
+            return from(post, post.getRecruitingDetails(),dDay);
         }
     }
 

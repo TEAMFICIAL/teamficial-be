@@ -52,8 +52,10 @@ public class MypageService {
 
         Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUserAndStatus(user.getId(),pageable,recruitingStatus);
 
-        Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage
-                .map(CurrentApplicantResponseDto::of);
+        Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage.map(recruitingPost -> {
+            long dDay = recruitingPostService.checkDDay(recruitingPost);
+            return CurrentApplicantResponseDto.of(recruitingPost,dDay);
+        });
 
         return PagedResponse.of(dtoPage);
     }
@@ -64,6 +66,8 @@ public class MypageService {
         RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
         recruitingPostService.validatePostOwner(user,recruitingPost);
 
+        long dDay = recruitingPostService.checkDDay(recruitingPost);
+
         List<Application> applications = applicationService.getApplicationsByRecruitingPost(recruitingPost);
 
         if (position != null) {
@@ -71,8 +75,10 @@ public class MypageService {
                     .filter(application -> application.getProfile().getPosition() == position)
                     .toList();
         }
+        recruitingPost.getDDay();
 
-        return CurrentApplicationDetailResponseDto.from(recruitingPost, applications);
+
+        return CurrentApplicationDetailResponseDto.from(recruitingPost, applications,dDay);
     }
 
     @Transactional
