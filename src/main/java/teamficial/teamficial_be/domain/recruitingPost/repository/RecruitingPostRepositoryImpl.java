@@ -46,12 +46,7 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = queryFactory
-                .select(Wildcard.count)
-                .from(post)
-                .leftJoin(post.recruitingDetails, postDetail)
-                .where(builder)
-                .fetchOne();
+        long total = content.size();
 
         return new PageImpl<>(content, pageable, total);
     }
