@@ -53,7 +53,7 @@ public class MypageService {
         Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUserAndStatus(user.getId(),pageable,recruitingStatus);
 
         Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage.map(recruitingPost -> {
-            long dDay = recruitingPostService.checkDDay(recruitingPost);
+            long dDay = recruitingPost.getDDay();
             return CurrentApplicantResponseDto.of(recruitingPost,dDay);
         });
 
@@ -66,7 +66,7 @@ public class MypageService {
         RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
         recruitingPostService.validatePostOwner(user,recruitingPost);
 
-        long dDay = recruitingPostService.checkDDay(recruitingPost);
+        long dDay = recruitingPost.getDDay();
 
         List<Application> applications = applicationService.getApplicationsByRecruitingPost(recruitingPost);
 
@@ -90,8 +90,8 @@ public class MypageService {
         recruitingPost.closedRecruitingPost();
         List<Application> applications = applicationService.getApplicationsByRecruitingPost(recruitingPost);
         applications.stream()
-                .filter(app -> app.getApplicationStatus() == ApplicationStatus.OPEN)
-                .forEach(app -> app.updateStatus(ApplicationStatus.CLOSED));
+                .filter(app -> app.getApplicationStatus() == ApplicationStatus.MATCHING)
+                .forEach(app -> app.updateStatus(ApplicationStatus.MATCH_FAILED));
 
         applicationService.saveApplications(applications);
     }
@@ -110,7 +110,7 @@ public class MypageService {
     }
 
     @Transactional
-    public void confirmedApplicant(User user, Long recruitingPostId, Long applicationId) {
+    public void confirmedApplicant(User user, Long recruitingPostId, Long applicationId,ApplicationStatus applicationStatus) {
         RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
         recruitingPostService.validatePostOwner(user, recruitingPost);
 
@@ -119,7 +119,7 @@ public class MypageService {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
         }
 
-        application.updateStatus(ApplicationStatus.CONFIRMED);
+        application.updateStatus(applicationStatus);
         applicationService.saveApplication(application);
     }
 
