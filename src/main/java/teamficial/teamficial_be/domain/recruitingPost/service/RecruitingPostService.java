@@ -54,7 +54,7 @@ public class RecruitingPostService {
                 .title(dto.getTitle())
                 .build();
 
-        long dDay = checkDDay(post);
+        long dDay = post.getDDay();
         RecruitingPost saved = recruitingPostRepository.save(post);
 
         List<RecruitingDetail> details = dto.getRecruitingPositions().stream()
@@ -144,7 +144,7 @@ public class RecruitingPostService {
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
 
-        long dDay = checkDDay(post);
+        long dDay = post.getDDay();
 
         List<RecruitingDetail> recruitingDetails =
                 recruitingDetailRepository.findByRecruitingPostId(postId);
@@ -179,14 +179,8 @@ public class RecruitingPostService {
                 recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
 
         return posts.map(recruitingPost -> {
-            long dDay = checkDDay(recruitingPost);
+            long dDay = recruitingPost.getDDay();
             return RecruitingPostDTO.RecruitingPostResponseDTO.from(recruitingPost,dDay);
         });
-    }
-
-    public long checkDDay(RecruitingPost post) {
-        long dDay = post.getDDay();
-        recruitingPostRepository.save(post);
-        return dDay;
     }
 }

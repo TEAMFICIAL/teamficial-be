@@ -55,7 +55,7 @@ public class RecruitingPost extends BaseEntity {
     @Column(name = "period", nullable = false)
     private Period period;
 
-    @Column(name = "deadline")
+    @Column(name = "deadline", nullable = false)
     private LocalDate deadline;
 
     @Enumerated(EnumType.STRING)
@@ -94,13 +94,9 @@ public class RecruitingPost extends BaseEntity {
     }
 
     public long getDDay(){
-        if (this.deadline == null) return -1L;
-
         if (this.deadline.isBefore(LocalDate.now())) {
-            this.status = RecruitingStatus.CLOSED;
-            return 0L;
+            return -1L;
         }
-
         return ChronoUnit.DAYS.between(this.deadline, LocalDate.now());
     }
 }

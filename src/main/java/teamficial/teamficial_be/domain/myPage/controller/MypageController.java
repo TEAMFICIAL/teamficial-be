@@ -69,9 +69,9 @@ public class MypageController {
     }
 
     @PatchMapping("/my-page/{recruitingPostId}/{applicationId}")
-    @Operation(summary = "지원자와 함께하기", description = "지원자를 합격시키는 API입니다.")
-    public ApiResponse<String> confirmedApplicant(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long recruitingPostId, @PathVariable Long applicationId){
-        mypageService.confirmedApplicant(authDetails.user(),recruitingPostId,applicationId);
+    @Operation(summary = "지원자와 합불 정하기", description = "지원자를 합불을 정하는 API입니다.")
+    public ApiResponse<String> confirmedApplicant(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long recruitingPostId, @PathVariable Long applicationId, @RequestParam ApplicationStatus applicationStatus){
+        mypageService.confirmedApplicant(authDetails.user(),recruitingPostId,applicationId,applicationStatus);
 
         return ApiResponse.onSuccess("함께할 사람이 생겼습니다!");
     }
