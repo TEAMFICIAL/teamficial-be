@@ -59,6 +59,7 @@ public class RecruitingPostDTO {
     @AllArgsConstructor
     @Builder
     public static class RecruitingPostResponseDTO {
+        private Long postId;                // 모집 글 Id
         private Long profileId;             // 작성자 프로필 ID
         private String profileName;         // 작성자 프로필 이름
         private ProgressWay progressWay;    // 진행 방식
@@ -76,6 +77,7 @@ public class RecruitingPostDTO {
 
         public static RecruitingPostResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails) {
             return RecruitingPostResponseDTO.builder()
+                    .postId(post.getId())
                     .profileId(post.getProfile().getId())
                     .profileName(post.getProfile().getProfileName())
                     .title(post.getTitle())
