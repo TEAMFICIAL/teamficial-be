@@ -31,8 +31,9 @@ public class RecruitingPostResponseDto {
     private LocalDate deadline;
     @Schema(description = "모집 분야/인원", example="[\"프론트엔드 3명\",\n\"백엔드 3명\"]")
     private List<String> recruitingDetails;
+    private long dDay;
 
-    public static RecruitingPostResponseDto from(RecruitingPost recruitingPost) {
+    public static RecruitingPostResponseDto from(RecruitingPost recruitingPost, long dDay) {
         return RecruitingPostResponseDto.builder()
                 .recruitingPostId(recruitingPost.getId())
                 .recruitingPostTitle(recruitingPost.getTitle())
@@ -46,6 +47,7 @@ public class RecruitingPostResponseDto {
                         .map(rd -> rd.getRecruitingDetail())
                         .toList()
                 )
+                .dDay(dDay)
                 .build();
     }
 }

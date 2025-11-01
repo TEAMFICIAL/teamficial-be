@@ -16,9 +16,9 @@ public class CurrentApplicationDetailResponseDto {
     private RecruitingPostResponseDto recruitingPost;
     private List<ApplicantListResponseDto> applicantList;
 
-    public static CurrentApplicationDetailResponseDto from(RecruitingPost recruitingPost, List<Application> applications) {
+    public static CurrentApplicationDetailResponseDto from(RecruitingPost recruitingPost, List<Application> applications, long dDay) {
         return CurrentApplicationDetailResponseDto.builder()
-                .recruitingPost(RecruitingPostResponseDto.from(recruitingPost))
+                .recruitingPost(RecruitingPostResponseDto.from(recruitingPost,dDay))
                 .applicantList(applications.stream()
                         .map(application -> ApplicantListResponseDto.from(application.getId(), application.getProfile()))
                         .toList()

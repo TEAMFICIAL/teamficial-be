@@ -54,6 +54,7 @@ public class RecruitingPostService {
                 .title(dto.getTitle())
                 .build();
 
+        long dDay = checkDDay(post);
         RecruitingPost saved = recruitingPostRepository.save(post);
 
         List<RecruitingDetail> details = dto.getRecruitingPositions().stream()
@@ -66,8 +67,7 @@ public class RecruitingPostService {
 
         recruitingDetailRepository.saveAll(details);
 
-
-        return RecruitingPostDTO.RecruitingPostResponseDTO.from(saved, details);
+        return RecruitingPostDTO.RecruitingPostResponseDTO.from(saved, details,dDay);
     }
 
     public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
@@ -144,10 +144,13 @@ public class RecruitingPostService {
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
 
+        long dDay = checkDDay(post);
+
         List<RecruitingDetail> recruitingDetails =
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
-        return RecruitingPostDTO.RecruitingPostResponseDTO.from(post, recruitingDetails);
+
+        return RecruitingPostDTO.RecruitingPostResponseDTO.from(post, recruitingDetails,dDay);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
@@ -175,6 +178,15 @@ public class RecruitingPostService {
         Page<RecruitingPost> posts =
                 recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
 
-        return posts.map(RecruitingPostDTO.RecruitingPostResponseDTO::from);
+        return posts.map(recruitingPost -> {
+            long dDay = checkDDay(recruitingPost);
+            return RecruitingPostDTO.RecruitingPostResponseDTO.from(recruitingPost,dDay);
+        });
+    }
+
+    public long checkDDay(RecruitingPost post) {
+        long dDay = post.getDDay();
+        recruitingPostRepository.save(post);
+        return dDay;
     }
 }

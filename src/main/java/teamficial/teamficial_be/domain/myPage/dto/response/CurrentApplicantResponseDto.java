@@ -28,8 +28,9 @@ public class CurrentApplicantResponseDto {
     private int totalApplicants;
     @Schema(description = "글 작성일", example="2025-10-28T06:38:03.179Z")
     private LocalDateTime createdAt;
+    private long dDay;
 
-    public static CurrentApplicantResponseDto of(RecruitingPost recruitingPost) {
+    public static CurrentApplicantResponseDto of(RecruitingPost recruitingPost,long dDay) {
         List<String> tags = recruitingPost.getRecruitingDetails().stream()
                 .map(recruitingDetail -> recruitingDetail.getPosition().getDescription())
                 .toList();
@@ -43,6 +44,7 @@ public class CurrentApplicantResponseDto {
                 .tags(tags)
                 .deadline(recruitingPost.getDeadline())
                 .createdAt(recruitingPost.getCreatedAt())
+                .dDay(dDay)
                 .build();
     }
 }

@@ -13,7 +13,7 @@ import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,5 +91,16 @@ public class RecruitingPost extends BaseEntity {
         if (dto.getStatus() != null) this.status = dto.getStatus();
         if (dto.getContent() != null) this.content = dto.getContent();
         if (dto.getTitle() != null) this.title = dto.getTitle();
+    }
+
+    public long getDDay(){
+        if (this.deadline == null) return -1L;
+
+        if (this.deadline.isBefore(LocalDate.now())) {
+            this.status = RecruitingStatus.CLOSED;
+            return 0L;
+        }
+
+        return ChronoUnit.DAYS.between(this.deadline, LocalDate.now());
     }
 }
