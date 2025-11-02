@@ -92,7 +92,6 @@ public class RecruitingPostService {
                 .orElseThrow(()-> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
     }
 
-
     @Transactional
     public RecruitingPostDTO.RecruitingPostModifyResponseDTO updatePost(Long userId, Long postId, RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
@@ -194,5 +193,7 @@ public class RecruitingPostService {
         });
     }
 
-
+    public List<RecruitingPost> getTop3ByUser(User user) {
+        return recruitingPostRepository.findTop3ByUserOrderByDeadlineAsc(user);
+    }
 }

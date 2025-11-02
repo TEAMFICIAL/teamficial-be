@@ -9,6 +9,7 @@ import teamficial.teamficial_be.domain.application.dto.response.ApplicationRespo
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicantResponseDto;
 import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicationDetailResponseDto;
+import teamficial.teamficial_be.domain.myPage.dto.response.DashboardResponseDto;
 import teamficial.teamficial_be.domain.myPage.dto.response.MyApplicationResponseDto;
 import teamficial.teamficial_be.domain.myPage.service.MypageService;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
@@ -23,6 +24,13 @@ import teamficial.teamficial_be.global.util.PagedResponse;
 public class MypageController {
 
     private final MypageService mypageService;
+
+    @GetMapping("/my-page/dashboard")
+    @Operation(summary = "마이페이지 대쉬보드 조회", description = "GUI 4.1에 해당하는 내가 지원한 팀 3개, 작성한 모집 글 3개를 불러오는 API입니다.")
+    public ApiResponse<DashboardResponseDto> getDashboard(@AuthenticationPrincipal AuthDetails authDetails) {
+        DashboardResponseDto responseDto = mypageService.getUserDashBoard(authDetails.user());
+        return ApiResponse.onSuccess(responseDto);
+    }
 
     @GetMapping("/my-page/applications")
     @Operation(summary = "내가 지원한 팀 리스트 조회하기", description = "마이페이지에서 내가 지원한 팀들을 조회하는 API입니다.")

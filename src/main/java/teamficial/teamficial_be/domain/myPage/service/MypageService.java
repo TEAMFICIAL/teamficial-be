@@ -13,6 +13,7 @@ import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicantResponseDto;
+import teamficial.teamficial_be.domain.myPage.dto.response.DashboardResponseDto;
 import teamficial.teamficial_be.domain.myPage.dto.response.MyApplicationResponseDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
@@ -123,4 +124,11 @@ public class MypageService {
         applicationService.saveApplication(application);
     }
 
+    @Transactional(readOnly = true)
+    public DashboardResponseDto getUserDashBoard(User user) {
+        List<RecruitingPost> recruitingPostList = recruitingPostService.getTop3ByUser(user);
+        List<Application> applicationList = applicationService.getTop3ByUser(user);
+
+        return DashboardResponseDto.of(applicationList,recruitingPostList);
+    }
 }
