@@ -61,7 +61,7 @@ public class RecruitingPostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "모집 글 단일 조회 API", description = "프로젝트 모집 글 단일 조회 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostDetailResponseDTO> getPost(
+    public ApiResponse<RecruitingPostDTO.RecruitingPostsResponseDTO> getPost(
             @PathVariable Long postId) {
 
         return ApiResponse.onSuccess(recruitingPostService.getPost(postId));

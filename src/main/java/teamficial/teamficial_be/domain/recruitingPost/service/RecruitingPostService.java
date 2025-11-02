@@ -21,6 +21,8 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 import teamficial.teamficial_be.global.enums.Position;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -139,7 +141,7 @@ public class RecruitingPostService {
     }
 
     @Transactional(readOnly = true)
-    public RecruitingPostDTO.RecruitingPostDetailResponseDTO getPost(Long postId) {
+    public RecruitingPostDTO.RecruitingPostsResponseDTO getPost(Long postId) {
 
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
@@ -150,7 +152,7 @@ public class RecruitingPostService {
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
 
-        return RecruitingPostDTO.RecruitingPostDetailResponseDTO.from(post, recruitingDetails,dDay);
+        return RecruitingPostDTO.RecruitingPostsResponseDTO.from(post, recruitingDetails,dDay);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
@@ -175,7 +177,7 @@ public class RecruitingPostService {
             ProgressWay progressWay,
             Pageable pageable) {
 
-        Page<RecruitingPost> posts =
+        Page<RecruitingPostDTO.RecruitingPostsResponseDTO> posts =
                 recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
 
         System.out.println("=== [DEBUG] 페이지네이션 결과 확인 ===");
@@ -187,9 +189,10 @@ public class RecruitingPostService {
         System.out.println("==============================");
 
 
-        return posts.map(recruitingPost -> {
-            long dDay = checkDDay(recruitingPost);
-            return RecruitingPostDTO.RecruitingPostsResponseDTO.from(recruitingPost, dDay);
+        return posts.map(dto -> {
+            long dDay = checkDDay(dto.getDeadline());
+            dto.setDDay(dDay);
+            return dto;
         });
     }
 
@@ -198,4 +201,17 @@ public class RecruitingPostService {
         recruitingPostRepository.save(post);
         return dDay;
     }
+
+    public long checkDDay(LocalDate deadline) {
+        if (deadline == null) return -1L;
+
+        // 마감일이 오늘보다 이전이면 마감 처리
+        if (deadline.isBefore(LocalDate.now())) {
+            return 0L;
+        }
+
+        // 남은 일수 계산 (오늘 기준)
+        return ChronoUnit.DAYS.between(LocalDate.now(), deadline);
+    }
+
 }

@@ -1,10 +1,8 @@
 package teamficial.teamficial_be.domain.recruitingPost.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.*;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
 import teamficial.teamficial_be.domain.recruitingPost.entity.Period;
@@ -57,6 +55,7 @@ public class RecruitingPostDTO {
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
@@ -109,29 +108,36 @@ public class RecruitingPostDTO {
         }
 
         public static RecruitingPostsResponseDTO from(RecruitingPost post, long dDay) {
-            System.out.println("=== [DEBUG 3] from(post, dDay) 내부 진입 ===");
-            System.out.println("RecruitingPost class: " + post.getClass().getName());
-
-            // 프로필 상태 확인
-            System.out.println("isInitialized(profile): " + org.hibernate.Hibernate.isInitialized(post.getProfile()));
-            System.out.println("profile class: " + post.getProfile().getClass().getName());
-
-            // recruitingDetails 상태 확인
-            System.out.println("isInitialized(recruitingDetails): " + org.hibernate.Hibernate.isInitialized(post.getRecruitingDetails()));
-            System.out.println("recruitingDetails class: " + post.getRecruitingDetails().getClass().getName());
-
-            // 실제 접근 시도 (여기서 쿼리가 발생할 수 있음)
-            try {
-                int size = post.getRecruitingDetails().size();
-                System.out.println("recruitingDetails size: " + size + " ✅ 접근 성공");
-            } catch (Exception e) {
-                System.out.println("recruitingDetails 접근 중 예외 ❌: " + e.getClass().getSimpleName() + " - " + e.getMessage());
-            }
-
-            System.out.println("=========================================");
-
-            // 이 호출이 N+1 쿼리 발생 구간인지 확인
             return from(post, post.getRecruitingDetails(), dDay);
+        }
+
+        @QueryProjection
+        public RecruitingPostsResponseDTO(
+                Long postId,
+                String userName,
+                String profileImageUrl,
+                ProgressWay progressWay,
+                String contactWay,
+                LocalDate startDate,
+                Period period,
+                LocalDate deadline,
+                RecruitingStatus status,
+                String content,
+                String title,
+                LocalDateTime createdAt
+        ) {
+            this.postId = postId;
+            this.userName = userName;
+            this.profileImageUrl = profileImageUrl;
+            this.progressWay = progressWay;
+            this.contactWay = contactWay;
+            this.startDate = startDate;
+            this.period = period;
+            this.deadline = deadline;
+            this.status = status;
+            this.content = content;
+            this.title = title;
+            this.createdAt = createdAt;
         }
     }
 
