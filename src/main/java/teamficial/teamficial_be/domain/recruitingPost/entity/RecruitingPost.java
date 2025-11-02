@@ -97,6 +97,20 @@ public class RecruitingPost extends BaseEntity {
         if (this.deadline.isBefore(LocalDate.now())) {
             return -1L;
         }
+
         return ChronoUnit.DAYS.between(this.deadline, LocalDate.now());
     }
+
+    public static long checkDDay(LocalDate deadline) {
+        if (deadline == null) return -1L;
+
+        if (deadline.isBefore(LocalDate.now())) {
+            return 0L;
+        }
+
+        // 남은 일수 계산 (오늘 기준)
+        return ChronoUnit.DAYS.between(LocalDate.now(), deadline);
+    }
+
+
 }

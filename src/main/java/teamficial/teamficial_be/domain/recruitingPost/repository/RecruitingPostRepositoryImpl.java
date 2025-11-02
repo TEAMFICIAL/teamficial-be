@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.QRecruitingDetail;
+import teamficial.teamficial_be.domain.recruitingPost.dto.QRecruitingPostDTO_RecruitingPostsResponseDTO;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.QRecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
@@ -22,7 +24,7 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<RecruitingPost> findByFilters(
+    public Page<RecruitingPostDTO.RecruitingPostsResponseDTO> findByFilters(
             RecruitingStatus status,
             Position position,
             ProgressWay progressWay,
@@ -36,18 +38,36 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
         if (progressWay != null) builder.and(post.progressWay.eq(progressWay));
         if (position != null) builder.and(postDetail.position.eq(position));
 
-        List<RecruitingPost> content = queryFactory
-                .selectFrom(post)
-                .leftJoin(post.profile).fetchJoin()
-                .leftJoin(post.recruitingDetails, postDetail).fetchJoin()
+        List<RecruitingPostDTO.RecruitingPostsResponseDTO> content = queryFactory
+                .select(new QRecruitingPostDTO_RecruitingPostsResponseDTO(
+                        post.id,
+                        post.profile.userName,
+                        post.profile.profileImage,
+                        post.progressWay,
+                        post.contactWay,
+                        post.startDate,
+                        post.period,
+                        post.deadline,
+                        post.status,
+                        post.content,
+                        post.title,
+                        post.createdAt
+                ))
+                .from(post)
+                .distinct()
+                .leftJoin(post.recruitingDetails, postDetail)
                 .where(builder)
                 .orderBy(post.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = content.size();
+        Long total = queryFactory
+                .select(Wildcard.count)
+                .from(post)
+                .where(builder)
+                .fetchOne();
 
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 }

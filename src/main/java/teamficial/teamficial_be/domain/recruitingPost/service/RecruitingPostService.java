@@ -30,12 +30,12 @@ public class RecruitingPostService {
 
     private final UserRepository userRepository;
     private final RecruitingPostRepository recruitingPostRepository;
-    private final ProfileRepository profileRepository; //프로필 여러개 있을때 고르는 과정 때문에 필요
+    private final ProfileRepository profileRepository;
     private final RecruitingDetailRepository recruitingDetailRepository;
 
 
     @Transactional
-    public RecruitingPostDTO.RecruitingPostResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+    public RecruitingPostDTO.RecruitingPostsResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         Profile profile = profileRepository.findById(dto.getProfileId())
@@ -67,7 +67,7 @@ public class RecruitingPostService {
 
         recruitingDetailRepository.saveAll(details);
 
-        return RecruitingPostDTO.RecruitingPostResponseDTO.from(saved, details,dDay);
+        return RecruitingPostDTO.RecruitingPostsResponseDTO.from(saved, details,dDay);
     }
 
     public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
@@ -139,7 +139,7 @@ public class RecruitingPostService {
     }
 
     @Transactional(readOnly = true)
-    public RecruitingPostDTO.RecruitingPostResponseDTO getPost(Long postId) {
+    public RecruitingPostDTO.RecruitingPostsResponseDTO getPost(Long postId) {
 
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
@@ -150,7 +150,7 @@ public class RecruitingPostService {
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
 
-        return RecruitingPostDTO.RecruitingPostResponseDTO.from(post, recruitingDetails,dDay);
+        return RecruitingPostDTO.RecruitingPostsResponseDTO.from(post, recruitingDetails,dDay);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
@@ -169,18 +169,30 @@ public class RecruitingPostService {
     }
 
 
-    public Page<RecruitingPostDTO.RecruitingPostResponseDTO> getRecruitingPosts(
+    public Page<RecruitingPostDTO.RecruitingPostsResponseDTO> getRecruitingPosts(
             RecruitingStatus status,
             Position position,
             ProgressWay progressWay,
             Pageable pageable) {
 
-        Page<RecruitingPost> posts =
+        Page<RecruitingPostDTO.RecruitingPostsResponseDTO> posts =
                 recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
 
-        return posts.map(recruitingPost -> {
-            long dDay = recruitingPost.getDDay();
-            return RecruitingPostDTO.RecruitingPostResponseDTO.from(recruitingPost,dDay);
+        System.out.println("=== [DEBUG] 페이지네이션 결과 확인 ===");
+        System.out.println("page number   : " + posts.getNumber());
+        System.out.println("page size     : " + posts.getSize());
+        System.out.println("total elements: " + posts.getTotalElements());
+        System.out.println("total pages   : " + posts.getTotalPages());
+        System.out.println("content count : " + posts.getContent().size());
+        System.out.println("==============================");
+
+
+        return posts.map(dto -> {
+            long dDay = RecruitingPost.checkDDay(dto.getDeadline());
+            dto.setDDay(dDay);
+            return dto;
         });
     }
+
+
 }

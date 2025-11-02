@@ -6,17 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
-import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
-import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
-import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.enums.Position;
 import teamficial.teamficial_be.global.security.AuthDetails;
 import teamficial.teamficial_be.global.util.GlobalAuthUtil;
@@ -30,7 +26,7 @@ public class RecruitingPostController {
 
     @PostMapping
     @Operation(summary = "모집 글 작성 API", description = "프로젝트 모집 글 작성 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostResponseDTO> createPost(
+    public ApiResponse<RecruitingPostDTO.RecruitingPostsResponseDTO> createPost(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody RecruitingPostDTO.RecruitingPostRequestDTO dto) {
 
@@ -65,7 +61,7 @@ public class RecruitingPostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "모집 글 단일 조회 API", description = "프로젝트 모집 글 단일 조회 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostResponseDTO> getPost(
+    public ApiResponse<RecruitingPostDTO.RecruitingPostsResponseDTO> getPost(
             @PathVariable Long postId) {
 
         return ApiResponse.onSuccess(recruitingPostService.getPost(postId));
@@ -73,7 +69,7 @@ public class RecruitingPostController {
 
     @GetMapping
     @Operation(summary = "모집 글 전체 조회 API", description = "프로젝트 모집 글 전체 조회 API입니다.")
-    public ApiResponse<Page<RecruitingPostDTO.RecruitingPostResponseDTO>> getRecruitingPosts(
+    public ApiResponse<Page<RecruitingPostDTO.RecruitingPostsResponseDTO>> getRecruitingPosts(
             @RequestParam(required = false) RecruitingStatus status,
             @RequestParam(required = false) Position position,
             @RequestParam(required = false) ProgressWay progressWay,
