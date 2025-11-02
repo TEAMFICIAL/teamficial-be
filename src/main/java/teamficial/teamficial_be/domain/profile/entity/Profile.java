@@ -45,7 +45,7 @@ public class Profile extends BaseEntity {
     @Column(name = "working_time", nullable = false)
     private WorkingTime workingTime;
 
-    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<ProfileLink> profileLinks= new ArrayList<>();
 

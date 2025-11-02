@@ -14,11 +14,13 @@ public class ProfileLink {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
     @Column(name = "link", length = 255)
     private String link;
+
+
 
 }

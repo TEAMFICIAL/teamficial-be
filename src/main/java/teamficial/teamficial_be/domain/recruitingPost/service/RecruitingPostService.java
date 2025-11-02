@@ -35,7 +35,7 @@ public class RecruitingPostService {
 
 
     @Transactional
-    public RecruitingPostDTO.RecruitingPostResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+    public RecruitingPostDTO.RecruitingPostsResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         Profile profile = profileRepository.findById(dto.getProfileId())
@@ -67,7 +67,7 @@ public class RecruitingPostService {
 
         recruitingDetailRepository.saveAll(details);
 
-        return RecruitingPostDTO.RecruitingPostResponseDTO.from(saved, details,dDay);
+        return RecruitingPostDTO.RecruitingPostsResponseDTO.from(saved, details,dDay);
     }
 
     public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
@@ -139,7 +139,7 @@ public class RecruitingPostService {
     }
 
     @Transactional(readOnly = true)
-    public RecruitingPostDTO.RecruitingPostResponseDTO getPost(Long postId) {
+    public RecruitingPostDTO.RecruitingPostDetailResponseDTO getPost(Long postId) {
 
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
@@ -150,7 +150,7 @@ public class RecruitingPostService {
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
 
-        return RecruitingPostDTO.RecruitingPostResponseDTO.from(post, recruitingDetails,dDay);
+        return RecruitingPostDTO.RecruitingPostDetailResponseDTO.from(post, recruitingDetails,dDay);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
@@ -169,7 +169,7 @@ public class RecruitingPostService {
     }
 
 
-    public Page<RecruitingPostDTO.RecruitingPostResponseDTO> getRecruitingPosts(
+    public Page<RecruitingPostDTO.RecruitingPostsResponseDTO> getRecruitingPosts(
             RecruitingStatus status,
             Position position,
             ProgressWay progressWay,
@@ -178,9 +178,18 @@ public class RecruitingPostService {
         Page<RecruitingPost> posts =
                 recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
 
+        System.out.println("=== [DEBUG] 페이지네이션 결과 확인 ===");
+        System.out.println("page number   : " + posts.getNumber());
+        System.out.println("page size     : " + posts.getSize());
+        System.out.println("total elements: " + posts.getTotalElements());
+        System.out.println("total pages   : " + posts.getTotalPages());
+        System.out.println("content count : " + posts.getContent().size());
+        System.out.println("==============================");
+
+
         return posts.map(recruitingPost -> {
             long dDay = checkDDay(recruitingPost);
-            return RecruitingPostDTO.RecruitingPostResponseDTO.from(recruitingPost,dDay);
+            return RecruitingPostDTO.RecruitingPostsResponseDTO.from(recruitingPost, dDay);
         });
     }
 
