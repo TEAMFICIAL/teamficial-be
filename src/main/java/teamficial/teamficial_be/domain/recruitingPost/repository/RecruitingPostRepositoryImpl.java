@@ -41,6 +41,7 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
         List<RecruitingPostDTO.RecruitingPostsResponseDTO> content = queryFactory
                 .select(new QRecruitingPostDTO_RecruitingPostsResponseDTO(
                         post.id,
+                        post.profile.id,
                         post.profile.userName,
                         post.profile.profileImage,
                         post.progressWay,
