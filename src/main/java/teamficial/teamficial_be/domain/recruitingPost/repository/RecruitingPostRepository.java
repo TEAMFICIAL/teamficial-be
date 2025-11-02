@@ -2,6 +2,7 @@ package teamficial.teamficial_be.domain.recruitingPost.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,15 +21,11 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "WHERE rp.id = :id")
     Optional<RecruitingPost> findByIdWithProfile(@Param("id") Long id);
 
-    @Query("SELECT rp FROM RecruitingPost rp " +
-            "LEFT JOIN FETCH rp.applications " +
-            "WHERE rp.profile.user.id = :userId")
-    Page<RecruitingPost> findAllByProfile_User_Id(Long userId, Pageable pageable);
+    @EntityGraph(attributePaths = {"user"})
+    Page<RecruitingPost> findAllByUser(User user, Pageable pageable);
 
-    @Query("SELECT rp FROM RecruitingPost rp " +
-            "LEFT JOIN FETCH rp.applications " +
-            "WHERE rp.profile.user.id = :userId AND rp.status = :recruitingStatus")
-    Page<RecruitingPost> findAllByProfile_User_IdAndStatus(Long userId, Pageable pageable, RecruitingStatus recruitingStatus);
+    @EntityGraph(attributePaths = {"user"})
+    Page<RecruitingPost> findAllByUserAndStatus(User user, Pageable pageable, RecruitingStatus recruitingStatus);
 
     List<RecruitingPost> findTop3ByUserOrderByDeadlineAsc(User user);
 }
