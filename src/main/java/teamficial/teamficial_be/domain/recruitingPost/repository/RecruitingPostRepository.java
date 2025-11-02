@@ -27,5 +27,11 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
     @EntityGraph(attributePaths = {"user"})
     Page<RecruitingPost> findAllByUserAndStatus(User user, Pageable pageable, RecruitingStatus recruitingStatus);
 
-    List<RecruitingPost> findTop3ByUserOrderByDeadlineAsc(User user);
+    @Query("SELECT rp FROM RecruitingPost rp " +
+            "JOIN FETCH rp.user " +
+            //"LEFT JOIN FETCH rp.profile " +
+            "WHERE rp.user = :user " +
+            "ORDER BY rp.deadline ASC " +
+            "LIMIT 3")
+    List<RecruitingPost> findTop3ByUserOrderByDeadlineAsc(@Param("user") User user);
 }
