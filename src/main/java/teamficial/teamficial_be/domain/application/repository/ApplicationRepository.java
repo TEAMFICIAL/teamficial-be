@@ -24,4 +24,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     @EntityGraph(attributePaths = {"user"})
     Page<Application> findAllByUserAndApplicationStatus(User user, Pageable pageable, ApplicationStatus status);
+
+    List<Application> findTop3ByUserOrderByCreatedAtDesc(User user);
 }

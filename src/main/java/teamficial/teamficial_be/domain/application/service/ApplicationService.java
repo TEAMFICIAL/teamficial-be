@@ -92,4 +92,8 @@ public class ApplicationService {
     public void saveApplications(List<Application> applications) {
         applicationRepository.saveAll(applications);
     }
+
+    public List<Application> getTop3ByUser(User user) {
+        return applicationRepository.findTop3ByUserOrderByCreatedAtDesc(user);
+    }
 }
