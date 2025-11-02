@@ -159,11 +159,11 @@ public class RecruitingPostService {
         }
     }
 
-    public Page<RecruitingPost> getAllRecruitingPostsByUserAndStatus(Long userId, Pageable pageable,RecruitingStatus recruitingStatus) {
+    public Page<RecruitingPost> getAllRecruitingPostsByUserAndStatus(User user, Pageable pageable,RecruitingStatus recruitingStatus) {
         if (recruitingStatus ==null){
-            return recruitingPostRepository.findAllByProfile_User_Id(userId,pageable);
+            return recruitingPostRepository.findAllByUser(user,pageable);
         } else {
-            return recruitingPostRepository.findAllByProfile_User_IdAndStatus(userId,pageable,recruitingStatus);
+            return recruitingPostRepository.findAllByUserAndStatus(user,pageable,recruitingStatus);
         }
     }
 

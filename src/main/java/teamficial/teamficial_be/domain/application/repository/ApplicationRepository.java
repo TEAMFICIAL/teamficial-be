@@ -19,11 +19,17 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     List<Application> findAllByRecruitingPost(RecruitingPost recruitingPost);
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user", "profile"})
     Page<Application> findAllByUser(User user, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user", "profile"})
     Page<Application> findAllByUserAndApplicationStatus(User user, Pageable pageable, ApplicationStatus status);
 
+    @Query("SELECT ap FROM Application ap " +
+            "JOIN FETCH ap.user " +
+            "LEFT JOIN FETCH ap.profile " +
+            "WHERE ap.user = :user " +
+            "ORDER BY ap.createdAt DESC " +
+            "LIMIT 3")
     List<Application> findTop3ByUserOrderByCreatedAtDesc(User user);
 }

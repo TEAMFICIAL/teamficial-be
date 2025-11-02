@@ -51,7 +51,7 @@ public class MypageService {
     public PagedResponse<CurrentApplicantResponseDto> getAllCurrentApplication(User user, int page, int size, RecruitingStatus recruitingStatus) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "deadline"));
 
-        Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUserAndStatus(user.getId(),pageable,recruitingStatus);
+        Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUserAndStatus(user,pageable,recruitingStatus);
 
         Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage.map(recruitingPost -> {
             long dDay = recruitingPost.getDDay();
