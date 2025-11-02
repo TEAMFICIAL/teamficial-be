@@ -51,7 +51,7 @@ public class ApplicationService {
                 .profile(profile)
                 .recruitingPost(recruitingPost)
                 .content(req.getContent())
-                .applicationStatus(ApplicationStatus.OPEN)
+                .applicationStatus(ApplicationStatus.MATCHING)
                 .build();
 
         Application saved = applicationRepository.save(application);

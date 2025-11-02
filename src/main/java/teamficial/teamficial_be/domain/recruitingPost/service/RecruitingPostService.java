@@ -21,8 +21,6 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 import teamficial.teamficial_be.global.enums.Position;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +30,7 @@ public class RecruitingPostService {
 
     private final UserRepository userRepository;
     private final RecruitingPostRepository recruitingPostRepository;
-    private final ProfileRepository profileRepository; //프로필 여러개 있을때 고르는 과정 때문에 필요
+    private final ProfileRepository profileRepository;
     private final RecruitingDetailRepository recruitingDetailRepository;
 
 
@@ -56,7 +54,7 @@ public class RecruitingPostService {
                 .title(dto.getTitle())
                 .build();
 
-        long dDay = checkDDay(post);
+        long dDay = post.getDDay();
         RecruitingPost saved = recruitingPostRepository.save(post);
 
         List<RecruitingDetail> details = dto.getRecruitingPositions().stream()
@@ -146,7 +144,7 @@ public class RecruitingPostService {
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
 
-        long dDay = checkDDay(post);
+        long dDay = post.getDDay();
 
         List<RecruitingDetail> recruitingDetails =
                 recruitingDetailRepository.findByRecruitingPostId(postId);
@@ -190,28 +188,11 @@ public class RecruitingPostService {
 
 
         return posts.map(dto -> {
-            long dDay = checkDDay(dto.getDeadline());
+            long dDay = RecruitingPost.checkDDay(dto.getDeadline());
             dto.setDDay(dDay);
             return dto;
         });
     }
 
-    public long checkDDay(RecruitingPost post) {
-        long dDay = post.getDDay();
-        recruitingPostRepository.save(post);
-        return dDay;
-    }
-
-    public long checkDDay(LocalDate deadline) {
-        if (deadline == null) return -1L;
-
-        // 마감일이 오늘보다 이전이면 마감 처리
-        if (deadline.isBefore(LocalDate.now())) {
-            return 0L;
-        }
-
-        // 남은 일수 계산 (오늘 기준)
-        return ChronoUnit.DAYS.between(LocalDate.now(), deadline);
-    }
 
 }
