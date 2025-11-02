@@ -21,15 +21,15 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "WHERE rp.id = :id")
     Optional<RecruitingPost> findByIdWithProfile(@Param("id") Long id);
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user", "profile"})
     Page<RecruitingPost> findAllByUser(User user, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user", "profile"})
     Page<RecruitingPost> findAllByUserAndStatus(User user, Pageable pageable, RecruitingStatus recruitingStatus);
 
     @Query("SELECT rp FROM RecruitingPost rp " +
             "JOIN FETCH rp.user " +
-            //"LEFT JOIN FETCH rp.profile " +
+            "LEFT JOIN FETCH rp.profile " +
             "WHERE rp.user = :user " +
             "ORDER BY rp.deadline ASC " +
             "LIMIT 3")
