@@ -2,9 +2,11 @@ package teamficial.teamficial_be.domain.recruitingPost.repository;
 
 import com.amazonaws.event.request.Progress;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +19,15 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.global.enums.Position;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+
 
     @Override
     public Page<RecruitingPostDTO.RecruitingPostsResponseDTO> findByFilters(
@@ -62,6 +68,43 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        List<Long> postIds = content.stream()
+                        .map(RecruitingPostDTO.RecruitingPostsResponseDTO::getPostId)
+                        .toList();
+
+        if (postIds.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+
+        Map<Long, List<RecruitingPostDTO.RecruitingPositionDTO>> positionMap = queryFactory
+                .select(Projections.constructor(RecruitingPostDTO.RecruitingPositionQueryDTO.class,
+                        postDetail.recruitingPost.id,
+                        postDetail.position,
+                        postDetail.count))
+                .from(postDetail)
+                .where(postDetail.recruitingPost.id.in(postIds))
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(RecruitingPostDTO.RecruitingPositionQueryDTO::getPostId))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream()
+                                .map(p -> RecruitingPostDTO.RecruitingPositionDTO.builder()
+                                        .position(p.getPosition())
+                                        .count(p.getCount())
+                                        .build())
+                                .toList()
+                ));
+
+        content.forEach(dto ->
+                dto.setRecruitingPositions(
+                        positionMap.getOrDefault(dto.getPostId(), Collections.emptyList())
+                )
+        );
+
 
         Long total = queryFactory
                 .select(Wildcard.count)

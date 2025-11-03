@@ -55,6 +55,16 @@ public class RecruitingPostDTO {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecruitingPositionQueryDTO {
+        private Long postId;
+        private Position position;
+        private Integer count;
+
+    }
+
+    @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
