@@ -11,6 +11,8 @@ public class LoginResponseDTO {
     public static class LoginTokenResponseDto {
         @Schema(description = "사용자 id", example="1")
         private Long userId;
+        @Schema(description = "사용자 이름", example="연호")
+        private String userName;
         @Schema(description = "사용자 accessToken", example="exksoijsdjon...")
         private String accessToken;
         @Schema(description = "사용자 refreshToken", example="exjnasoicjkdd...")
@@ -20,9 +22,10 @@ public class LoginResponseDTO {
         @Schema(description = "사용자 최초 로그인 여부(처음이면 true)", example="true")
         private boolean isFirst;
 
-        public static LoginTokenResponseDto of(Long userId,String accessToken,String refreshToken,String uuid,boolean isFirst) {
+        public static LoginTokenResponseDto of(Long userId,String userName,String accessToken,String refreshToken,String uuid,boolean isFirst) {
             return new LoginTokenResponseDto(
                     userId,
+                    userName,
                     accessToken,
                     refreshToken,
                     uuid,
