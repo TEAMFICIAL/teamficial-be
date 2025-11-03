@@ -107,8 +107,9 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
 
 
         Long total = queryFactory
-                .select(Wildcard.count)
+                .select(post.id.countDistinct())
                 .from(post)
+                .leftJoin(post.recruitingDetails, postDetail)
                 .where(builder)
                 .fetchOne();
 
