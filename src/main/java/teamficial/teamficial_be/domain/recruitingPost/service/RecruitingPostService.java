@@ -1,6 +1,8 @@
 package teamficial.teamficial_be.domain.recruitingPost.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
+import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -70,6 +72,7 @@ public class RecruitingPostService {
         return RecruitingPostDTO.RecruitingPostsResponseDTO.from(saved, details,dDay);
     }
 
+
     public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
@@ -137,6 +140,7 @@ public class RecruitingPostService {
 
     }
 
+
     @Transactional(readOnly = true)
     public RecruitingPostDTO.RecruitingPostsResponseDTO getPost(Long postId) {
 
@@ -176,15 +180,6 @@ public class RecruitingPostService {
 
         Page<RecruitingPostDTO.RecruitingPostsResponseDTO> posts =
                 recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
-
-        System.out.println("=== [DEBUG] 페이지네이션 결과 확인 ===");
-        System.out.println("page number   : " + posts.getNumber());
-        System.out.println("page size     : " + posts.getSize());
-        System.out.println("total elements: " + posts.getTotalElements());
-        System.out.println("total pages   : " + posts.getTotalPages());
-        System.out.println("content count : " + posts.getContent().size());
-        System.out.println("==============================");
-
 
         return posts.map(dto -> {
             long dDay = RecruitingPost.checkDDay(dto.getDeadline());
