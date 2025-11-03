@@ -93,6 +93,7 @@ public class AuthService {
 
         return LoginResponseDTO.LoginTokenResponseDto.of(
                 user.getId(),
+                user.getName(),
                 tokenResponse.getAccessToken(),
                 tokenResponse.getRefreshToken(),
                 user.getUuid(),
