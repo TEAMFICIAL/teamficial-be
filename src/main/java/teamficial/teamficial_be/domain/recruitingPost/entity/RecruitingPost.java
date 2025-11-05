@@ -98,7 +98,7 @@ public class RecruitingPost extends BaseEntity {
             return -1L;
         }
 
-        return ChronoUnit.DAYS.between(this.deadline, LocalDate.now());
+        return ChronoUnit.DAYS.between(LocalDate.now(), this.deadline);
     }
 
     public static long checkDDay(LocalDate deadline) {
