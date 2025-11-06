@@ -22,6 +22,8 @@ public class MyApplicationResponseDto {
     private String title;
     @Schema(description = "모집 글의 모집 파트", example="[\"프론트엔드\",\n\"백엔드\"]")
     private List<String> tags;
+    @Schema(description = "프로젝트 진행 방식", example="온/오프라인")
+    private String progressWay;
     @Schema(description = "지원 상태", example="참여 확정")
     private String status;
     @Schema(description = "프로젝트 진행 기간", example="1개월 이내")
@@ -43,6 +45,7 @@ public class MyApplicationResponseDto {
                 .status(applicationStatus)
                 .profileImage(recruitingPost.getProfile().getProfileImage())
                 .tags(tags)
+                .progressWay(recruitingPost.getProgressWay().getDescription())
                 .period(recruitingPost.getPeriod().getDescription())
                 .deadline(recruitingPost.getDeadline())
                 .createdAt(recruitingPost.getCreatedAt())
