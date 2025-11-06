@@ -19,14 +19,17 @@ public class ApplicantListResponseDto {
     private String profilePosition;
     @Schema(description = "지원자 프로필 사진")
     private String profileImage;
+    @Schema(description = "지원 상태", example="매칭 성공")
+    private String applicationStatus;
 
-    public static ApplicantListResponseDto from(Long applicationId, Profile profile, Position position) {
+    public static ApplicantListResponseDto from(Long applicationId,String applicationStatus, Profile profile, Position position) {
         return ApplicantListResponseDto.builder()
                 .applicationId(applicationId)
                 .profileId(profile.getId())
                 .applicantName(profile.getUserName())
                 .profileImage(profile.getProfileImage())
                 .profilePosition(position.getDescription())
+                .applicationStatus(applicationStatus)
                 .build();
     }
 }
