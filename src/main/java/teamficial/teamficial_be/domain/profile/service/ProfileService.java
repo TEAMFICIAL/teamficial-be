@@ -28,7 +28,6 @@ public class ProfileService {
         Profile profile = Profile.builder()
                 .user(user)
                 .userName(user.getName())
-                .position(requestDto.getPosition())
                 .workingTime(requestDto.getWorkingTime())
                 .profileName(requestDto.getProfileName())
                 .contactWay(requestDto.getContactWay())

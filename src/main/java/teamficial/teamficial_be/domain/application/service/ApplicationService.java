@@ -49,6 +49,7 @@ public class ApplicationService {
         Application application = Application.builder()
                 .user(user)
                 .profile(profile)
+                .position(req.getPosition())
                 .recruitingPost(recruitingPost)
                 .content(req.getContent())
                 .applicationStatus(ApplicationStatus.MATCHING)
@@ -58,6 +59,7 @@ public class ApplicationService {
 
         return ApplicationDTO.ApplicationResponseDTO.builder()
                 .applicationId(saved.getId())
+                .position(saved.getPosition())
                 .status(saved.getApplicationStatus().name())
                 .userId(saved.getUser().getId())
                 .profileId(saved.getProfile().getId())

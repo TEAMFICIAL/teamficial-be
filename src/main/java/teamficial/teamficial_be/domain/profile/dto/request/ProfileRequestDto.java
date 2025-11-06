@@ -14,9 +14,6 @@ public class ProfileRequestDto {
     @Schema(description = "프로필 이름", example="1")
     @NotBlank(message = "프로필 이름은 필수입니다.")
     private String profileName;
-    @Schema(description = "프로필 파트", example="FRONTEND")
-    @NotNull(message = "파트는 필수입니다.")
-    private Position position;
     @Schema(description = "근무 시간대", example="MORNING")
     @NotNull(message = "근무 시간대는 필수입니다.")
     private WorkingTime workingTime;

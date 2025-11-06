@@ -26,8 +26,6 @@ public class ProfileResponseDto {
     private String profileImageUrl;
     @Schema(description = "프로필 이름", example="1")
     private String profileName;
-    @Schema(description = "프로필 파트", example="프론트엔드")
-    private String position;
     @Schema(description = "근무 시간대", example="아침")
     private String workingTime;
     @Schema(description = "관련 링크")
@@ -48,7 +46,6 @@ public class ProfileResponseDto {
                 .userName(profile.getUserName())
                 .profileName(profile.getProfileName())
                 .profileImageUrl(profile.getProfileImage())
-                .position(profile.getPosition().getDescription())
                 .workingTime(profile.getWorkingTime().getDescription())
                 .links(linkList)
                 .contactWay(profile.getContactWay())

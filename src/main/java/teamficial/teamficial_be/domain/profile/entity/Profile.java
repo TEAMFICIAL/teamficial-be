@@ -38,10 +38,6 @@ public class Profile extends BaseEntity {
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "position", nullable = false)
-    private Position position;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "working_time", nullable = false)
     private WorkingTime workingTime;
 
@@ -54,7 +50,6 @@ public class Profile extends BaseEntity {
 
     public void update(ProfileRequestDto dto) {
         this.profileName = dto.getProfileName();
-        this.position = dto.getPosition();
         this.workingTime = dto.getWorkingTime();
         this.contactWay = dto.getContactWay();
     }

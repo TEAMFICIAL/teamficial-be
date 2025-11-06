@@ -73,7 +73,7 @@ public class MypageService {
 
         if (position != null) {
             applications = applications.stream()
-                    .filter(application -> application.getProfile().getPosition() == position)
+                    .filter(application -> application.getPosition() == position)
                     .toList();
         }
         recruitingPost.getDDay();
