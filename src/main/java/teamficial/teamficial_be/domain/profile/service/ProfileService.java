@@ -23,7 +23,10 @@ public class ProfileService {
 
     @Transactional
     public ProfileResponseDto createProfile(User user, ProfileRequestDto requestDto, String objectKey){
-        String imageUrl = preSignedUrlService.getPublicUrl(objectKey);
+        String imageUrl=null;
+        if (objectKey != null && !objectKey.isEmpty()) {
+            imageUrl = preSignedUrlService.getPublicUrl(objectKey);
+        }
 
         Profile profile = Profile.builder()
                 .user(user)
