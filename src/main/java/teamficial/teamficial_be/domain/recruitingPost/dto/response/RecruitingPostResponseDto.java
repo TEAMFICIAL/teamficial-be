@@ -31,6 +31,8 @@ public class RecruitingPostResponseDto {
     private LocalDate deadline;
     @Schema(description = "모집 분야/인원", example="[\"프론트엔드 3명\",\n\"백엔드 3명\"]")
     private List<String> recruitingDetails;
+    @Schema(description = "글 작성일", example="2025-10-28T06:38:03.179Z")
+    private LocalDateTime createdAt;
     private long dDay;
 
     public static RecruitingPostResponseDto from(RecruitingPost recruitingPost, long dDay) {
@@ -48,6 +50,7 @@ public class RecruitingPostResponseDto {
                         .toList()
                 )
                 .dDay(dDay)
+                .createdAt(recruitingPost.getCreatedAt())
                 .build();
     }
 }
