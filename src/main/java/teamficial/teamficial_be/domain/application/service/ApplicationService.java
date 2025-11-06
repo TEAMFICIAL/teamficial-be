@@ -35,6 +35,10 @@ public class ApplicationService {
         Profile profile = profileRepository.findById(req.getProfileId())
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE));
 
+        if (!profile.getUser().getId().equals(userId)) {
+            throw new GeneralException(ErrorStatus._FORBIDDEN);
+        }
+
         RecruitingPost recruitingPost = recruitingPostRepository.findById(req.getRecruitingPostId())
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
 
