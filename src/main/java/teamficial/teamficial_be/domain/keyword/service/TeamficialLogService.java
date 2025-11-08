@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.keyword.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import teamficial.teamficial_be.global.util.ScrollResponse;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TeamficialLogService {
@@ -48,7 +50,7 @@ public class TeamficialLogService {
 
         Profile profile = profileService.getProfileById(profileId);
 
-        if (!profile.getUser().equals(user)) {
+        if (!profile.getUser().getId().equals(user.getId())) {
             throw new GeneralException(ErrorStatus.PROFILE_FORBIDDEN);
         }
 
@@ -62,16 +64,16 @@ public class TeamficialLogService {
 
                 Keyword keyword = keywordService.getKeywordById(keywordId);
                 keyword.updateHead();
+                keywordService.saveKeyword(keyword);
 
                 HeadKeyword headKeyword = HeadKeyword.builder()
                         .profile(profile)
                         .keywordName(keyword.getKeywordName())
                         .build();
 
-                headKeywordService.save(headKeyword);
-                keywordService.saveKeyword(keyword);
-
                 profile.getHeadKeywords().add(headKeyword);
+                log.info("headKeyword: {}", headKeyword.getKeywordName());
+
             }
         }
 
@@ -84,7 +86,7 @@ public class TeamficialLogService {
     public PagedResponse<KeywordResponseDto> getKeywordList(Long userId, int page, int size) {
         User user = userService.getUserById(userId);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<Keyword> keywordPage = keywordService.getAllKeywordByUser(user,pageable);
 
@@ -97,7 +99,7 @@ public class TeamficialLogService {
     public ScrollResponse<KeywordCommentResponseDto> getKeywordCommentList(Long keywordId, int page, int size) {
         Keyword keyword = keywordService.getKeywordById(keywordId);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Slice<KeywordComment> keywordComments = keywordCommentService.getAllByKeyword(keyword,pageable);
 

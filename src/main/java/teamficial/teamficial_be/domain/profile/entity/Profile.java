@@ -47,7 +47,6 @@ public class Profile extends BaseEntity {
     private List<ProfileLink> profileLinks= new ArrayList<>();
 
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
     private List<HeadKeyword> headKeywords= new ArrayList<>();
 
     @Column(name = "contact_way", length = 255)
