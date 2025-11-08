@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
@@ -45,6 +46,10 @@ public class Profile extends BaseEntity {
     @Builder.Default
     private List<ProfileLink> profileLinks= new ArrayList<>();
 
+    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<HeadKeyword> headKeywords= new ArrayList<>();
+
     @Column(name = "contact_way", length = 255)
     private String contactWay;
 
@@ -72,4 +77,5 @@ public class Profile extends BaseEntity {
     public void clearLinks() {
         this.profileLinks.clear();
     }
+
 }

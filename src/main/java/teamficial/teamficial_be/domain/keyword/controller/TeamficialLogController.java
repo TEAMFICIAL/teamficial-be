@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import teamficial.teamficial_be.domain.keyword.dto.HeadKeywordRequestDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.HeadKeywordResponseDto;
 import teamficial.teamficial_be.domain.keyword.service.TeamficialLogService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
@@ -21,6 +23,14 @@ public class TeamficialLogController {
     @Operation(summary = "프로필의 대표 키워드 조회하기", description = "해당 프로필의 대표 키워드를 조회하는 api입니다.")
     public ApiResponse<HeadKeywordResponseDto> getHeadKeyword(@PathVariable("profileId") Long profileId, @AuthenticationPrincipal AuthDetails authDetails) {
         HeadKeywordResponseDto responseDto = teamficialLogService.getHeadKeyword(authDetails.user(),profileId);
+        return ApiResponse.onSuccess(responseDto);
+    }
+
+    @PutMapping("/teamficial-log/head-keyword/{profileId}")
+    @Operation(summary = "대표 키워드 선택하기", description = "해당 프로필의 대표 키워드를 선택하는 api입니다.")
+    public ApiResponse<HeadKeywordResponseDto> updateHeadKeyword(@PathVariable("profileId") Long profileId, HeadKeywordRequestDto requestDto, @AuthenticationPrincipal AuthDetails authDetails) {
+        HeadKeywordResponseDto responseDto = teamficialLogService.updateHeadKeyword(authDetails.user(),profileId,requestDto);
+
         return ApiResponse.onSuccess(responseDto);
     }
 }
