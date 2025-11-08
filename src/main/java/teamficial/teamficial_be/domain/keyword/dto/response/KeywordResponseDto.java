@@ -6,14 +6,14 @@ import teamficial.teamficial_be.domain.keyword.entity.Keyword;
 
 @Getter
 @Builder
-public class KeywordListResponseDto {
+public class KeywordResponseDto {
     Long keywordId;
     String keywordName;
     boolean isHead;
     int count;
 
-    public static KeywordListResponseDto from(Keyword keyword) {
-        return KeywordListResponseDto.builder()
+    public static KeywordResponseDto from(Keyword keyword) {
+        return KeywordResponseDto.builder()
                 .keywordId(keyword.getId())
                 .keywordName(keyword.getKeywordName())
                 .isHead(keyword.is_head())

@@ -1,18 +1,16 @@
 package teamficial.teamficial_be.domain.keyword.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.keyword.dto.request.HeadKeywordRequestDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.HeadKeywordResponseDto;
-import teamficial.teamficial_be.domain.keyword.dto.response.KeywordListResponseDto;
+import teamficial.teamficial_be.domain.keyword.dto.response.KeywordCommentResponseDto;
+import teamficial.teamficial_be.domain.keyword.dto.response.KeywordResponseDto;
 import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.keyword.entity.Keyword;
-import teamficial.teamficial_be.domain.keyword.repository.HeadKeywordRepository;
+import teamficial.teamficial_be.domain.keyword.entity.KeywordComment;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.service.ProfileService;
 import teamficial.teamficial_be.domain.user.entity.User;
@@ -20,6 +18,7 @@ import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.util.PagedResponse;
+import teamficial.teamficial_be.global.util.ScrollResponse;
 
 import java.util.List;
 
@@ -32,6 +31,7 @@ public class TeamficialLogService {
     private final KeywordService keywordService;
     private final HeadKeywordService headKeywordService;
     private final UserService userService;
+    private final KeywordCommentService keywordCommentService;
 
     @Transactional(readOnly = true)
     public HeadKeywordResponseDto getHeadKeyword(User user, Long profileId) {
@@ -81,15 +81,28 @@ public class TeamficialLogService {
     }
 
     @Transactional(readOnly = true)
-    public PagedResponse<KeywordListResponseDto> getKeywordList(Long userId, int page, int size) {
+    public PagedResponse<KeywordResponseDto> getKeywordList(Long userId, int page, int size) {
         User user = userService.getUserById(userId);
 
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC);
 
         Page<Keyword> keywordPage = keywordService.getAllKeywordByUser(user,pageable);
 
-        Page<KeywordListResponseDto> dtoPage = keywordPage.map(KeywordListResponseDto::from);
+        Page<KeywordResponseDto> dtoPage = keywordPage.map(KeywordResponseDto::from);
 
         return PagedResponse.of(dtoPage);
+    }
+
+    @Transactional(readOnly = true)
+    public ScrollResponse<KeywordCommentResponseDto> getKeywordCommentList(Long keywordId, int page, int size) {
+        Keyword keyword = keywordService.getKeywordById(keywordId);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC);
+
+        Slice<KeywordComment> keywordComments = keywordCommentService.getAllByKeyword(keyword,pageable);
+
+        Slice<KeywordCommentResponseDto> dtoList = keywordComments.map(KeywordCommentResponseDto::from);
+
+        return ScrollResponse.of(dtoList);
     }
 }
