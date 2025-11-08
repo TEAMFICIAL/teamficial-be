@@ -135,4 +135,8 @@ public class ProfileService {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
         }
     }
+
+    public void saveProfile(Profile profile) {
+        profileRepository.save(profile);
+    }
 }
