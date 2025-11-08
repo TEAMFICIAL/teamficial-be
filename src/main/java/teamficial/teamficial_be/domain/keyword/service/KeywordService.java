@@ -29,7 +29,7 @@ public class KeywordService {
         keywordRepository.save(keyword);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<Keyword> getAllKeywordByUser(User user, Pageable pageable) {
         return keywordRepository.findAllByUser(user,pageable);
     }
