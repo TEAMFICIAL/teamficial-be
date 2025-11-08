@@ -2,9 +2,11 @@ package teamficial.teamficial_be.domain.keyword.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import teamficial.teamficial_be.domain.keyword.dto.HeadKeywordRequestDto;
+import org.springframework.transaction.annotation.Transactional;
+import teamficial.teamficial_be.domain.keyword.dto.request.HeadKeywordRequestDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.HeadKeywordResponseDto;
 import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
+import teamficial.teamficial_be.domain.keyword.entity.Keyword;
 import teamficial.teamficial_be.domain.keyword.repository.HeadKeywordRepository;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.service.ProfileService;
@@ -18,18 +20,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TeamficialLogService {
 
-    private final HeadKeywordRepository headKeywordRepository;
-    private final ProfileService profileService;
 
+    private final ProfileService profileService;
+    private final KeywordService keywordService;
+    private final HeadKeywordService headKeywordService;
+
+    @Transactional(readOnly = true)
     public HeadKeywordResponseDto getHeadKeyword(User user, Long profileId) {
         Profile profile = profileService.getProfileById(profileId);
 
-        List<HeadKeyword> headKeywords= headKeywordRepository.findAllByProfile(profile);
+        List<HeadKeyword> headKeywords= headKeywordService.getAllByProfile(profile);
 
         return HeadKeywordResponseDto.fromKeyword(profile, headKeywords);
     }
 
 
+    @Transactional
     public HeadKeywordResponseDto updateHeadKeyword(User user, Long profileId, HeadKeywordRequestDto requestDto) {
 
         Profile profile = profileService.getProfileById(profileId);
@@ -43,12 +49,20 @@ public class TeamficialLogService {
         }
 
         //대표키워드 설정
-        if (requestDto.getKeywords() != null) {
-            for (String keyword : requestDto.getKeywords()) {
+        if (requestDto.getKeywordIds() != null) {
+            for (Long keywordId : requestDto.getKeywordIds()) {
+
+                Keyword keyword = keywordService.getKeywordById(keywordId);
+                keyword.updateHead();
+
                 HeadKeyword headKeyword = HeadKeyword.builder()
                         .profile(profile)
-                        .keywordName(keyword)
+                        .keywordName(keyword.getKeywordName())
                         .build();
+
+                headKeywordService.save(headKeyword);
+                keywordService.saveKeyword(keyword);
+
                 profile.getHeadKeywords().add(headKeyword);
             }
         }

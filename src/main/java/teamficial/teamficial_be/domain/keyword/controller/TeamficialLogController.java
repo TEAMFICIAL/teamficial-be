@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-import teamficial.teamficial_be.domain.keyword.dto.HeadKeywordRequestDto;
+import teamficial.teamficial_be.domain.keyword.dto.request.HeadKeywordRequestDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.HeadKeywordResponseDto;
 import teamficial.teamficial_be.domain.keyword.service.TeamficialLogService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.security.AuthDetails;
+import teamficial.teamficial_be.global.util.PagedResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,4 +34,7 @@ public class TeamficialLogController {
 
         return ApiResponse.onSuccess(responseDto);
     }
+
+    @GetMapping("/")
+    public ApiResponse<PagedResponse<>>
 }
