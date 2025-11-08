@@ -36,6 +36,8 @@ public enum ErrorStatus implements BaseErrorCode {
     //지원 관련 응답
     DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST,"APPLICATION6001","이미 지원한 모집 글 입니다."),
 
+    //키워드 관련 응답
+    KEYWORD_FORBIDDEN(HttpStatus.FORBIDDEN,"KEYWORD4003","키워드 설정 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
