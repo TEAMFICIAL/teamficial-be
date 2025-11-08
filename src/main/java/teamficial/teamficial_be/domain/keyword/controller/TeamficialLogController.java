@@ -3,12 +3,10 @@ package teamficial.teamficial_be.domain.keyword.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.keyword.dto.request.HeadKeywordRequestDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.HeadKeywordResponseDto;
+import teamficial.teamficial_be.domain.keyword.dto.response.KeywordListResponseDto;
 import teamficial.teamficial_be.domain.keyword.service.TeamficialLogService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.security.AuthDetails;
@@ -35,6 +33,13 @@ public class TeamficialLogController {
         return ApiResponse.onSuccess(responseDto);
     }
 
-    @GetMapping("/")
-    public ApiResponse<PagedResponse<>>
+    @GetMapping("/teamficial-log/{userId}")
+    @Operation(summary = "키워드 리스트 조회하기", description = "한 유저의 키워드 리스트를 조회하는 api 입니다.")
+    public ApiResponse<PagedResponse<KeywordListResponseDto>> getKeywordList(@PathVariable Long userId,
+                                                                             @RequestParam(defaultValue = "0") int page,
+                                                                             @RequestParam(defaultValue = "3") int size) {
+        PagedResponse<KeywordListResponseDto> responseDto = teamficialLogService.getKeywordList(userId,page,size);
+
+        return ApiResponse.onSuccess(responseDto);
+    }
 }
