@@ -58,11 +58,17 @@ public class TeamficialLogService {
             profile.getHeadKeywords().clear();
         }
 
+
         //대표키워드 설정
         if (requestDto.getKeywordIds() != null) {
             for (Long keywordId : requestDto.getKeywordIds()) {
 
                 Keyword keyword = keywordService.getKeywordById(keywordId);
+
+                if (!keyword.getUser().getId().equals(user.getId())) {
+                    throw new GeneralException(ErrorStatus.KEYWORD_FORBIDDEN);
+                }
+
                 keyword.updateHead();
                 keywordService.saveKeyword(keyword);
 
