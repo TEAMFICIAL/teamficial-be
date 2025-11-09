@@ -3,6 +3,7 @@ package teamficial.teamficial_be.domain.profile.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
@@ -42,7 +43,7 @@ public class ProfileService {
         }
 
         profileRepository.save(profile);
-        return ProfileResponseDto.of(profile);
+        return ProfileResponseDto.of(profile,profile.getHeadKeywords());
     }
 
     @Transactional
@@ -58,13 +59,13 @@ public class ProfileService {
         }
 
         profileRepository.save(profile);
-        return ProfileResponseDto.of(profile);
+        return ProfileResponseDto.of(profile,profile.getHeadKeywords());
     }
 
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(Long profileId){
         Profile profile = getProfileById(profileId);
-        return ProfileResponseDto.of(profile);
+        return ProfileResponseDto.of(profile,profile.getHeadKeywords());
     }
 
     @Transactional
@@ -126,7 +127,7 @@ public class ProfileService {
     public List<ProfileResponseDto> getProfileList(User user) {
         List<Profile> profiles = profileRepository.findAllByUser(user);
         return profiles.stream()
-                .map(profile -> ProfileResponseDto.of(profile))
+                .map(profile -> ProfileResponseDto.of(profile,profile.getHeadKeywords()))
                 .toList();
     }
 
