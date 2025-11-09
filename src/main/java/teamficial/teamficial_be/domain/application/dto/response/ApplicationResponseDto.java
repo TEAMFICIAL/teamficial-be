@@ -16,7 +16,7 @@ public class ApplicationResponseDto {
         return ApplicationResponseDto.builder()
                 .applicationId(application.getId())
                 .content(application.getContent())
-                .profile(ProfileResponseDto.of(application.getProfile()))
+                .profile(ProfileResponseDto.of(application.getProfile(),application.getProfile().getHeadKeywords()))
                 .build();
     }
 }
