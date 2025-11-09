@@ -4,6 +4,7 @@ package teamficial.teamficial_be.domain.profile.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
@@ -32,10 +33,12 @@ public class ProfileResponseDto {
     private List<String> links;
     @Schema(description = "연락 수단", example="오픈채팅방 링크")
     private String contactWay;
+    @Schema(description = "대표 키워드")
+    private List<String> headKeywords;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public static ProfileResponseDto of(Profile profile) {
+    public static ProfileResponseDto of(Profile profile, List<HeadKeyword> headKeywords) {
         List<String> linkList = profile.getProfileLinks().stream()
                 .map(ProfileLink::getLink)
                 .collect(Collectors.toList());
@@ -51,6 +54,10 @@ public class ProfileResponseDto {
                 .contactWay(profile.getContactWay())
                 .createdAt(profile.getCreatedAt())
                 .modifiedAt(profile.getUpdatedAt())
+                .headKeywords(headKeywords.stream()
+                        .map(HeadKeyword::getKeywordName)
+                        .toList()
+                )
                 .build();
     }
 }

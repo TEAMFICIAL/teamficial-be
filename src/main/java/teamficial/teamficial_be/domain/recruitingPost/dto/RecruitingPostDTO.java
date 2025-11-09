@@ -187,7 +187,7 @@ public class RecruitingPostDTO {
         public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay) {
             return RecruitingPostDetailResponseDTO.builder()
                     .postId(post.getId())
-                    .profile(ProfileResponseDto.of(post.getProfile()))
+                    .profile(ProfileResponseDto.of(post.getProfile(),post.getProfile().getHeadKeywords()))
                     .title(post.getTitle())
                     .content(post.getContent())
                     .progressWay(post.getProgressWay())
