@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.user.entity.User;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,4 +36,8 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "ORDER BY rp.deadline ASC " +
             "LIMIT 3")
     List<RecruitingPost> findTop3ByUserOrderByDeadlineAsc(@Param("user") User user);
+
+    @Modifying
+    @Query("UPDATE RecruitingPost p SET p.status = 'CLOSED' WHERE p.deadline < :today AND p.status <> 'CLOSED'")
+    int updateStatusToClosed(@Param("today") LocalDate today);
 }
