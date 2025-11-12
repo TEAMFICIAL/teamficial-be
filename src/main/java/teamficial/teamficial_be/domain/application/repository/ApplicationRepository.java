@@ -33,6 +33,5 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             "LIMIT 3")
     List<Application> findTop3ByUserOrderByCreatedAtDesc(User user);
 
-    @Query("SELECT COUNT(a) FROM Application a WHERE a.recruitingPost.id = :postId")
     int countAllByRecruitingPost(RecruitingPost recruitingPost);
 }

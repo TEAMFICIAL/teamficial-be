@@ -123,7 +123,7 @@ public class ApplicationService {
                 redisService.incrementValue(key, 1);
             } else {
                 // 키 없으면 저장
-                long count = applicationRepository.countAllByRecruitingPost(recruitingPost);
+                int count = applicationRepository.countAllByRecruitingPost(recruitingPost);
                 redisService.setValue(key, String.valueOf(count + 1), 0L);
             }
         } catch (Exception e) {
