@@ -23,6 +23,7 @@ import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.enums.Position;
+import teamficial.teamficial_be.global.redis.RedisService;
 import teamficial.teamficial_be.global.util.PagedResponse;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class MypageService {
 
     private final RecruitingPostService recruitingPostService;
     private final ApplicationService applicationService;
+    private final RedisService redisService;
 
     @Transactional(readOnly = true)
     public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size,ApplicationStatus applicationStatus) {
@@ -55,7 +57,8 @@ public class MypageService {
 
         Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage.map(recruitingPost -> {
             long dDay = recruitingPost.getDDay();
-            return CurrentApplicantResponseDto.of(recruitingPost,dDay);
+            int totalApplicants = getApplicantCount(recruitingPost);
+            return CurrentApplicantResponseDto.of(recruitingPost,dDay,totalApplicants);
         });
 
         return PagedResponse.of(dtoPage);
@@ -129,6 +132,38 @@ public class MypageService {
         List<RecruitingPost> recruitingPostList = recruitingPostService.getTop3ByUser(user);
         List<Application> applicationList = applicationService.getTop3ByUser(user);
 
-        return DashboardResponseDto.of(applicationList,recruitingPostList);
+        List<CurrentApplicantResponseDto> recruitingDtos = recruitingPostList.stream()
+                .map(recruitingPost -> {
+                    long dDay = recruitingPost.getDDay();
+                    int totalApplicants = getApplicantCount(recruitingPost);
+                    return CurrentApplicantResponseDto.of(recruitingPost, dDay, totalApplicants);
+                })
+                .toList();
+
+        List<MyApplicationResponseDto> applicationDtos = applicationList.stream()
+                .map(app -> MyApplicationResponseDto.of(
+                        app.getRecruitingPost(),
+                        app.getApplicationStatus().getDescription()))
+                .toList();
+
+        return DashboardResponseDto.builder()
+                .myRecruitingPost(recruitingDtos)
+                .myApplications(applicationDtos)
+                .build();
     }
+
+    @Transactional
+    public int getApplicantCount(RecruitingPost recruitingPost){
+        String key = redisService.applicationKey(recruitingPost.getId());
+        String value = redisService.getValue(key);
+
+        if (value.isEmpty()){
+            int count = applicationService.getApplicantCount(recruitingPost);
+            value = String.valueOf(count);
+            redisService.setValue(key,String.valueOf(count),0L);
+        }
+
+        return Integer.parseInt(value);
+    }
+
 }
