@@ -185,10 +185,16 @@ public class MypageService {
         List<RecruitingPost> recruitingPostList = recruitingPostService.getTop3ByUser(user);
         List<Application> applicationList = applicationService.getTop3ByUser(user);
 
+        List<Long> postIds = recruitingPostList.stream()
+                .map(RecruitingPost::getId)
+                .toList();
+
+        Map<Long,Integer> applicantCountMap = getApplicantCountsBatch(postIds);
+
         List<CurrentApplicantResponseDto> recruitingDtos = recruitingPostList.stream()
                 .map(recruitingPost -> {
                     long dDay = recruitingPost.getDDay();
-                    int totalApplicants = getApplicantCount(recruitingPost);
+                    int totalApplicants = applicantCountMap.get(recruitingPost.getId());
                     return CurrentApplicantResponseDto.of(recruitingPost, dDay, totalApplicants);
                 })
                 .toList();
@@ -203,20 +209,6 @@ public class MypageService {
                 .myRecruitingPost(recruitingDtos)
                 .myApplications(applicationDtos)
                 .build();
-    }
-
-    @Transactional
-    public int getApplicantCount(RecruitingPost recruitingPost){
-        String key = redisService.applicationKey(recruitingPost.getId());
-        String value = redisService.getValue(key);
-
-        if (value.isEmpty()){
-            int count = applicationService.getApplicantCount(recruitingPost);
-            value = String.valueOf(count);
-            redisService.setValue(key,String.valueOf(count),0L);
-        }
-
-        return Integer.parseInt(value);
     }
 
 }
