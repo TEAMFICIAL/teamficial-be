@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
@@ -34,4 +35,10 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findTop3ByUserOrderByCreatedAtDesc(User user);
 
     int countAllByRecruitingPost(RecruitingPost recruitingPost);
+
+    @Query("SELECT a.recruitingPost.id, COUNT(a) " +
+            "FROM Application a " +
+            "WHERE a.recruitingPost.id IN :postIds " +
+            "GROUP BY a.recruitingPost.id")
+    List<Object[]> countByRecruitingPostIds(@Param("postIds") List<Long> postIds);
 }

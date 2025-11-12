@@ -21,7 +21,10 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 import teamficial.teamficial_be.global.redis.RedisService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -129,5 +132,20 @@ public class ApplicationService {
         } catch (Exception e) {
             log.warn("Redis increment error key={}, postId={}", key, recruitingPost.getId(), e);
         }
+    }
+
+    public Map<Long, Integer> getApplicantCountBatch(List<Long> postIds) {
+        if (postIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<Object[]> results = applicationRepository.countByRecruitingPostIds(postIds);
+
+
+        return results.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0], //postId
+                        row -> ((Long) row[1]).intValue() //count
+                ));
     }
 }

@@ -26,7 +26,10 @@ import teamficial.teamficial_be.global.enums.Position;
 import teamficial.teamficial_be.global.redis.RedisService;
 import teamficial.teamficial_be.global.util.PagedResponse;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -49,19 +52,69 @@ public class MypageService {
         return PagedResponse.of(dtoPage);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PagedResponse<CurrentApplicantResponseDto> getAllCurrentApplication(User user, int page, int size, RecruitingStatus recruitingStatus) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "deadline"));
 
         Page<RecruitingPost> recruitingPostPage = recruitingPostService.getAllRecruitingPostsByUserAndStatus(user,pageable,recruitingStatus);
 
+        List<Long> postIds = recruitingPostPage.stream()
+                .map(RecruitingPost::getId)
+                .toList();
+
+        Map<Long,Integer> applicantCountMap = getApplicantCountsBatch(postIds);
+
         Page<CurrentApplicantResponseDto> dtoPage = recruitingPostPage.map(recruitingPost -> {
             long dDay = recruitingPost.getDDay();
-            int totalApplicants = getApplicantCount(recruitingPost);
+            //int totalApplicants = getApplicantCount(recruitingPost);
+            int totalApplicants = applicantCountMap.get(recruitingPost.getId());
             return CurrentApplicantResponseDto.of(recruitingPost,dDay,totalApplicants);
         });
 
         return PagedResponse.of(dtoPage);
+    }
+
+    private Map<Long, Integer> getApplicantCountsBatch(List<Long> postIds) {
+        List<String> keys = postIds.stream()
+                .map(redisService::applicationKey)
+                .toList();
+
+        List<String> cachedValues = redisService.getValues(keys);
+
+        Map<Long,Integer> resultMap = new HashMap<>();
+        List<Long> missIds = new ArrayList<>();
+
+        for (int i=0; i < postIds.size(); i++) {
+            Long postId = postIds.get(i);
+            String key = keys.get(i);
+            String value = cachedValues.get(i);
+
+            if (value != null && !value.isEmpty()) {
+                resultMap.put(postId, Integer.parseInt(value));
+                log.debug("캐시 히트 key={}, value={}, postId={}", key, value, postId);
+            } else {
+                log.debug("캐시 미스 key={}, postId={}", key, postId);
+                missIds.add(postId);
+            }
+        }
+
+        if (!missIds.isEmpty()) {
+            log.debug("DB 조회 대상 모집글들: {}", missIds);
+            Map<Long, Integer> dbCounts = applicationService.getApplicantCountBatch(missIds);
+
+            Map<String, String> cacheData = new HashMap<>();
+            dbCounts.forEach((postId,count) -> {
+                resultMap.put(postId, count);
+                cacheData.put(redisService.applicationKey(postId), String.valueOf(count));
+            });
+
+            if (!cacheData.isEmpty()) {
+                redisService.setValues(cacheData);
+                log.debug("캐시 일괄 저장 완료 keys={}", cacheData.keySet());
+            }
+        }
+
+        return resultMap;
     }
 
     @Transactional(readOnly = true)
