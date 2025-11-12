@@ -16,6 +16,8 @@ import java.time.Duration;
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
 
+    private static final String APPLICANT_COUNT_KEY_PREFIX = "recruit:post:";
+
     public void setValue(String key, String value, long ttlMillis) {
         try {
             ValueOperations<String, Object> values = redisTemplate.opsForValue();
@@ -52,5 +54,19 @@ public class RedisService {
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.REDIS_ERROR);
         }
+    }
+
+    public void incrementValue(String key, long delta) {
+        try {
+            ValueOperations<String, Object> ops = redisTemplate.opsForValue();
+            ops.increment(key, delta);
+        } catch (Exception e) {
+            log.warn("Redis 지원자 수 increment 오류 — key: {}, delta: {}, 예외: {}", key, delta, e.toString(), e);
+            throw new GeneralException(ErrorStatus.REDIS_ERROR);
+        }
+    }
+
+    public String applicationKey(Long postId) {
+        return APPLICANT_COUNT_KEY_PREFIX + postId + ":applicantCount";
     }
 }

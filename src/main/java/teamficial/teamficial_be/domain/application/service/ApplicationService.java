@@ -1,9 +1,11 @@
 package teamficial.teamficial_be.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.application.dto.ApplicationDTO;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
@@ -17,9 +19,11 @@ import teamficial.teamficial_be.domain.user.repository.UserRepository;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
+import teamficial.teamficial_be.global.redis.RedisService;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplicationService {
@@ -27,7 +31,9 @@ public class ApplicationService {
     private final ProfileRepository profileRepository;
     private final RecruitingPostRepository recruitingPostRepository;
     private final ApplicationRepository applicationRepository;
+    private final RedisService redisService;
 
+    @Transactional
     public ApplicationDTO.ApplicationResponseDTO createApplication(Long userId, ApplicationDTO.ApplicationRequestDTO req) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
@@ -60,6 +66,7 @@ public class ApplicationService {
                 .build();
 
         Application saved = applicationRepository.save(application);
+        applicantIncrement(recruitingPost);
 
         return ApplicationDTO.ApplicationResponseDTO.builder()
                 .applicationId(saved.getId())
@@ -101,5 +108,26 @@ public class ApplicationService {
 
     public List<Application> getTop3ByUser(User user) {
         return applicationRepository.findTop3ByUserOrderByCreatedAtDesc(user);
+    }
+
+    public int getApplicantCount(RecruitingPost recruitingPost) {
+        return applicationRepository.countAllByRecruitingPost(recruitingPost);
+    }
+
+    @Transactional
+    public void applicantIncrement(RecruitingPost recruitingPost) {
+        String key = redisService.applicationKey(recruitingPost.getId());
+        try {
+            // 존재하는 경우 increment
+            if (redisService.checkExistsValue(key)) {
+                redisService.incrementValue(key, 1);
+            } else {
+                // 키 없으면 저장
+                long count = applicationRepository.countAllByRecruitingPost(recruitingPost);
+                redisService.setValue(key, String.valueOf(count + 1), 0L);
+            }
+        } catch (Exception e) {
+            log.warn("Redis increment error key={}, postId={}", key, recruitingPost.getId(), e);
+        }
     }
 }
