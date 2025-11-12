@@ -113,10 +113,6 @@ public class ApplicationService {
         return applicationRepository.findTop3ByUserOrderByCreatedAtDesc(user);
     }
 
-    public int getApplicantCount(RecruitingPost recruitingPost) {
-        return applicationRepository.countAllByRecruitingPost(recruitingPost);
-    }
-
     @Transactional
     public void applicantIncrement(RecruitingPost recruitingPost) {
         String key = redisService.applicationKey(recruitingPost.getId());
@@ -141,11 +137,13 @@ public class ApplicationService {
 
         List<Object[]> results = applicationRepository.countByRecruitingPostIds(postIds);
 
-
-        return results.stream()
+        Map<Long,Integer> counts = results.stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0], //postId
                         row -> ((Long) row[1]).intValue() //count
                 ));
+
+        postIds.forEach(postId -> {counts.putIfAbsent(postId, 0);});
+        return counts;
     }
 }
