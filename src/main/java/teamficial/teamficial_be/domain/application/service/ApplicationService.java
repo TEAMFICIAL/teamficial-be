@@ -124,7 +124,7 @@ public class ApplicationService {
             } else {
                 // 키 없으면 저장
                 int count = applicationRepository.countAllByRecruitingPost(recruitingPost);
-                redisService.setValue(key, String.valueOf(count + 1), 0L);
+                redisService.setValue(key, String.valueOf(count), 0L);
             }
         } catch (Exception e) {
             log.warn("Redis increment error key={}, postId={}", key, recruitingPost.getId(), e);
