@@ -81,9 +81,8 @@ public class ProfileService {
             String objectKey = preSignedUrlService.extractKeyFromUrl(image);
             preSignedUrlService.deleteByKey(objectKey);
         }
+        profileRepository.delete(profile);
 
-        profile.deleteProfile();
-        profileRepository.save(profile);
     }
 
     @Transactional

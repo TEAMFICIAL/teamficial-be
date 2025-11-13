@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.user.entity.User;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE profile SET is_deleted = 1 WHERE profile_id = ?")
+@Where(clause = "is_deleted = 0")
 @Getter
 @Builder
 @AllArgsConstructor
@@ -53,11 +57,8 @@ public class Profile extends BaseEntity {
     @Column(name = "contact_way", length = 255)
     private String contactWay;
 
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint(1) default 0")
     private boolean isDeleted = false;
-
-    public void deleteProfile(){
-        this.isDeleted = true;
-    }
 
     public void update(ProfileRequestDto dto) {
         this.profileName = dto.getProfileName();
