@@ -11,7 +11,6 @@ import java.util.List;
 
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
-    @Query("SELECT p FROM Profile p " +
-            "WHERE p.user = :user")
-    List<Profile> findAllByUser(@Param("user") User user);
+
+    List<Profile> findAllByUserAndIsDeletedFalse(User user);
 }

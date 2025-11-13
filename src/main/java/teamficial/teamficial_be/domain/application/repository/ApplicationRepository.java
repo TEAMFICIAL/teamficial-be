@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
+import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.user.entity.User;
 
@@ -41,4 +42,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             "WHERE a.recruitingPost.id IN :postIds " +
             "GROUP BY a.recruitingPost.id")
     List<Object[]> countByRecruitingPostIds(@Param("postIds") List<Long> postIds);
+
+    @Query("SELECT ap FROM Application ap " +
+            "JOIN FETCH ap.profile p " +
+            "WHERE p = :profile")
+    List<Application> findAllByProfile(Profile profile);
 }

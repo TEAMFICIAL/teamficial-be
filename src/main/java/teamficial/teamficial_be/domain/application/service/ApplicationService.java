@@ -146,4 +146,9 @@ public class ApplicationService {
         postIds.forEach(postId -> {counts.putIfAbsent(postId, 0);});
         return counts;
     }
+
+    public List<Application> getApplicationsByProfile(Profile profile) {
+        return applicationRepository.findAllByProfile(profile);
+    }
+
 }
