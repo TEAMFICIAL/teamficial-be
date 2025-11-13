@@ -3,6 +3,9 @@ package teamficial.teamficial_be.domain.profile.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import teamficial.teamficial_be.domain.application.entity.Application;
+import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
+import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
@@ -19,6 +22,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
+    private final ApplicationService applicationService;
     private final ProfileRepository profileRepository;
     private final PreSignedUrlService preSignedUrlService;
 
@@ -71,19 +75,37 @@ public class ProfileService {
     @Transactional
     public void deleteProfile(User user,Long profileId) {
 
-
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_PROFILE));
 
         validateUserProfile(user, profile);
 
-        String image = profile.getProfileImage();
-        if (image != null && !image.isBlank()) {
-            String objectKey = preSignedUrlService.extractKeyFromUrl(image);
-            preSignedUrlService.deleteByKey(objectKey);
-        }
+        // 이 프로필을 사용한 Application 존재하는지 확인
+        List<Application> applications = applicationService.getApplicationsByProfile(profile);
+        if (!applications.isEmpty()) {
+            // 존재한다면, applicationStatus 확인
+            boolean hasMatchable = applications.stream()
+                    .anyMatch(app -> app.getApplicationStatus() == ApplicationStatus.MATCHED
+                            || app.getApplicationStatus() == ApplicationStatus.MATCH_FAILED);
 
-        profileRepository.delete(profile);
+            if (hasMatchable) {
+                // soft-delete 처리
+                profile.deleteProfile();
+                profileRepository.save(profile);
+            } else {
+                // 매칭 대기 상태라면 삭제 금지
+                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_APPLICATION_PENDING);
+            }
+        } else {
+            // 3) Application이 아예 없다면 물리 삭제 가능
+            // 이미지 삭제 로직 수행
+            String image = profile.getProfileImage();
+            if (image != null && !image.isBlank()) {
+                String objectKey = preSignedUrlService.extractKeyFromUrl(image);
+                preSignedUrlService.deleteByKey(objectKey);
+            }
+            profileRepository.delete(profile);
+        }
     }
 
     @Transactional
@@ -125,7 +147,7 @@ public class ProfileService {
 
     @Transactional(readOnly = true)
     public List<ProfileResponseDto> getProfileList(User user) {
-        List<Profile> profiles = profileRepository.findAllByUser(user);
+        List<Profile> profiles = profileRepository.findAllByUserAndIsDeletedFalse(user);
         return profiles.stream()
                 .map(profile -> ProfileResponseDto.of(profile,profile.getHeadKeywords()))
                 .toList();

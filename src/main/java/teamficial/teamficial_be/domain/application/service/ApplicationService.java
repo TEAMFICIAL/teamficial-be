@@ -44,6 +44,10 @@ public class ApplicationService {
         Profile profile = profileRepository.findById(req.getProfileId())
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE));
 
+        if (profile.isDeleted()){
+            throw new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE);
+        }
+
         if (!profile.getUser().getId().equals(userId)) {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
         }
@@ -146,4 +150,9 @@ public class ApplicationService {
         postIds.forEach(postId -> {counts.putIfAbsent(postId, 0);});
         return counts;
     }
+
+    public List<Application> getApplicationsByProfile(Profile profile) {
+        return applicationRepository.findAllByProfile(profile);
+    }
+
 }
