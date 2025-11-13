@@ -71,7 +71,6 @@ public class ProfileService {
     @Transactional
     public void deleteProfile(User user,Long profileId) {
 
-
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_PROFILE));
 
@@ -83,7 +82,8 @@ public class ProfileService {
             preSignedUrlService.deleteByKey(objectKey);
         }
 
-        profileRepository.delete(profile);
+        profile.deleteProfile();
+        profileRepository.save(profile);
     }
 
     @Transactional

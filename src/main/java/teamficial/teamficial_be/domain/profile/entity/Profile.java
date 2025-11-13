@@ -53,6 +53,12 @@ public class Profile extends BaseEntity {
     @Column(name = "contact_way", length = 255)
     private String contactWay;
 
+    private boolean isDeleted = false;
+
+    public void deleteProfile(){
+        this.isDeleted = true;
+    }
+
     public void update(ProfileRequestDto dto) {
         this.profileName = dto.getProfileName();
         this.workingTime = dto.getWorkingTime();
