@@ -1,8 +1,10 @@
 package teamficial.teamficial_be.domain.keyword.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import teamficial.teamficial_be.domain.keyword.entity.Keyword;
 
 @Getter
@@ -25,4 +27,5 @@ public class KeywordResponseDto {
                 .count(keyword.getCount())
                 .build();
     }
+
 }
