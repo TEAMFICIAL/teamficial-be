@@ -71,7 +71,9 @@ public class RecruitingPostDTO {
     @Builder
     public static class RecruitingPostsResponseDTO {
         private Long postId;                // 모집 글 Id
-        private Long profileId;
+
+        private Long writerUserId;
+        private Long writerProfileId;
         private String userName;         // 작성자 이름
         private String profileImageUrl;     // profile image url
 
@@ -96,7 +98,8 @@ public class RecruitingPostDTO {
         public static RecruitingPostsResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay) {
             return RecruitingPostsResponseDTO.builder()
                     .postId(post.getId())
-                    .profileId(post.getProfile().getId())
+                    .writerUserId(post.getUser().getId())
+                    .writerProfileId(post.getProfile().getId())
                     .userName(post.getProfile().getUserName())
                     .profileImageUrl(post.getProfile().getProfileImage())
                     .title(post.getTitle())
@@ -126,7 +129,7 @@ public class RecruitingPostDTO {
         @QueryProjection
         public RecruitingPostsResponseDTO(
                 Long postId,
-                Long profileId,
+                Long writerProfileId,
                 String userName,
                 String profileImageUrl,
                 ProgressWay progressWay,
@@ -140,7 +143,7 @@ public class RecruitingPostDTO {
                 LocalDateTime createdAt
         ) {
             this.postId = postId;
-            this.profileId = profileId;
+            this.writerProfileId = writerProfileId;
             this.userName = userName;
             this.profileImageUrl = profileImageUrl;
             this.progressWay = progressWay;
