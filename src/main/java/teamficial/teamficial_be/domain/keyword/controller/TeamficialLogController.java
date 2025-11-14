@@ -7,18 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.keyword.dto.request.HeadKeywordRequestDto;
-import teamficial.teamficial_be.domain.keyword.dto.request.TeamficialLogRequestDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.HeadKeywordResponseDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.KeywordCommentResponseDto;
 import teamficial.teamficial_be.domain.keyword.dto.response.KeywordResponseDto;
-import teamficial.teamficial_be.domain.keyword.dto.response.TeamficialLogResponseDto;
 import teamficial.teamficial_be.domain.keyword.service.TeamficialLogService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.security.AuthDetails;
 import teamficial.teamficial_be.global.util.PagedResponse;
 import teamficial.teamficial_be.global.util.ScrollResponse;
-
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,14 +57,4 @@ public class TeamficialLogController {
 
         return ApiResponse.onSuccess(responseDto);
     }
-
-    @PostMapping("/teamficial-log")
-    @Operation(summary = "팀피셜록 작성하기", description = "팀피셜록을 작성하고 키워드,요약을 추출하는 api 입니다.")
-    public ApiResponse<TeamficialLogResponseDto> createTeamficialLog(
-            @AuthenticationPrincipal AuthDetails authDetails,
-            @Valid @RequestBody TeamficialLogRequestDto request) throws IOException {
-
-        return ApiResponse.onSuccess(teamficialLogService.createTeamficialLog(authDetails.user(), request));
-    }
-
 }
