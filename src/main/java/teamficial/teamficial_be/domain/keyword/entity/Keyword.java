@@ -34,4 +34,8 @@ public class Keyword extends BaseEntity {
     public void updateHead(){
         this.is_head = true;
     }
+
+    public void increaseCount() {
+        this.count++;
+    }
 }
