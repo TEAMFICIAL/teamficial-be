@@ -30,7 +30,7 @@ public class CurrentApplicantResponseDto {
     private LocalDateTime createdAt;
     private long dDay;
 
-    public static CurrentApplicantResponseDto of(RecruitingPost recruitingPost,long dDay) {
+    public static CurrentApplicantResponseDto of(RecruitingPost recruitingPost,long dDay,int totalApplicants) {
         List<String> tags = recruitingPost.getRecruitingDetails().stream()
                 .map(recruitingDetail -> recruitingDetail.getPosition().getDescription())
                 .toList();
@@ -40,7 +40,7 @@ public class CurrentApplicantResponseDto {
                 .title(recruitingPost.getTitle())
                 .profileImage(recruitingPost.getProfile().getProfileImage())
                 .writerName(recruitingPost.getProfile().getUserName())
-                .totalApplicants(recruitingPost.getTotalApplicants())
+                .totalApplicants(totalApplicants)
                 .tags(tags)
                 .deadline(recruitingPost.getDeadline())
                 .createdAt(recruitingPost.getCreatedAt())

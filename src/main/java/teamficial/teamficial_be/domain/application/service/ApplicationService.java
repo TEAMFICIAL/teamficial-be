@@ -1,9 +1,11 @@
 package teamficial.teamficial_be.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.application.dto.ApplicationDTO;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
@@ -17,9 +19,14 @@ import teamficial.teamficial_be.domain.user.repository.UserRepository;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
+import teamficial.teamficial_be.global.redis.RedisService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplicationService {
@@ -27,13 +34,19 @@ public class ApplicationService {
     private final ProfileRepository profileRepository;
     private final RecruitingPostRepository recruitingPostRepository;
     private final ApplicationRepository applicationRepository;
+    private final RedisService redisService;
 
+    @Transactional
     public ApplicationDTO.ApplicationResponseDTO createApplication(Long userId, ApplicationDTO.ApplicationRequestDTO req) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         Profile profile = profileRepository.findById(req.getProfileId())
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE));
+
+        if (profile.isDeleted()){
+            throw new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE);
+        }
 
         if (!profile.getUser().getId().equals(userId)) {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
@@ -60,6 +73,7 @@ public class ApplicationService {
                 .build();
 
         Application saved = applicationRepository.save(application);
+        applicantIncrement(recruitingPost);
 
         return ApplicationDTO.ApplicationResponseDTO.builder()
                 .applicationId(saved.getId())
@@ -102,4 +116,43 @@ public class ApplicationService {
     public List<Application> getTop3ByUser(User user) {
         return applicationRepository.findTop3ByUserOrderByCreatedAtDesc(user);
     }
+
+    @Transactional
+    public void applicantIncrement(RecruitingPost recruitingPost) {
+        String key = redisService.applicationKey(recruitingPost.getId());
+        try {
+            // 존재하는 경우 increment
+            if (redisService.checkExistsValue(key)) {
+                redisService.incrementValue(key, 1);
+            } else {
+                // 키 없으면 저장
+                int count = applicationRepository.countAllByRecruitingPost(recruitingPost);
+                redisService.setValue(key, String.valueOf(count), 0L);
+            }
+        } catch (Exception e) {
+            log.warn("Redis increment error key={}, postId={}", key, recruitingPost.getId(), e);
+        }
+    }
+
+    public Map<Long, Integer> getApplicantCountBatch(List<Long> postIds) {
+        if (postIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<Object[]> results = applicationRepository.countByRecruitingPostIds(postIds);
+
+        Map<Long,Integer> counts = results.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0], //postId
+                        row -> ((Long) row[1]).intValue() //count
+                ));
+
+        postIds.forEach(postId -> {counts.putIfAbsent(postId, 0);});
+        return counts;
+    }
+
+    public List<Application> getApplicationsByProfile(Profile profile) {
+        return applicationRepository.findAllByProfile(profile);
+    }
+
 }
