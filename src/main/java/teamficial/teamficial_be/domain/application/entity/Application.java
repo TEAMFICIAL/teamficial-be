@@ -40,6 +40,7 @@ public class Application extends BaseEntity {
     private Position position;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private ApplicationStatus applicationStatus;
 
     @Lob

@@ -33,6 +33,9 @@ public enum ErrorStatus implements BaseErrorCode {
     ALREADY_DELETED_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE4002" , "프로필 사진이 이미 삭제된 상태입니다."),
     PROFILE_FORBIDDEN(HttpStatus.FORBIDDEN,"PROFILE4003","프로필 수정 권한이 없습니다."),
     CANNOT_DELETE_PROFILE_WHEN_APPLICATION_PENDING(HttpStatus.BAD_REQUEST,"PROFILE4004","해당 프로필로 지원중인 공고가 있어, 삭제가 불가능합니다."),
+    CANNOT_DELETE_PROFILE_WHEN_RECRUITINGPOST_OPEN(HttpStatus.BAD_REQUEST,"PROFILE4005","해당 프로필로 모집 중인 작성 글이 있어, 삭제가 불가능합니다."),
+    CANNOT_COUNT_OVER_3(HttpStatus.BAD_REQUEST,"PROFILE4006","사용자의 프로필 개수는 3개를 넘을 수 없습니다."),
+    CANNOT_DELETE_PROFILE(HttpStatus.BAD_REQUEST,"PROFILE4007","해당 프로필로 지원중인 공고나 모집 중인 작성 글이 있어, 삭제가 불가능합니다."),
 
     //지원 관련 응답
     DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST,"APPLICATION6001","이미 지원한 모집 글 입니다."),

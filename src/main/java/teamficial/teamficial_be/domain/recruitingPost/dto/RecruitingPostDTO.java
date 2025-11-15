@@ -76,6 +76,7 @@ public class RecruitingPostDTO {
         private Long writerProfileId;
         private String userName;         // 작성자 이름
         private String profileImageUrl;     // profile image url
+        private boolean profileIsDeleted;
 
         private ProgressWay progressWay;    // 진행 방식
         private String contactWay;          // 연락 방법
@@ -102,6 +103,7 @@ public class RecruitingPostDTO {
                     .writerProfileId(post.getProfile().getId())
                     .userName(post.getProfile().getUserName())
                     .profileImageUrl(post.getProfile().getProfileImage())
+                    .profileIsDeleted(post.getProfile().isDeleted())
                     .title(post.getTitle())
                     .content(post.getContent())
                     .progressWay(post.getProgressWay())

@@ -13,6 +13,9 @@ import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
+import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
@@ -26,6 +29,7 @@ public class ProfileService {
     private final ApplicationService applicationService;
     private final ProfileRepository profileRepository;
     private final PreSignedUrlService preSignedUrlService;
+    private final RecruitingPostService recruitingPostService;
 
     @Transactional
     public ProfileResponseDto createProfile(User user, ProfileRequestDto requestDto, String objectKey){
@@ -37,6 +41,12 @@ public class ProfileService {
         WorkingTime workingTime = null;
         if (requestDto.getWorkingTime() != null) {
             workingTime = requestDto.getWorkingTime();
+        }
+
+        int count = profileRepository.countByUser(user);
+
+        if (count >= 3) {
+            throw new GeneralException(ErrorStatus.CANNOT_COUNT_OVER_3);
         }
 
         Profile profile = Profile.builder()
@@ -88,30 +98,61 @@ public class ProfileService {
 
         // 이 프로필을 사용한 Application 존재하는지 확인
         List<Application> applications = applicationService.getApplicationsByProfile(profile);
-        if (!applications.isEmpty()) {
-            // 존재한다면, applicationStatus 확인
-            boolean hasMatchable = applications.stream()
-                    .anyMatch(app -> app.getApplicationStatus() == ApplicationStatus.MATCHED
-                            || app.getApplicationStatus() == ApplicationStatus.MATCH_FAILED);
+        List<RecruitingPost> recruitingPosts  = recruitingPostService.getRecruitingPostsByProfile(profile);
 
-            if (hasMatchable) {
-                // soft-delete 처리
-                profile.deleteProfile();
-                profileRepository.save(profile);
-            } else {
-                // 매칭 대기 상태라면 삭제 금지
-                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_APPLICATION_PENDING);
-            }
-        } else {
-            // 3) Application이 아예 없다면 물리 삭제 가능
-            // 이미지 삭제 로직 수행
+        boolean hasAnyApplication = !applications.isEmpty();
+        boolean hasMatchingApplication = applications.stream()
+                .anyMatch(a -> a.getApplicationStatus() == ApplicationStatus.MATCHING);
+
+        boolean hasAnyPost = !recruitingPosts.isEmpty();
+        boolean hasOpenPost = recruitingPosts.stream()
+                .anyMatch(p -> p.getStatus() == RecruitingStatus.OPEN);
+
+        //하드삭제
+        if (!hasAnyApplication && !hasAnyPost) {
             String image = profile.getProfileImage();
             if (image != null && !image.isBlank()) {
                 String objectKey = preSignedUrlService.extractKeyFromUrl(image);
                 preSignedUrlService.deleteByKey(objectKey);
             }
             profileRepository.delete(profile);
+            return;
         }
+
+        boolean softDeleteAboutApp = false;
+        //지원관련 필터링
+        if (hasAnyApplication) {
+            if (hasMatchingApplication) {
+                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_APPLICATION_PENDING);
+            } else {
+                softDeleteAboutApp = true;
+            }
+        } else {
+            softDeleteAboutApp = true;
+        }
+
+        boolean softDeleteAboutRp = false;
+        //모집글 관련 필터링
+        if (hasAnyPost) {
+            if (hasOpenPost) {
+                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_RECRUITINGPOST_OPEN);
+            }
+            else {
+                softDeleteAboutRp = true;
+            }
+        } else {
+            softDeleteAboutRp = true;
+        }
+
+        // 소프트 삭제
+        if (softDeleteAboutRp && softDeleteAboutApp) {
+            profile.deleteProfile();
+            profileRepository.save(profile);
+            return;
+        }
+
+        // 위 케이스 외
+        throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE);
     }
 
     @Transactional

@@ -35,6 +35,8 @@ public class ProfileResponseDto {
     private String contactWay;
     @Schema(description = "대표 키워드")
     private List<String> headKeywords;
+
+    private boolean isDeleted;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -55,6 +57,7 @@ public class ProfileResponseDto {
                 .workingTime(workingTimeDesc)
                 .links(linkList)
                 .contactWay(profile.getContactWay())
+                .isDeleted(profile.isDeleted())
                 .createdAt(profile.getCreatedAt())
                 .modifiedAt(profile.getUpdatedAt())
                 .headKeywords(headKeywords.stream()
