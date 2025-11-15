@@ -11,6 +11,7 @@ import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
+import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.service.UserService;
@@ -33,10 +34,15 @@ public class ProfileService {
             imageUrl = preSignedUrlService.getPublicUrl(objectKey);
         }
 
+        WorkingTime workingTime = null;
+        if (requestDto.getWorkingTime() != null) {
+            workingTime = requestDto.getWorkingTime();
+        }
+
         Profile profile = Profile.builder()
                 .user(user)
                 .userName(user.getName())
-                .workingTime(requestDto.getWorkingTime())
+                .workingTime(workingTime)
                 .profileName(requestDto.getProfileName())
                 .contactWay(requestDto.getContactWay())
                 .profileImage(imageUrl)

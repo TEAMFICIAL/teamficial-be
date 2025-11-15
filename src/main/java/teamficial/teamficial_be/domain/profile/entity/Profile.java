@@ -33,14 +33,14 @@ public class Profile extends BaseEntity {
     @Column(name = "user_name", length = 50, nullable = false)
     private String userName;
 
-    @Column(name = "profile_name", length = 50, nullable = false)
+    @Column(name = "profile_name", length = 50)
     private String profileName;
 
     @Column(name = "profile_image", length = 255)
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "working_time", nullable = false)
+    @Column(name = "working_time")
     private WorkingTime workingTime;
 
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)

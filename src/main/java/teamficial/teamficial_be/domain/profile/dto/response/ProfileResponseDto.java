@@ -43,13 +43,16 @@ public class ProfileResponseDto {
                 .map(ProfileLink::getLink)
                 .collect(Collectors.toList());
 
+        String workingTimeDesc =
+                profile.getWorkingTime() != null ? profile.getWorkingTime().getDescription() : null;
+
         return ProfileResponseDto.builder()
                 .profileId(profile.getId())
                 .userId(profile.getUser().getId())
                 .userName(profile.getUserName())
                 .profileName(profile.getProfileName())
                 .profileImageUrl(profile.getProfileImage())
-                .workingTime(profile.getWorkingTime().getDescription())
+                .workingTime(workingTimeDesc)
                 .links(linkList)
                 .contactWay(profile.getContactWay())
                 .createdAt(profile.getCreatedAt())
