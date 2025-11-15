@@ -13,4 +13,7 @@ import java.util.List;
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     List<Profile> findAllByUserAndIsDeletedFalse(User user);
+
+    @Query("select p from Profile  p where p.user = :user and p.isDeleted = false")
+    int countByUser(User user);
 }

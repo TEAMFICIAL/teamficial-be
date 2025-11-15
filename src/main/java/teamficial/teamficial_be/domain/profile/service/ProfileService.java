@@ -43,6 +43,12 @@ public class ProfileService {
             workingTime = requestDto.getWorkingTime();
         }
 
+        int count = profileRepository.countByUser(user);
+
+        if (count > 3) {
+            throw new GeneralException(ErrorStatus.CANNOT_COUNT_OVER_3);
+        }
+
         Profile profile = Profile.builder()
                 .user(user)
                 .userName(user.getName())
