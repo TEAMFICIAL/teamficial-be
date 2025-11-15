@@ -99,37 +99,65 @@ public class ProfileService {
         // 이 프로필을 사용한 Application 존재하는지 확인
         List<Application> applications = applicationService.getApplicationsByProfile(profile);
         List<RecruitingPost> recruitingPosts  = recruitingPostService.getRecruitingPostsByProfile(profile);
-        if (!applications.isEmpty() || !recruitingPosts.isEmpty()) {
-            // 존재한다면, applicationStatus 확인
-            boolean applicationHasMatchable = applications.stream()
-                    .anyMatch(app -> app.getApplicationStatus() == ApplicationStatus.MATCHED
-                            || app.getApplicationStatus() == ApplicationStatus.MATCH_FAILED);
 
-            boolean recruitingPostHasMatchable = recruitingPosts.stream()
-                    .anyMatch(recruitingPost -> recruitingPost.getStatus()== RecruitingStatus.CLOSED);
+        boolean hasAnyApplication = !applications.isEmpty();
+        boolean hasMatchingApplication = applications.stream()
+                .anyMatch(a -> a.getApplicationStatus() == ApplicationStatus.MATCHING);
+        boolean hasMatchedOrFailedApplication = applications.stream()
+                .anyMatch(a -> a.getApplicationStatus() == ApplicationStatus.MATCHED
+                        || a.getApplicationStatus() == ApplicationStatus.MATCH_FAILED);
 
-            if (applicationHasMatchable && recruitingPostHasMatchable) {
-                // soft-delete 처리
-                profile.deleteProfile();
-                profileRepository.save(profile);
-            } else if (!applicationHasMatchable) {
-                // 매칭 대기 상태라면 삭제 금지
+        boolean hasAnyPost = !recruitingPosts.isEmpty();
+        boolean hasOpenPost = recruitingPosts.stream()
+                .anyMatch(p -> p.getStatus() == RecruitingStatus.OPEN);
+        boolean hasClosedPost = recruitingPosts.stream()
+                .anyMatch(p -> p.getStatus() == RecruitingStatus.CLOSED);
+
+        boolean softDeleteAboutApp = false;
+        //지원관련 필터링
+        if (hasAnyApplication) {
+            if (hasMatchingApplication) {
                 throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_APPLICATION_PENDING);
-            } else if (!recruitingPostHasMatchable) {
-                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_RECRUITINGPOST_OPEN);
+            } else {
+                softDeleteAboutApp = true;
             }
         } else {
-            // 3) Application이 아예 없다면 물리 삭제 가능
-            // 이미지 삭제 로직 수행
+            softDeleteAboutApp = true;
+        }
+
+        boolean softDeleteAboutRp = false;
+        //모집글 관련 필터링
+        if (hasAnyPost) {
+            if (hasOpenPost) {
+                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_RECRUITINGPOST_OPEN);
+            }
+            else {
+                softDeleteAboutRp = true;
+            }
+        } else {
+            softDeleteAboutRp = true;
+        }
+
+        // 소프트 삭제
+        if (softDeleteAboutRp && softDeleteAboutApp) {
+            profile.deleteProfile();
+            profileRepository.save(profile);
+            return;
+        }
+
+        // 하드 삭제
+        if (!hasAnyApplication && !hasAnyPost) {
             String image = profile.getProfileImage();
             if (image != null && !image.isBlank()) {
                 String objectKey = preSignedUrlService.extractKeyFromUrl(image);
                 preSignedUrlService.deleteByKey(objectKey);
             }
             profileRepository.delete(profile);
+            return;
         }
 
-        //
+        // 위 케이스 외
+        throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE);
     }
 
     @Transactional

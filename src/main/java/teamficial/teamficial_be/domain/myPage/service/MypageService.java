@@ -52,7 +52,7 @@ public class MypageService {
         return PagedResponse.of(dtoPage);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PagedResponse<CurrentApplicantResponseDto> getAllCurrentApplication(User user, int page, int size, RecruitingStatus recruitingStatus) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "deadline"));
 
@@ -121,6 +121,7 @@ public class MypageService {
     public CurrentApplicationDetailResponseDto getCurrentApplication(Long recruitingPostId, User user, Position position) {
 
         RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
+        log.info("모집 글 id: " + recruitingPost.getId());
         recruitingPostService.validatePostOwner(user,recruitingPost);
 
         long dDay = recruitingPost.getDDay();

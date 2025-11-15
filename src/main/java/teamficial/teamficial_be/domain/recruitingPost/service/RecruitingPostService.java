@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.recruitingPost.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import teamficial.teamficial_be.global.enums.Position;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecruitingPostService {
@@ -157,7 +159,7 @@ public class RecruitingPostService {
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
-        Long writerId = recruitingPost.getProfile().getUser().getId();
+        Long writerId = recruitingPost.getUser().getId();
         if (!user.getId().equals(writerId)) {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
         }
