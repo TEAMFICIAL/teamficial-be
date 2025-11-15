@@ -13,6 +13,9 @@ import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
+import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
@@ -26,6 +29,7 @@ public class ProfileService {
     private final ApplicationService applicationService;
     private final ProfileRepository profileRepository;
     private final PreSignedUrlService preSignedUrlService;
+    private final RecruitingPostService recruitingPostService;
 
     @Transactional
     public ProfileResponseDto createProfile(User user, ProfileRequestDto requestDto, String objectKey){
@@ -88,19 +92,25 @@ public class ProfileService {
 
         // 이 프로필을 사용한 Application 존재하는지 확인
         List<Application> applications = applicationService.getApplicationsByProfile(profile);
-        if (!applications.isEmpty()) {
+        List<RecruitingPost> recruitingPosts  = recruitingPostService.getRecruitingPostsByProfile(profile);
+        if (!applications.isEmpty() || !recruitingPosts.isEmpty()) {
             // 존재한다면, applicationStatus 확인
-            boolean hasMatchable = applications.stream()
+            boolean applicationHasMatchable = applications.stream()
                     .anyMatch(app -> app.getApplicationStatus() == ApplicationStatus.MATCHED
                             || app.getApplicationStatus() == ApplicationStatus.MATCH_FAILED);
 
-            if (hasMatchable) {
+            boolean recruitingPostHasMatchable = recruitingPosts.stream()
+                    .anyMatch(recruitingPost -> recruitingPost.getStatus()== RecruitingStatus.CLOSED);
+
+            if (applicationHasMatchable && recruitingPostHasMatchable) {
                 // soft-delete 처리
                 profile.deleteProfile();
                 profileRepository.save(profile);
-            } else {
+            } else if (!applicationHasMatchable) {
                 // 매칭 대기 상태라면 삭제 금지
                 throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_APPLICATION_PENDING);
+            } else if (!recruitingPostHasMatchable) {
+                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_RECRUITINGPOST_OPEN);
             }
         } else {
             // 3) Application이 아예 없다면 물리 삭제 가능
@@ -112,6 +122,8 @@ public class ProfileService {
             }
             profileRepository.delete(profile);
         }
+
+        //
     }
 
     @Transactional
