@@ -45,7 +45,7 @@ public class ProfileService {
 
         int count = profileRepository.countByUser(user);
 
-        if (count > 3) {
+        if (count >= 3) {
             throw new GeneralException(ErrorStatus.CANNOT_COUNT_OVER_3);
         }
 
@@ -103,15 +103,21 @@ public class ProfileService {
         boolean hasAnyApplication = !applications.isEmpty();
         boolean hasMatchingApplication = applications.stream()
                 .anyMatch(a -> a.getApplicationStatus() == ApplicationStatus.MATCHING);
-        boolean hasMatchedOrFailedApplication = applications.stream()
-                .anyMatch(a -> a.getApplicationStatus() == ApplicationStatus.MATCHED
-                        || a.getApplicationStatus() == ApplicationStatus.MATCH_FAILED);
 
         boolean hasAnyPost = !recruitingPosts.isEmpty();
         boolean hasOpenPost = recruitingPosts.stream()
                 .anyMatch(p -> p.getStatus() == RecruitingStatus.OPEN);
-        boolean hasClosedPost = recruitingPosts.stream()
-                .anyMatch(p -> p.getStatus() == RecruitingStatus.CLOSED);
+
+        //하드삭제
+        if (!hasAnyApplication && !hasAnyPost) {
+            String image = profile.getProfileImage();
+            if (image != null && !image.isBlank()) {
+                String objectKey = preSignedUrlService.extractKeyFromUrl(image);
+                preSignedUrlService.deleteByKey(objectKey);
+            }
+            profileRepository.delete(profile);
+            return;
+        }
 
         boolean softDeleteAboutApp = false;
         //지원관련 필터링
@@ -142,17 +148,6 @@ public class ProfileService {
         if (softDeleteAboutRp && softDeleteAboutApp) {
             profile.deleteProfile();
             profileRepository.save(profile);
-            return;
-        }
-
-        // 하드 삭제
-        if (!hasAnyApplication && !hasAnyPost) {
-            String image = profile.getProfileImage();
-            if (image != null && !image.isBlank()) {
-                String objectKey = preSignedUrlService.extractKeyFromUrl(image);
-                preSignedUrlService.deleteByKey(objectKey);
-            }
-            profileRepository.delete(profile);
             return;
         }
 
