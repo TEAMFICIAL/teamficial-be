@@ -47,11 +47,9 @@ public class Application extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 
     public void updateStatus(ApplicationStatus applicationStatus) {
         this.applicationStatus = applicationStatus;

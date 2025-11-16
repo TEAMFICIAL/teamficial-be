@@ -81,6 +81,6 @@ public class MypageController {
     public ApiResponse<String> confirmedApplicant(@AuthenticationPrincipal AuthDetails authDetails, @PathVariable Long recruitingPostId, @PathVariable Long applicationId, @RequestParam ApplicationStatus applicationStatus){
         mypageService.confirmedApplicant(authDetails.user(),recruitingPostId,applicationId,applicationStatus);
 
-        return ApiResponse.onSuccess("함께할 사람이 생겼습니다!");
+        return ApiResponse.onSuccess("지원 결과를 수정하였습니다.");
     }
 }

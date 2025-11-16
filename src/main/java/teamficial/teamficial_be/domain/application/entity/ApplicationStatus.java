@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ApplicationStatus {
     MATCHED("매칭 성공"),
+    TEMP_SAVED("임시저장"),
     MATCHING("매칭중"),
     MATCH_FAILED("매칭 실패");
 
