@@ -6,18 +6,16 @@ import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
-import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
+import teamficial.teamficial_be.domain.profile.dto.ProfileStatus;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
-import teamficial.teamficial_be.domain.profile.entity.ProfileLink;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.domain.user.entity.User;
-import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
@@ -67,19 +65,27 @@ public class ProfileService {
     }
 
     @Transactional
-    public ProfileResponseDto updateProfile(User user,Long profileId, ProfileRequestDto requestDto){
+    public ProfileResponseDto updateProfile(User user,Long profileId, ProfileRequestDto requestDto) {
         Profile profile = getProfileById(profileId);
-        profile.update(requestDto);
 
         validateUserProfile(user, profile);
 
+        ProfileStatus status = checkProfileStatus(profile);
+
+        if (!status.canModifyOrDelete()){
+            status.validateForModification();
+            throw new GeneralException(ErrorStatus.CANNOT_MODIFY_PROFILE);
+        }
+
+        profile.update(requestDto);
+
         if (requestDto.getLinks() != null) {
             profile.clearLinks();
-            requestDto.getLinks().forEach(link -> profile.addLink(link));
+            requestDto.getLinks().forEach(profile::addLink);
         }
 
         profileRepository.save(profile);
-        return ProfileResponseDto.of(profile,profile.getHeadKeywords());
+        return ProfileResponseDto.of(profile, profile.getHeadKeywords());
     }
 
     @Transactional(readOnly = true)
@@ -96,20 +102,9 @@ public class ProfileService {
 
         validateUserProfile(user, profile);
 
-        // 이 프로필을 사용한 Application 존재하는지 확인
-        List<Application> applications = applicationService.getApplicationsByProfile(profile);
-        List<RecruitingPost> recruitingPosts  = recruitingPostService.getRecruitingPostsByProfile(profile);
+        ProfileStatus status = checkProfileStatus(profile);
 
-        boolean hasAnyApplication = !applications.isEmpty();
-        boolean hasMatchingApplication = applications.stream()
-                .anyMatch(a -> a.getApplicationStatus() == ApplicationStatus.MATCHING);
-
-        boolean hasAnyPost = !recruitingPosts.isEmpty();
-        boolean hasOpenPost = recruitingPosts.stream()
-                .anyMatch(p -> p.getStatus() == RecruitingStatus.OPEN);
-
-        //하드삭제
-        if (!hasAnyApplication && !hasAnyPost) {
+        if (status.canHardDelete()){
             String image = profile.getProfileImage();
             if (image != null && !image.isBlank()) {
                 String objectKey = preSignedUrlService.extractKeyFromUrl(image);
@@ -119,40 +114,13 @@ public class ProfileService {
             return;
         }
 
-        boolean softDeleteAboutApp = false;
-        //지원관련 필터링
-        if (hasAnyApplication) {
-            if (hasMatchingApplication) {
-                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_APPLICATION_PENDING);
-            } else {
-                softDeleteAboutApp = true;
-            }
-        } else {
-            softDeleteAboutApp = true;
+        if (!status.canModifyOrDelete()){
+            status.validateForDeletion();
+            throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE);
         }
 
-        boolean softDeleteAboutRp = false;
-        //모집글 관련 필터링
-        if (hasAnyPost) {
-            if (hasOpenPost) {
-                throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE_WHEN_RECRUITINGPOST_OPEN);
-            }
-            else {
-                softDeleteAboutRp = true;
-            }
-        } else {
-            softDeleteAboutRp = true;
-        }
-
-        // 소프트 삭제
-        if (softDeleteAboutRp && softDeleteAboutApp) {
-            profile.deleteProfile();
-            profileRepository.save(profile);
-            return;
-        }
-
-        // 위 케이스 외
-        throw new GeneralException(ErrorStatus.CANNOT_DELETE_PROFILE);
+        profile.deleteProfile();
+        profileRepository.save(profile);
     }
 
     @Transactional
@@ -208,5 +176,26 @@ public class ProfileService {
 
     public void saveProfile(Profile profile) {
         profileRepository.save(profile);
+    }
+
+    private ProfileStatus checkProfileStatus(Profile profile){
+        //이 프로필의 application 또는 작성한 recruitingPost 있는지
+        List<Application> applications = applicationService.getApplicationsByProfile(profile);
+        List<RecruitingPost> recruitingPosts = recruitingPostService.getRecruitingPostsByProfile(profile);
+
+        boolean hasAnyApplication = !applications.isEmpty();
+        boolean hasMatchingApplication = applications.stream()
+                .anyMatch(a -> a.getApplicationStatus() == ApplicationStatus.MATCHING || a.getApplicationStatus() == ApplicationStatus.TEMP_SAVED);
+
+        boolean hasAnyPost = !recruitingPosts.isEmpty();
+        boolean hasOpenPost = recruitingPosts.stream()
+                .anyMatch(p -> p.getStatus() == RecruitingStatus.OPEN);
+
+        return ProfileStatus.builder()
+                .hasMatchingApplication(hasMatchingApplication)
+                .hasAnyApplication(hasAnyApplication)
+                .hasAnyPost(hasAnyPost)
+                .hasOpenPost(hasOpenPost)
+                .build();
     }
 }
