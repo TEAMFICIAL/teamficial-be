@@ -47,7 +47,16 @@ public class MypageService {
         Page<Application> applicationPage = applicationService.getApplicationsByUserAndStatus(user,pageable,applicationStatus);
 
         Page<MyApplicationResponseDto> dtoPage = applicationPage
-                .map(application -> MyApplicationResponseDto.of(application.getRecruitingPost(),application.getApplicationStatus().getDescription()));
+                .map(application -> {
+                    RecruitingPost recruitingPost = application.getRecruitingPost();
+                    ApplicationStatus status = application.getApplicationStatus();
+
+                    if (recruitingPost.getStatus() == RecruitingStatus.OPEN || status ==ApplicationStatus.TEMP_SAVED) {
+                        return MyApplicationResponseDto.of(application.getRecruitingPost(), ApplicationStatus.MATCHING.getDescription());
+                    }
+
+                    return MyApplicationResponseDto.of(application.getRecruitingPost(), ApplicationStatus.MATCHING.getDescription());
+                });
 
         return PagedResponse.of(dtoPage);
     }
@@ -201,9 +210,13 @@ public class MypageService {
                 .toList();
 
         List<MyApplicationResponseDto> applicationDtos = applicationList.stream()
-                .map(app -> MyApplicationResponseDto.of(
-                        app.getRecruitingPost(),
-                        app.getApplicationStatus().getDescription()))
+                .map(app -> {
+                    ApplicationStatus status = app.getApplicationStatus();
+                    if (status == ApplicationStatus.TEMP_SAVED) {
+                        return MyApplicationResponseDto.of(app.getRecruitingPost(), ApplicationStatus.TEMP_SAVED.getDescription());
+                    }
+                    return MyApplicationResponseDto.of(app.getRecruitingPost(), app.getApplicationStatus().getDescription());
+                })
                 .toList();
 
         return DashboardResponseDto.builder()
