@@ -55,7 +55,7 @@ public class MypageService {
                         return MyApplicationResponseDto.of(application.getRecruitingPost(), ApplicationStatus.MATCHING.getDescription());
                     }
 
-                    return MyApplicationResponseDto.of(application.getRecruitingPost(), ApplicationStatus.MATCHING.getDescription());
+                    return MyApplicationResponseDto.of(application.getRecruitingPost(), status.getDescription());
                 });
 
         return PagedResponse.of(dtoPage);
@@ -157,8 +157,15 @@ public class MypageService {
         recruitingPost.closedRecruitingPost();
         List<Application> applications = applicationService.getApplicationsByRecruitingPost(recruitingPost);
         applications.stream()
-                .filter(app -> app.getApplicationStatus() == ApplicationStatus.MATCHING)
-                .forEach(app -> app.updateStatus(ApplicationStatus.MATCH_FAILED));
+                .filter(app -> app.getApplicationStatus() == ApplicationStatus.MATCHING
+                        || app.getApplicationStatus() == ApplicationStatus.TEMP_SAVED)
+                .forEach(app -> {
+                    if (app.getApplicationStatus() == ApplicationStatus.TEMP_SAVED) {
+                        app.updateStatus(ApplicationStatus.MATCHED);
+                    } else {
+                        app.updateStatus(ApplicationStatus.MATCH_FAILED);
+                    }
+                });
 
         applicationService.saveApplications(applications);
     }

@@ -38,7 +38,7 @@ public enum ErrorStatus implements BaseErrorCode {
     CANNOT_DELETE_PROFILE(HttpStatus.BAD_REQUEST,"PROFILE4007","해당 프로필로 지원중인 공고나 모집 중인 작성 글이 있어, 삭제가 불가능합니다."),
     CANNOT_MODIFY_PROFILE_WHEN_APPLICATION_PENDING(HttpStatus.BAD_REQUEST,"PROFILE4008","해당 프로필로 지원중인 공고가 있어, 수정이 불가능합니다."),
     CANNOT_MODIFY_PROFILE_WHEN_RECRUITING_POST_OPEN(HttpStatus.BAD_REQUEST,"PROFILE4009","해당 프로필로 모집 중인 작성 글이 있어, 수정이 불가능합니다."),
-    CANNOT_MODIFY_PROFILE(HttpStatus.BAD_REQUEST,"PROFILE4010","해당 프로필로 지원중인 공고나 모집 중인 작성 글이 있어, 삭제가 불가능합니다."),
+    CANNOT_MODIFY_PROFILE(HttpStatus.BAD_REQUEST,"PROFILE4010","해당 프로필로 지원중인 공고나 모집 중인 작성 글이 있어, 수정이 불가능합니다."),
 
     //지원 관련 응답
     DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST,"APPLICATION6001","이미 지원한 모집 글 입니다."),
