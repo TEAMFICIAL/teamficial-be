@@ -26,6 +26,8 @@ public class CurrentApplicantResponseDto {
     private LocalDate deadline;
     @Schema(description = "총 지원자 수", example="3")
     private int totalApplicants;
+    @Schema(description = "모집글 상태", example="모집중")
+    private String recruitingPostStatus;
     @Schema(description = "글 작성일", example="2025-10-28T06:38:03.179Z")
     private LocalDateTime createdAt;
     private long dDay;
@@ -43,6 +45,7 @@ public class CurrentApplicantResponseDto {
                 .totalApplicants(totalApplicants)
                 .tags(tags)
                 .deadline(recruitingPost.getDeadline())
+                .recruitingPostStatus(recruitingPost.getStatus().getDescription())
                 .createdAt(recruitingPost.getCreatedAt())
                 .dDay(dDay)
                 .build();
