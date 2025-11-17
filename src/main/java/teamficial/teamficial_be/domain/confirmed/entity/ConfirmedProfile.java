@@ -3,6 +3,7 @@ package teamficial.teamficial_be.domain.confirmed.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
+import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 import teamficial.teamficial_be.global.enums.Position;
 
@@ -19,6 +20,10 @@ public class ConfirmedProfile extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "confirmed_profile_id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recruiting_post_id", nullable = false)
+    private RecruitingPost recruitingPost;
 
     @OneToMany(mappedBy = "confirmedProfile",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default

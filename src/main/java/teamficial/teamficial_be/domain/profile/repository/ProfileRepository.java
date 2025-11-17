@@ -20,7 +20,6 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     @Query("SELECT p FROM Profile p " +
             "LEFT JOIN FETCH p.profileLinks " +
-            "LEFT JOIN FETCH p.headKeywords " +
             "WHERE p.id = :id")
-    Optional<Profile> findWithLinksAndKeywordsById(@Param("id") Long id);
+    Optional<Profile> findWithLinksById(@Param("id") Long id);
 }

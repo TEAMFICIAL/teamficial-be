@@ -1,12 +1,9 @@
 package teamficial.teamficial_be.domain.recruitingPost.repository;
 
-import com.amazonaws.event.request.Progress;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +24,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-
 
     @Override
     public Page<RecruitingPostDTO.RecruitingPostsResponseDTO> findByFilters(

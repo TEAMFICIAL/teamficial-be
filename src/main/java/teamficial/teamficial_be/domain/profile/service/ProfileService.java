@@ -169,7 +169,7 @@ public class ProfileService {
                 .toList();
     }
 
-    private void validateUserProfile(User user,Profile profile) {
+    public void validateUserProfile(User user,Profile profile) {
         if(!user.getId().equals(profile.getUser().getId())) {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
         }
@@ -201,8 +201,8 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public Profile getProfileWithLinksAndKeywords(Long profileId) {
-        return profileRepository.findWithLinksAndKeywordsById(profileId)
+    public Profile getProfileWithLinks(Long profileId) {
+        return profileRepository.findWithLinksById(profileId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE));
     }
 }

@@ -46,6 +46,8 @@ public class MypageService {
     private final RedisService redisService;
     private final ProfileService profileService;
     private final ConfirmedProfileService confirmedProfileService;
+    private final HeadKeywordService headKeywordService;
+
 
     @Transactional(readOnly = true)
     public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size,ApplicationStatus applicationStatus) {
@@ -174,9 +176,10 @@ public class MypageService {
                     }
 
                     if (app.getApplicationStatus() == ApplicationStatus.MATCHED) {
-                        Profile profile = profileService.getProfileWithLinksAndKeywords(app.getProfile().getId());
+                        Profile profile = profileService.getProfileWithLinks(app.getProfile().getId());
+                        profile.getHeadKeywords().size();
 
-                        confirmedProfileService.createSnapshotFrom(profile, app.getPosition());
+                        confirmedProfileService.createSnapshotFrom(profile, app.getPosition(), recruitingPost);
                     }
 
                 });
