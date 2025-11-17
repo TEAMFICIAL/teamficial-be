@@ -63,7 +63,7 @@ public class KeywordService {
 
     @Transactional
     public void saveBestKeyword(TeamficialLogRequestDto req, String content, String bestKeyword, List<KeywordContentPairDto> results) {
-        User receiver = userService.getUserById(req.getUserId());
+        User receiver = userService.getUserByUuid(req.getUserUuid());
         Keyword keyword = upsertKeyword(receiver, bestKeyword);
 
         keywordCommentService.save(
