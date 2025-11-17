@@ -18,6 +18,7 @@ import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostServ
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
+import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 
 import java.util.List;
 
@@ -197,5 +198,11 @@ public class ProfileService {
                 .hasAnyPost(hasAnyPost)
                 .hasOpenPost(hasOpenPost)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Profile getProfileWithLinksAndKeywords(Long profileId) {
+        return profileRepository.findWithLinksAndKeywordsById(profileId)
+                .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE));
     }
 }

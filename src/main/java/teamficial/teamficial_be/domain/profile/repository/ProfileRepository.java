@@ -8,6 +8,7 @@ import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.user.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
@@ -16,4 +17,10 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     @Query("select count(p) from Profile  p where p.user = :user and p.isDeleted = false")
     int countByUser(User user);
+
+    @Query("SELECT p FROM Profile p " +
+            "LEFT JOIN FETCH p.profileLinks " +
+            "LEFT JOIN FETCH p.headKeywords " +
+            "WHERE p.id = :id")
+    Optional<Profile> findWithLinksAndKeywordsById(@Param("id") Long id);
 }

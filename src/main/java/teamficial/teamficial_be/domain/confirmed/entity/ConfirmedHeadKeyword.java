@@ -1,15 +1,13 @@
 package teamficial.teamficial_be.domain.confirmed.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -2,6 +2,8 @@ package teamficial.teamficial_be.domain.confirmed;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import teamficial.teamficial_be.domain.confirmed.entity.ConfirmedHeadKeyword;
 import teamficial.teamficial_be.domain.confirmed.entity.ConfirmedProfile;
 import teamficial.teamficial_be.domain.confirmed.entity.ConfirmedProfileLink;
 import teamficial.teamficial_be.domain.confirmed.entity.ConfirmedProfileRepository;
@@ -13,7 +15,8 @@ public class ConfirmedProfileService {
 
     private final ConfirmedProfileRepository confirmedProfileRepository;
 
-    public ConfirmedProfile createSnapshotFrom(Profile profile) {
+    @Transactional
+    public void createSnapshotFrom(Profile profile) {
 
         ConfirmedProfile confirmed = ConfirmedProfile.builder()
                 .userName(profile.getUser().getName())
@@ -32,6 +35,15 @@ public class ConfirmedProfileService {
                 )
         );
 
-        return confirmedProfileRepository.save(confirmed);
+        profile.getHeadKeywords().forEach(hk ->
+                confirmed.addHeadKeyword(
+                        ConfirmedHeadKeyword.builder()
+                                .confirmedProfile(confirmed)
+                                .keywordName(hk.getKeywordName())
+                                .build()
+                )
+        );
+
+        confirmedProfileRepository.save(confirmed);
     }
 }

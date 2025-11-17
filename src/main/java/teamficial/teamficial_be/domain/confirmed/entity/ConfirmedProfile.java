@@ -48,5 +48,8 @@ public class ConfirmedProfile extends BaseEntity {
         profileLink.setConfirmedProfile(this);
     }
 
-
+    public void addHeadKeyword(ConfirmedHeadKeyword keyword) {
+        confirmedHeadKeywords.add(keyword);
+        keyword.setConfirmedProfile(this);
+    }
 }
