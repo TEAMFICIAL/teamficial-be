@@ -8,10 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.keyword.dto.request.HeadKeywordRequestDto;
 import teamficial.teamficial_be.domain.keyword.dto.request.TeamficialLogRequestDto;
-import teamficial.teamficial_be.domain.keyword.dto.response.HeadKeywordResponseDto;
-import teamficial.teamficial_be.domain.keyword.dto.response.KeywordCommentResponseDto;
-import teamficial.teamficial_be.domain.keyword.dto.response.KeywordResponseDto;
-import teamficial.teamficial_be.domain.keyword.dto.response.TeamficialLogResponseDto;
+import teamficial.teamficial_be.domain.keyword.dto.response.*;
 import teamficial.teamficial_be.domain.keyword.service.TeamficialLogService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.security.AuthDetails;
@@ -68,6 +65,14 @@ public class TeamficialLogController {
             @Valid @RequestBody TeamficialLogRequestDto request) throws IOException {
 
         return ApiResponse.onSuccess(teamficialLogService.createTeamficialLog(request));
+    }
+
+    @GetMapping("/teamficial-log/requester")
+    @Operation(summary = "팀피셜록 요청자의 정보 반환 api")
+    public ApiResponse<TeamficialLogRequesterResponseDto> getTeamficialLogRequester(@RequestParam String requesterUuid) {
+        TeamficialLogRequesterResponseDto responseDto = teamficialLogService.getTeamficialLogRequester(requesterUuid);
+
+        return ApiResponse.onSuccess(responseDto);
     }
 
 }

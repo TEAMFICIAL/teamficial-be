@@ -18,4 +18,9 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(()->new GeneralException(ErrorStatus.NOT_FOUND_USER));
     }
+
+    public User getUserByUuid(String requesterUuid) {
+        return userRepository.findByUuidAndDeletedAtIsNull(requesterUuid)
+                .orElseThrow(()->new GeneralException(ErrorStatus.NOT_FOUND_USER));
+    }
 }
