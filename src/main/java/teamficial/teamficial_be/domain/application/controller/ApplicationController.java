@@ -10,7 +10,6 @@ import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.global.security.AuthDetails;
 import teamficial.teamficial_be.global.util.GlobalAuthUtil;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/applications")

@@ -131,7 +131,7 @@ public class TeamficialLogService {
         return ScrollResponse.of(dtoList);
     }
 
-    public TeamficialLogResponseDto createTeamficialLog(User writer, TeamficialLogRequestDto req) throws IOException {
+    public TeamficialLogResponseDto createTeamficialLog(TeamficialLogRequestDto req) throws IOException {
 
         List<String> contents = List.of(
                 req.getContent1(),

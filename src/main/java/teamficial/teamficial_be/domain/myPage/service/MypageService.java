@@ -12,9 +12,14 @@ import teamficial.teamficial_be.domain.application.dto.response.ApplicationRespo
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
+import teamficial.teamficial_be.domain.confirmed.ConfirmedProfileService;
+import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
+import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
 import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicantResponseDto;
 import teamficial.teamficial_be.domain.myPage.dto.response.DashboardResponseDto;
 import teamficial.teamficial_be.domain.myPage.dto.response.MyApplicationResponseDto;
+import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.profile.service.ProfileService;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
@@ -39,6 +44,10 @@ public class MypageService {
     private final RecruitingPostService recruitingPostService;
     private final ApplicationService applicationService;
     private final RedisService redisService;
+    private final ProfileService profileService;
+    private final ConfirmedProfileService confirmedProfileService;
+    private final HeadKeywordService headKeywordService;
+
 
     @Transactional(readOnly = true)
     public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size,ApplicationStatus applicationStatus) {
@@ -145,7 +154,7 @@ public class MypageService {
         recruitingPost.getDDay();
 
 
-        return CurrentApplicationDetailResponseDto.from(recruitingPost, applications,dDay);
+        return CurrentApplicationDetailResponseDto.from(recruitingPost, applications, dDay);
     }
 
     @Transactional
@@ -165,6 +174,14 @@ public class MypageService {
                     } else {
                         app.updateStatus(ApplicationStatus.MATCH_FAILED);
                     }
+
+                    if (app.getApplicationStatus() == ApplicationStatus.MATCHED) {
+                        Profile profile = profileService.getProfileWithLinks(app.getProfile().getId());
+                        profile.getHeadKeywords().size();
+
+                        confirmedProfileService.createSnapshotFrom(profile, app.getPosition(), recruitingPost);
+                    }
+
                 });
 
         applicationService.saveApplications(applications);
