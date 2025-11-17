@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
 import teamficial.teamficial_be.global.entity.BaseEntity;
+import teamficial.teamficial_be.global.enums.Position;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,8 @@ public class ConfirmedProfile extends BaseEntity {
 
     @Column(name = "contact_way", length = 255)
     private String contactWay;
+
+    private Position position;
 
     public void addProfileLink(ConfirmedProfileLink profileLink) {
         confirmedProfileLinks.add(profileLink);

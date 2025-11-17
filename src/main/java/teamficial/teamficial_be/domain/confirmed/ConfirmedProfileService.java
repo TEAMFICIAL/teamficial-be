@@ -8,6 +8,7 @@ import teamficial.teamficial_be.domain.confirmed.entity.ConfirmedProfile;
 import teamficial.teamficial_be.domain.confirmed.entity.ConfirmedProfileLink;
 import teamficial.teamficial_be.domain.confirmed.entity.ConfirmedProfileRepository;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.global.enums.Position;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class ConfirmedProfileService {
     private final ConfirmedProfileRepository confirmedProfileRepository;
 
     @Transactional
-    public void createSnapshotFrom(Profile profile) {
+    public void createSnapshotFrom(Profile profile, Position position) {
 
         ConfirmedProfile confirmed = ConfirmedProfile.builder()
                 .userName(profile.getUser().getName())
@@ -24,6 +25,7 @@ public class ConfirmedProfileService {
                 .profileImage(profile.getProfileImage())
                 .workingTime(profile.getWorkingTime())
                 .contactWay(profile.getContactWay())
+                .position(position)
                 .build();
 
         profile.getProfileLinks().forEach(link ->

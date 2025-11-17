@@ -176,7 +176,7 @@ public class MypageService {
                     if (app.getApplicationStatus() == ApplicationStatus.MATCHED) {
                         Profile profile = profileService.getProfileWithLinksAndKeywords(app.getProfile().getId());
 
-                        confirmedProfileService.createSnapshotFrom(profile);
+                        confirmedProfileService.createSnapshotFrom(profile, app.getPosition());
                     }
 
                 });
