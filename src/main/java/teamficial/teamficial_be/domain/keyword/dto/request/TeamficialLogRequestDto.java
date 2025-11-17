@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class TeamficialLogRequestDto {
-    private Long userId;
+    private String userUuid;
 
     @NotBlank(message = "첫 번째 내용은 비어 있을 수 없습니다.")
     private String content1;

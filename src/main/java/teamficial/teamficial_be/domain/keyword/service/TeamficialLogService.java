@@ -210,7 +210,6 @@ public class TeamficialLogService {
         User user = userService.getUserByUuid(requesterUuid);
 
         return TeamficialLogRequesterResponseDto.builder()
-                .requesterId(user.getId())
                 .requesterName(user.getName())
                 .build();
     }
