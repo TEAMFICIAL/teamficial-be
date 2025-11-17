@@ -65,10 +65,9 @@ public class TeamficialLogController {
     @PostMapping("/teamficial-log")
     @Operation(summary = "팀피셜록 작성하기", description = "팀피셜록을 작성하고 키워드,요약을 추출하는 api 입니다.")
     public ApiResponse<TeamficialLogResponseDto> createTeamficialLog(
-            @AuthenticationPrincipal AuthDetails authDetails,
             @Valid @RequestBody TeamficialLogRequestDto request) throws IOException {
 
-        return ApiResponse.onSuccess(teamficialLogService.createTeamficialLog(authDetails.user(), request));
+        return ApiResponse.onSuccess(teamficialLogService.createTeamficialLog(request));
     }
 
 }
