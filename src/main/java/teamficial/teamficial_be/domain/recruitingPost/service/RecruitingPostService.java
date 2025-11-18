@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
@@ -19,6 +20,7 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.repository.RecruitingPostRepository;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.repository.UserRepository;
+import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
@@ -39,6 +41,8 @@ public class RecruitingPostService {
     private final RecruitingPostRepository recruitingPostRepository;
     private final ProfileRepository profileRepository;
     private final RecruitingDetailRepository recruitingDetailRepository;
+    private final ApplicationService applicationService;
+    private final UserService userService;
 
 
     @Transactional
@@ -73,6 +77,8 @@ public class RecruitingPostService {
                 .toList();
 
         recruitingDetailRepository.saveAll(details);
+
+
 
         return RecruitingPostDto.RecruitingPostsResponseDTO.from(saved, details,dDay);
     }
@@ -147,7 +153,7 @@ public class RecruitingPostService {
 
 
     @Transactional(readOnly = true)
-    public RecruitingPostDto.RecruitingPostsResponseDTO getPost(Long postId) {
+    public RecruitingPostDto.RecruitingPostDetailResponseDTO getPost(Long postId,Long userId) {
 
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
@@ -157,8 +163,17 @@ public class RecruitingPostService {
         List<RecruitingDetail> recruitingDetails =
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
+        boolean alreadyApplied = false;
+        boolean isWriter = false;
 
-        return RecruitingPostDto.RecruitingPostsResponseDTO.from(post, recruitingDetails,dDay);
+        if (userId !=null){
+            User user = userService.getUserById(userId);
+
+            alreadyApplied = applicationService.alreadyApplied(userId,postId);
+            isWriter = post.isWriter(user);
+        }
+
+        return RecruitingPostDto.RecruitingPostDetailResponseDTO.from(post, recruitingDetails,dDay,alreadyApplied,isWriter);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {

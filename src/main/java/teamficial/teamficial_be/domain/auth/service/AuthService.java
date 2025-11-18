@@ -6,6 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.auth.dto.LoginResponseDTO;
+import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
+import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.profile.service.ProfileService;
 import teamficial.teamficial_be.domain.user.entity.LoginType;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.domain.user.entity.UserRole;
@@ -37,6 +40,7 @@ public class AuthService {
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
+    private final ProfileService profileService;
 
     private static final String REFRESH_TOKEN_PREFIX = "refresh:";
 
@@ -138,6 +142,10 @@ public class AuthService {
                 .userRole(UserRole.USER)
                 .loginType(loginType)
                 .build();
+
+        ProfileRequestDto profileRequestDto = new ProfileRequestDto();
+
+        profileService.createProfile(user,profileRequestDto,null);
 
         return userRepository.save(user);
     }
