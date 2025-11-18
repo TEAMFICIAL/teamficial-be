@@ -1,5 +1,7 @@
 package teamficial.teamficial_be.domain.recruitingPost.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +18,9 @@ import teamficial.teamficial_be.global.enums.Position;
 @SpringBootTest
 @Transactional
 public class RecruitingPostQueryPerformanceTest {
+    @PersistenceContext
+    private EntityManager em;
+
     @Autowired
     RecruitingPostRepositoryCustom recruitingPostRepository;
 
@@ -39,22 +44,40 @@ public class RecruitingPostQueryPerformanceTest {
         long end = System.currentTimeMillis();
         System.out.println("첫페이지 조회 시간: " + (end - start) + " ms");
 
-//        // 2) 두 번째 실행 (캐시 미스/플랜 생성된 상태)
-//        long start2 = System.currentTimeMillis();
-//        Page<RecruitingPostDto.RecruitingPostsResponseDTO> page2 =
-//                recruitingPostService.getRecruitingPosts(status, position, progressWay, pageable);
-//        long end2 = System.currentTimeMillis();
-//        System.out.println("Run #2: " + (end2 - start2) + " ms");
-//
-//        // 3) 세 번째 실행 (DB Cache / Buffer Pool Warm)
-//        long start3 = System.currentTimeMillis();
-//        Page<RecruitingPostDto.RecruitingPostsResponseDTO> page3 =
-//                recruitingPostService.getRecruitingPosts(status, position, progressWay, pageable);
-//        long end3 = System.currentTimeMillis();
-//        System.out.println("Run #3: " + (end3 - start3) + " ms");
-//
-//        // 페이지 내용 출력(옵션)
-//        System.out.println("Total Elements: " + page3.getTotalElements());
-//        System.out.println("Returned size: " + page3.getContent().size());
     }
+
+    @Test
+    void measure_querydsl_last_page_performance() {
+
+        RecruitingStatus status = null;
+        Position position = null;
+        ProgressWay progressWay = null;
+
+        int pageSize = 20;
+
+        // 1) 전체 개수 조회
+        Long totalCount = em.createQuery(
+                "SELECT COUNT(rp) FROM RecruitingPost rp", Long.class
+        ).getSingleResult();
+
+        // 2) 마지막 페이지 번호 계산
+        int lastPageNumber = (int) (totalCount == 0 ? 0 : (totalCount - 1) / pageSize);
+
+        Pageable pageable = PageRequest.of(lastPageNumber, pageSize);
+
+        System.out.println("==== QueryDSL Last Page Performance Test ====");
+        System.out.println("totalCount       = " + totalCount);
+        System.out.println("pageSize         = " + pageSize);
+        System.out.println("lastPageNumber   = " + lastPageNumber);
+        System.out.println("---------------------------------------------");
+
+        long start = System.currentTimeMillis();
+        Page<RecruitingPostDto.RecruitingPostsResponseDTO> lastPage =
+                recruitingPostService.getRecruitingPosts(status, position, progressWay, pageable);
+        long end = System.currentTimeMillis();
+
+        System.out.println("마지막 페이지 조회 시간 : " + (end - start) + " ms");
+        System.out.println("조회된 데이터 수       : " + lastPage.getContent().size());
+    }
+
 }

@@ -16,8 +16,9 @@ import teamficial.teamficial_be.global.enums.Position;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import static teamficial.teamficial_be.domain.profile.entity.QProfile.profile;
+import static teamficial.teamficial_be.domain.user.entity.QUser.user;
 
 @RequiredArgsConstructor
 public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCustom {
@@ -36,46 +37,78 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
 
         if (status != null) builder.and(post.status.eq(status));
         if (progressWay != null) builder.and(post.progressWay.eq(progressWay));
-        if (position != null) builder.and(postDetail.position.eq(position));
 
-        List<RecruitingPostPagingDto.RecruitingPostFlatDto> flatPosts = queryFactory
-                .select(Projections.constructor(
-                        RecruitingPostPagingDto.RecruitingPostFlatDto.class,
-                        post.id,
-                        post.profile.isDeleted,
-                        post.profile.user.id,
-                        post.profile.id,
-                        post.profile.userName,
-                        post.profile.profileImage,
-                        post.progressWay,
-                        post.contactWay,
-                        post.startDate,
-                        post.period,
-                        post.deadline,
-                        post.status,
-                        post.content,
-                        post.title,
-                        post.createdAt
-                ))
-                .from(post)
-                .leftJoin(post.recruitingDetails, postDetail)
-                .where(builder)
-                .orderBy(post.createdAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .distinct()
-                .fetch();
+        List<Long> pagedPostIds;
 
-        if (flatPosts.isEmpty()) {
-            return Page.empty(pageable);
+        if (position == null) {
+            pagedPostIds = queryFactory
+                    .select(post.id)
+                    .from(post)
+                    .where(builder)
+                    .orderBy(post.createdAt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        } else {
+            pagedPostIds = queryFactory
+                    .select(post.id)
+                    .from(post)
+                    .join(post.recruitingDetails, postDetail)
+                    .where(
+                            builder.and(postDetail.position.eq(position))
+                    )
+                    .orderBy(post.createdAt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
         }
 
-        Long total = queryFactory
-                .select(post.id.countDistinct())
-                .from(post)
-                .leftJoin(post.recruitingDetails, postDetail)
-                .where(builder)
-                .fetchOne();
+        if (pagedPostIds.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+
+        List<RecruitingPostPagingDto.RecruitingPostFlatDto> flatPosts =
+                queryFactory
+                        .select(Projections.constructor(
+                                RecruitingPostPagingDto.RecruitingPostFlatDto.class,
+                                post.id,
+                                post.profile.isDeleted,
+                                post.profile.user.id,
+                                post.profile.id,
+                                post.profile.userName,
+                                post.profile.profileImage,
+                                post.progressWay,
+                                post.contactWay,
+                                post.startDate,
+                                post.period,
+                                post.deadline,
+                                post.status,
+                                post.content,
+                                post.title,
+                                post.createdAt
+                        ))
+                        .from(post)
+                        .join(post.profile, profile)
+                        .join(profile.user, user)
+                        .where(post.id.in(pagedPostIds))
+                        .orderBy(post.createdAt.desc())
+                        .fetch();
+
+        Long total;
+        if (position == null) {
+            total = queryFactory
+                    .select(post.id.count())
+                    .from(post)
+                    .where(builder)
+                    .fetchOne();
+        } else {
+            total = queryFactory
+                    .select(post.id.countDistinct())
+                    .from(post)
+                    .join(post.recruitingDetails, postDetail)
+                    .where(builder.and(postDetail.position.eq(position)))
+                    .fetchOne();
+        }
 
         return new PageImpl<>(flatPosts, pageable, total == null ? 0 : total);
     }
