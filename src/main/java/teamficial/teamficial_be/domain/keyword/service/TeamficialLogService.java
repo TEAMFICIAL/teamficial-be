@@ -106,7 +106,7 @@ public class TeamficialLogService {
     }
 
     @Transactional(readOnly = true)
-    public PagedResponse<KeywordResponseDto> getKeywordList(Long userId, int page, int size) {
+    public PagedResponse<KeywordResponseDto> getKeywordList(User viewer,Long userId, int page, int size) {
         User user = userService.getUserById(userId);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -119,7 +119,7 @@ public class TeamficialLogService {
     }
 
     @Transactional(readOnly = true)
-    public ScrollResponse<KeywordCommentResponseDto> getKeywordCommentList(Long keywordId, int page, int size) {
+    public ScrollResponse<KeywordCommentResponseDto> getKeywordCommentList(User user,Long keywordId, int page, int size) {
         Keyword keyword = keywordService.getKeywordById(keywordId);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));

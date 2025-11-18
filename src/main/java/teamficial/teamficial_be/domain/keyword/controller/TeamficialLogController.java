@@ -41,20 +41,22 @@ public class TeamficialLogController {
 
     @GetMapping("/teamficial-log/{userId}")
     @Operation(summary = "키워드 리스트 조회하기", description = "한 유저의 키워드 리스트를 조회하는 api 입니다.")
-    public ApiResponse<PagedResponse<KeywordResponseDto>> getKeywordList(@PathVariable Long userId,
+    public ApiResponse<PagedResponse<KeywordResponseDto>> getKeywordList(@AuthenticationPrincipal AuthDetails authDetails,
+                                                                         @PathVariable Long userId,
                                                                          @RequestParam(defaultValue = "0") int page,
                                                                          @RequestParam(defaultValue = "3") int size) {
-        PagedResponse<KeywordResponseDto> responseDto = teamficialLogService.getKeywordList(userId,page,size);
+        PagedResponse<KeywordResponseDto> responseDto = teamficialLogService.getKeywordList(authDetails.user(),userId,page,size);
 
         return ApiResponse.onSuccess(responseDto);
     }
 
     @GetMapping("/teamficial-log/users/{keywordId}")
     @Operation(summary = "키워드 코멘트 리스트 조회하기", description = "키워드 코멘트 리스트를 조회하는 api 입니다.")
-    public ApiResponse<ScrollResponse<KeywordCommentResponseDto>> getKeywordCommentList(@PathVariable Long keywordId,
+    public ApiResponse<ScrollResponse<KeywordCommentResponseDto>> getKeywordCommentList(@AuthenticationPrincipal AuthDetails authDetails,
+                                                                                        @PathVariable Long keywordId,
                                                                                  @RequestParam(defaultValue = "0") int page,
                                                                                  @RequestParam(defaultValue = "3") int size) {
-        ScrollResponse<KeywordCommentResponseDto> responseDto = teamficialLogService.getKeywordCommentList(keywordId,page,size);
+        ScrollResponse<KeywordCommentResponseDto> responseDto = teamficialLogService.getKeywordCommentList(authDetails.user(),keywordId,page,size);
 
         return ApiResponse.onSuccess(responseDto);
     }
