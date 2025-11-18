@@ -166,7 +166,7 @@ public class RecruitingPostService {
         boolean alreadyApplied = false;
         boolean isWriter = false;
 
-        if (userId !=0){
+        if (userId !=null){
             User user = userService.getUserById(userId);
 
             alreadyApplied = applicationService.alreadyApplied(userId,postId);
