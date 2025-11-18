@@ -53,7 +53,7 @@ public class TeamficialLogService {
     private final PromptLoadService promptLoadService;
 
     @Transactional(readOnly = true)
-    public HeadKeywordResponseDto getHeadKeyword(User user, Long profileId) {
+    public HeadKeywordResponseDto getHeadKeyword(Long profileId) {
         Profile profile = profileService.getProfileById(profileId);
 
         List<HeadKeyword> headKeywords= headKeywordService.getAllByProfile(profile);
