@@ -108,5 +108,9 @@ public class RecruitingPost extends BaseEntity {
         return ChronoUnit.DAYS.between(LocalDate.now(), deadline);
     }
 
+    public boolean isWriter(User user) {
+        return this.user.equals(user);
+    }
+
 
 }

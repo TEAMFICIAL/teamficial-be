@@ -1,7 +1,6 @@
 package teamficial.teamficial_be.domain.recruitingPost.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
@@ -157,7 +156,11 @@ public class RecruitingPostDto {
     @Builder
     public static class RecruitingPostDetailResponseDTO {
         private Long postId;
-        private ProfileResponseDto profile;
+        private Long writerUserId;
+        private Long writerProfileId;
+        private String userName;
+        private String profileImageUrl;
+        private boolean profileIsDeleted;
         private ProgressWay progressWay;
         private String contactWay;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
@@ -172,11 +175,17 @@ public class RecruitingPostDto {
         private LocalDateTime createdAt;
         private long dDay;
         private List<RecruitingPositionDto> recruitingPositions;
+        private boolean alreadyApplied;
+        private boolean isWriter;
 
-        public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay) {
+        public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay, boolean alreadyApplied, boolean isWriter) {
             return RecruitingPostDetailResponseDTO.builder()
                     .postId(post.getId())
-                    .profile(ProfileResponseDto.of(post.getProfile(),post.getProfile().getHeadKeywords()))
+                    .writerUserId(post.getUser().getId())
+                    .writerProfileId(post.getProfile().getId())
+                    .userName(post.getProfile().getUserName())
+                    .profileImageUrl(post.getProfile().getProfileImage())
+                    .profileIsDeleted(post.getProfile().isDeleted())
                     .title(post.getTitle())
                     .content(post.getContent())
                     .progressWay(post.getProgressWay())
@@ -194,6 +203,8 @@ public class RecruitingPostDto {
                     )
                     .createdAt(post.getCreatedAt())
                     .dDay(dDay)
+                    .alreadyApplied(alreadyApplied)
+                    .isWriter(isWriter)
                     .build();
         }
 

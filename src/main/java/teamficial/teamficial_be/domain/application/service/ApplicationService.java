@@ -155,4 +155,10 @@ public class ApplicationService {
         return applicationRepository.findAllByProfile(profile);
     }
 
+    public boolean alreadyApplied(Long userId, Long recruitingPostId) {
+        boolean exists = applicationRepository.existsByUserIdAndRecruitingPostId(userId, recruitingPostId) ==1;
+
+        return exists;
+    }
+
 }
