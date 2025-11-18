@@ -18,7 +18,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class RecruitingPostDTO {
+public class RecruitingPostDto {
 
     @Getter
     @NoArgsConstructor
@@ -34,7 +34,7 @@ public class RecruitingPostDTO {
         private String title;
 
         // 모집 직무 & 인원 리스트
-        private List<RecruitingPositionDTO> recruitingPositions;
+        private List<RecruitingPositionDto> recruitingPositions;
 
     }
 
@@ -42,12 +42,12 @@ public class RecruitingPostDTO {
     @NoArgsConstructor
     @Builder
     @AllArgsConstructor
-    public static class RecruitingPositionDTO {
+    public static class RecruitingPositionDto {
         private Position position;
         private Integer count;
 
-        public static RecruitingPositionDTO from(RecruitingDetail detail) {
-            return RecruitingPositionDTO.builder()
+        public static RecruitingPositionDto from(RecruitingDetail detail) {
+            return RecruitingPositionDto.builder()
                     .position(detail.getPosition())
                     .count(detail.getCount())
                     .build();
@@ -70,31 +70,26 @@ public class RecruitingPostDTO {
     @AllArgsConstructor
     @Builder
     public static class RecruitingPostsResponseDTO {
-        private Long postId;                // 모집 글 Id
-
+        private Long postId;
         private Long writerUserId;
         private Long writerProfileId;
-        private String userName;         // 작성자 이름
-        private String profileImageUrl;     // profile image url
+        private String userName;
+        private String profileImageUrl;
         private boolean profileIsDeleted;
-
-        private ProgressWay progressWay;    // 진행 방식
-        private String contactWay;          // 연락 방법
+        private ProgressWay progressWay;
+        private String contactWay;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-        private LocalDate startDate;    // 시작일
-        private Period period;              // 진행 기간
+        private LocalDate startDate;
+        private Period period;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-        private LocalDate deadline;     // 모집 마감일
-        private RecruitingStatus status;    // 모집 상태
-        private String content;             // 프로젝트 설명
+        private LocalDate deadline;
+        private RecruitingStatus status;
+        private String content;
         private String title;
-
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
         private LocalDateTime createdAt;
         private long dDay;
-
-        // 모집 직무 & 인원 리스트
-        private List<RecruitingPositionDTO> recruitingPositions;
+        private List<RecruitingPositionDto> recruitingPositions;
 
         public static RecruitingPostsResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay) {
             return RecruitingPostsResponseDTO.builder()
@@ -115,7 +110,7 @@ public class RecruitingPostDTO {
                     .recruitingPositions(
                             recruitingDetails != null
                                     ? recruitingDetails.stream()
-                                    .map(RecruitingPositionDTO::from)
+                                    .map(RecruitingPositionDto::from)
                                     .toList()
                                     : Collections.emptyList()
                     )
@@ -128,35 +123,30 @@ public class RecruitingPostDTO {
             return from(post, post.getRecruitingDetails(), dDay);
         }
 
-        @QueryProjection
-        public RecruitingPostsResponseDTO(
-                Long postId,
-                Long writerProfileId,
-                String userName,
-                String profileImageUrl,
-                ProgressWay progressWay,
-                String contactWay,
-                LocalDate startDate,
-                Period period,
-                LocalDate deadline,
-                RecruitingStatus status,
-                String content,
-                String title,
-                LocalDateTime createdAt
+        public static RecruitingPostsResponseDTO from(
+                RecruitingPostPagingDto.RecruitingPostFlatDto post,
+                List<RecruitingPostDto.RecruitingPositionDto> positions,
+                long dDay
         ) {
-            this.postId = postId;
-            this.writerProfileId = writerProfileId;
-            this.userName = userName;
-            this.profileImageUrl = profileImageUrl;
-            this.progressWay = progressWay;
-            this.contactWay = contactWay;
-            this.startDate = startDate;
-            this.period = period;
-            this.deadline = deadline;
-            this.status = status;
-            this.content = content;
-            this.title = title;
-            this.createdAt = createdAt;
+            return RecruitingPostsResponseDTO.builder()
+                    .postId(post.getPostId())
+                    .writerUserId(post.getWriterUserId())
+                    .writerProfileId(post.getProfileId())
+                    .userName(post.getUserName())
+                    .profileImageUrl(post.getProfileImage())
+                    .profileIsDeleted(post.getProfileIsDeleted())
+                    .progressWay(post.getProgressWay())
+                    .contactWay(post.getContactWay())
+                    .startDate(post.getStartDate())
+                    .period(post.getPeriod())
+                    .deadline(post.getDeadline())
+                    .status(post.getStatus())
+                    .content(post.getContent())
+                    .title(post.getTitle())
+                    .createdAt(post.getCreatedAt())
+                    .recruitingPositions(positions)
+                    .dDay(dDay)
+                    .build();
         }
     }
 
@@ -166,28 +156,22 @@ public class RecruitingPostDTO {
     @AllArgsConstructor
     @Builder
     public static class RecruitingPostDetailResponseDTO {
-        private Long postId;                // 모집 글 Id
+        private Long postId;
         private ProfileResponseDto profile;
-
-        private ProgressWay progressWay;    // 진행 방식
-        private String contactWay;          // 연락 방법
-
+        private ProgressWay progressWay;
+        private String contactWay;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-        private LocalDate startDate;    // 시작일
-
-        private Period period;              // 진행 기간
-
+        private LocalDate startDate;
+        private Period period;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-        private LocalDate deadline;     // 모집 마감일
-        private RecruitingStatus status;    // 모집 상태
-        private String content;             // 프로젝트 설명
+        private LocalDate deadline;
+        private RecruitingStatus status;
+        private String content;
         private String title;
-
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
         private LocalDateTime createdAt;
         private long dDay;
-        // 모집 직무 & 인원 리스트
-        private List<RecruitingPositionDTO> recruitingPositions;
+        private List<RecruitingPositionDto> recruitingPositions;
 
         public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay) {
             return RecruitingPostDetailResponseDTO.builder()
@@ -204,7 +188,7 @@ public class RecruitingPostDTO {
                     .recruitingPositions(
                             recruitingDetails != null
                                     ? recruitingDetails.stream()
-                                    .map(RecruitingPositionDTO::from)
+                                    .map(RecruitingPositionDto::from)
                                     .toList()
                                     : Collections.emptyList()
                     )
@@ -221,8 +205,8 @@ public class RecruitingPostDTO {
     @Builder
     public static class RecruitingPostDeleteResponseDTO {
 
-        private Long deletedPostId;   // 삭제된 게시글 ID
-        private String message;       // 응답 메시지
+        private Long deletedPostId;
+        private String message;
 
         public static RecruitingPostDeleteResponseDTO of(Long postId, String message) {
             return RecruitingPostDeleteResponseDTO.builder()
@@ -246,8 +230,7 @@ public class RecruitingPostDTO {
         private String content;
         private String title;
 
-        // 모집 직무 & 인원 리스트
-        private List<RecruitingPositionDTO> recruitingPositions;
+        private List<RecruitingPositionDto> recruitingPositions;
 
     }
 
@@ -274,7 +257,7 @@ public class RecruitingPostDTO {
         private LocalDateTime createdAt;
 
         // 모집 직무 & 인원 리스트
-        private List<RecruitingPositionDTO> recruitingPositions;
+        private List<RecruitingPositionDto> recruitingPositions;
 
         public static RecruitingPostModifyResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails) {
             return RecruitingPostModifyResponseDTO.builder()
@@ -288,7 +271,7 @@ public class RecruitingPostDTO {
                     .recruitingPositions(
                             recruitingDetails != null
                                     ? recruitingDetails.stream()
-                                    .map(RecruitingPositionDTO::from)
+                                    .map(RecruitingPositionDto::from)
                                     .toList()
                                     : Collections.emptyList()
                     )

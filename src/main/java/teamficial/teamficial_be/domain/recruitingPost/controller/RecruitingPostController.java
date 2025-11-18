@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
@@ -26,9 +26,9 @@ public class RecruitingPostController {
 
     @PostMapping
     @Operation(summary = "모집 글 작성 API", description = "프로젝트 모집 글 작성 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostsResponseDTO> createPost(
+    public ApiResponse<RecruitingPostDto.RecruitingPostsResponseDTO> createPost(
             @AuthenticationPrincipal AuthDetails authDetails,
-            @RequestBody RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+            @RequestBody RecruitingPostDto.RecruitingPostRequestDTO dto) {
 
         Long userId = GlobalAuthUtil.extractUserId(authDetails);
 
@@ -37,7 +37,7 @@ public class RecruitingPostController {
 
     @DeleteMapping("/{postId}")
     @Operation(summary = "모집 글 삭제 API", description = "프로젝트 모집 글 삭제 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostDeleteResponseDTO> deletePost(
+    public ApiResponse<RecruitingPostDto.RecruitingPostDeleteResponseDTO> deletePost(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long postId) {
 
@@ -48,10 +48,10 @@ public class RecruitingPostController {
 
     @PatchMapping("/{postId}")
     @Operation(summary = "모집 글 수정 API", description = "프로젝트 모집 글 수정 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostModifyResponseDTO> updatePost(
+    public ApiResponse<RecruitingPostDto.RecruitingPostModifyResponseDTO> updatePost(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long postId,
-            @RequestBody RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
+            @RequestBody RecruitingPostDto.RecruitingPostModifyRequestDTO dto) {
 
         Long userId = GlobalAuthUtil.extractUserId(authDetails);
 
@@ -61,7 +61,7 @@ public class RecruitingPostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "모집 글 단일 조회 API", description = "프로젝트 모집 글 단일 조회 API입니다.")
-    public ApiResponse<RecruitingPostDTO.RecruitingPostsResponseDTO> getPost(
+    public ApiResponse<RecruitingPostDto.RecruitingPostsResponseDTO> getPost(
             @PathVariable Long postId) {
 
         return ApiResponse.onSuccess(recruitingPostService.getPost(postId));
@@ -69,7 +69,7 @@ public class RecruitingPostController {
 
     @GetMapping
     @Operation(summary = "모집 글 전체 조회 API", description = "프로젝트 모집 글 전체 조회 API입니다.")
-    public ApiResponse<Page<RecruitingPostDTO.RecruitingPostsResponseDTO>> getRecruitingPosts(
+    public ApiResponse<Page<RecruitingPostDto.RecruitingPostsResponseDTO>> getRecruitingPosts(
             @RequestParam(required = false) RecruitingStatus status,
             @RequestParam(required = false) Position position,
             @RequestParam(required = false) ProgressWay progressWay,

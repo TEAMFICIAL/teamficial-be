@@ -8,25 +8,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.QRecruitingDetail;
-import teamficial.teamficial_be.domain.recruitingPost.dto.QRecruitingPostDTO_RecruitingPostsResponseDTO;
-import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostPagingDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.QRecruitingPost;
-import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.global.enums.Position;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import static teamficial.teamficial_be.domain.profile.entity.QProfile.profile;
+import static teamficial.teamficial_be.domain.user.entity.QUser.user;
 
 @RequiredArgsConstructor
 public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<RecruitingPostDTO.RecruitingPostsResponseDTO> findByFilters(
+    public Page<RecruitingPostPagingDto.RecruitingPostFlatDto> findByFilters(
             RecruitingStatus status,
             Position position,
             ProgressWay progressWay,
@@ -38,77 +37,95 @@ public class RecruitingPostRepositoryImpl implements RecruitingPostRepositoryCus
 
         if (status != null) builder.and(post.status.eq(status));
         if (progressWay != null) builder.and(post.progressWay.eq(progressWay));
-        if (position != null) builder.and(postDetail.position.eq(position));
 
-        List<RecruitingPostDTO.RecruitingPostsResponseDTO> content = queryFactory
-                .select(new QRecruitingPostDTO_RecruitingPostsResponseDTO(
-                        post.id,
-                        post.profile.id,
-                        post.profile.userName,
-                        post.profile.profileImage,
-                        post.progressWay,
-                        post.contactWay,
-                        post.startDate,
-                        post.period,
-                        post.deadline,
-                        post.status,
-                        post.content,
-                        post.title,
-                        post.createdAt
-                ))
-                .from(post)
-                .distinct()
-                .leftJoin(post.recruitingDetails, postDetail)
-                .where(builder)
-                .orderBy(post.createdAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Long> pagedPostIds;
 
-        List<Long> postIds = content.stream()
-                        .map(RecruitingPostDTO.RecruitingPostsResponseDTO::getPostId)
-                        .toList();
+        if (position == null) {
+            pagedPostIds = queryFactory
+                    .select(post.id)
+                    .from(post)
+                    .where(builder)
+                    .orderBy(post.createdAt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        } else {
+            pagedPostIds = queryFactory
+                    .select(post.id)
+                    .from(post)
+                    .join(post.recruitingDetails, postDetail)
+                    .where(
+                            builder.and(postDetail.position.eq(position))
+                    )
+                    .orderBy(post.createdAt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        }
 
-        if (postIds.isEmpty()) {
+        if (pagedPostIds.isEmpty()) {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
 
-        Map<Long, List<RecruitingPostDTO.RecruitingPositionDTO>> positionMap = queryFactory
-                .select(Projections.constructor(RecruitingPostDTO.RecruitingPositionQueryDTO.class,
-                        postDetail.recruitingPost.id,
-                        postDetail.position,
-                        postDetail.count))
-                .from(postDetail)
-                .where(postDetail.recruitingPost.id.in(postIds))
-                .fetch()
-                .stream()
-                .collect(Collectors.groupingBy(RecruitingPostDTO.RecruitingPositionQueryDTO::getPostId))
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().stream()
-                                .map(p -> RecruitingPostDTO.RecruitingPositionDTO.builder()
-                                        .position(p.getPosition())
-                                        .count(p.getCount())
-                                        .build())
-                                .toList()
-                ));
+        List<RecruitingPostPagingDto.RecruitingPostFlatDto> flatPosts =
+                queryFactory
+                        .select(Projections.constructor(
+                                RecruitingPostPagingDto.RecruitingPostFlatDto.class,
+                                post.id,
+                                post.profile.isDeleted,
+                                post.profile.user.id,
+                                post.profile.id,
+                                post.profile.userName,
+                                post.profile.profileImage,
+                                post.progressWay,
+                                post.contactWay,
+                                post.startDate,
+                                post.period,
+                                post.deadline,
+                                post.status,
+                                post.content,
+                                post.title,
+                                post.createdAt
+                        ))
+                        .from(post)
+                        .join(post.profile, profile)
+                        .join(profile.user, user)
+                        .where(post.id.in(pagedPostIds))
+                        .orderBy(post.createdAt.desc())
+                        .fetch();
 
-        content.forEach(dto ->
-                dto.setRecruitingPositions(
-                        positionMap.getOrDefault(dto.getPostId(), Collections.emptyList())
-                )
-        );
+        Long total;
+        if (position == null) {
+            total = queryFactory
+                    .select(post.id.count())
+                    .from(post)
+                    .where(builder)
+                    .fetchOne();
+        } else {
+            total = queryFactory
+                    .select(post.id.countDistinct())
+                    .from(post)
+                    .join(post.recruitingDetails, postDetail)
+                    .where(builder.and(postDetail.position.eq(position)))
+                    .fetchOne();
+        }
 
+        return new PageImpl<>(flatPosts, pageable, total == null ? 0 : total);
+    }
 
-        Long total = queryFactory
-                .select(post.id.countDistinct())
-                .from(post)
-                .leftJoin(post.recruitingDetails, postDetail)
-                .where(builder)
-                .fetchOne();
+    @Override
+    public List<RecruitingPostPagingDto.RecruitingDetailFlatDto> findPositionsByPostIds(List<Long> postIds) {
+        QRecruitingDetail detail = QRecruitingDetail.recruitingDetail;
 
-        return new PageImpl<>(content, pageable, total == null ? 0 : total);
+        return queryFactory
+                .select(Projections.constructor(
+                        RecruitingPostPagingDto.RecruitingDetailFlatDto.class,
+                        detail.recruitingPost.id,
+                        detail.position,
+                        detail.count
+                ))
+                .from(detail)
+                .where(detail.recruitingPost.id.in(postIds))
+                .fetch();
     }
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
-import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDto;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
@@ -78,7 +78,7 @@ public class RecruitingPost extends BaseEntity {
         this.status = RecruitingStatus.CLOSED;
     }
 
-    public void update(RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
+    public void update(RecruitingPostDto.RecruitingPostModifyRequestDTO dto) {
         if (dto.getProgressWay() != null) this.progressWay = dto.getProgressWay();
         if (dto.getContactWay() != null) this.contactWay = dto.getContactWay();
         if (dto.getStartDate() != null) this.startDate = dto.getStartDate();

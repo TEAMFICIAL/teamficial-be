@@ -2,9 +2,8 @@ package teamficial.teamficial_be.domain.recruitingPost.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +11,8 @@ import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
 import teamficial.teamficial_be.domain.recruitingDetail.repository.RecruitingDetailRepository;
-import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDTO;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDto;
+import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostPagingDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
@@ -24,8 +24,11 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 import teamficial.teamficial_be.global.enums.Position;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,7 +42,7 @@ public class RecruitingPostService {
 
 
     @Transactional
-    public RecruitingPostDTO.RecruitingPostsResponseDTO createPost(Long userId, RecruitingPostDTO.RecruitingPostRequestDTO dto) {
+    public RecruitingPostDto.RecruitingPostsResponseDTO createPost(Long userId, RecruitingPostDto.RecruitingPostRequestDTO dto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         Profile profile = profileRepository.findById(dto.getProfileId())
@@ -71,11 +74,11 @@ public class RecruitingPostService {
 
         recruitingDetailRepository.saveAll(details);
 
-        return RecruitingPostDTO.RecruitingPostsResponseDTO.from(saved, details,dDay);
+        return RecruitingPostDto.RecruitingPostsResponseDTO.from(saved, details,dDay);
     }
 
 
-    public RecruitingPostDTO.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
+    public RecruitingPostDto.RecruitingPostDeleteResponseDTO deletePost(Long userId, Long postId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         RecruitingPost post = recruitingPostRepository.findById(postId)
@@ -87,7 +90,7 @@ public class RecruitingPostService {
 
         recruitingPostRepository.delete(post);
 
-        return RecruitingPostDTO.RecruitingPostDeleteResponseDTO.of(postId, "게시글이 성공적으로 삭제되었습니다.");
+        return RecruitingPostDto.RecruitingPostDeleteResponseDTO.of(postId, "게시글이 성공적으로 삭제되었습니다.");
 
     }
 
@@ -98,7 +101,7 @@ public class RecruitingPostService {
     }
 
     @Transactional
-    public RecruitingPostDTO.RecruitingPostModifyResponseDTO updatePost(Long userId, Long postId, RecruitingPostDTO.RecruitingPostModifyRequestDTO dto) {
+    public RecruitingPostDto.RecruitingPostModifyResponseDTO updatePost(Long userId, Long postId, RecruitingPostDto.RecruitingPostModifyRequestDTO dto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
 
         RecruitingPost post = recruitingPostRepository.findById(postId)
@@ -136,7 +139,7 @@ public class RecruitingPostService {
             });
         }
 
-        return RecruitingPostDTO.RecruitingPostModifyResponseDTO.from(
+        return RecruitingPostDto.RecruitingPostModifyResponseDTO.from(
                 post, recruitingDetailRepository.findByRecruitingPostId(postId)
         );
 
@@ -144,7 +147,7 @@ public class RecruitingPostService {
 
 
     @Transactional(readOnly = true)
-    public RecruitingPostDTO.RecruitingPostsResponseDTO getPost(Long postId) {
+    public RecruitingPostDto.RecruitingPostsResponseDTO getPost(Long postId) {
 
         RecruitingPost post = recruitingPostRepository.findByIdWithProfile(postId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
@@ -155,7 +158,7 @@ public class RecruitingPostService {
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
 
-        return RecruitingPostDTO.RecruitingPostsResponseDTO.from(post, recruitingDetails,dDay);
+        return RecruitingPostDto.RecruitingPostsResponseDTO.from(post, recruitingDetails,dDay);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
@@ -166,7 +169,7 @@ public class RecruitingPostService {
     }
 
     public Page<RecruitingPost> getAllRecruitingPostsByUserAndStatus(User user, Pageable pageable,RecruitingStatus recruitingStatus) {
-        if (recruitingStatus ==null){
+        if (recruitingStatus == null){
             return recruitingPostRepository.findAllByUser(user,pageable);
         } else {
             return recruitingPostRepository.findAllByUserAndStatus(user,pageable,recruitingStatus);
@@ -174,20 +177,53 @@ public class RecruitingPostService {
     }
 
 
-    public Page<RecruitingPostDTO.RecruitingPostsResponseDTO> getRecruitingPosts(
+    public Page<RecruitingPostDto.RecruitingPostsResponseDTO> getRecruitingPosts(
             RecruitingStatus status,
             Position position,
             ProgressWay progressWay,
             Pageable pageable) {
 
-        Page<RecruitingPostDTO.RecruitingPostsResponseDTO> posts =
+        Page<RecruitingPostPagingDto.RecruitingPostFlatDto> flatPosts =
                 recruitingPostRepository.findByFilters(status, position, progressWay, pageable);
 
-        return posts.map(dto -> {
-            long dDay = RecruitingPost.checkDDay(dto.getDeadline());
-            dto.setDDay(dDay);
-            return dto;
-        });
+        List<Long> postIds = flatPosts.getContent().stream()
+                .map(RecruitingPostPagingDto.RecruitingPostFlatDto::getPostId)
+                .toList();
+
+        List<RecruitingPostPagingDto.RecruitingDetailFlatDto> flatPostDetails =
+                recruitingPostRepository.findPositionsByPostIds(postIds);
+
+        Map<Long, List<RecruitingPostDto.RecruitingPositionDto>> positionMap =
+                flatPostDetails.stream()
+                        .collect(Collectors.groupingBy(
+                                RecruitingPostPagingDto.RecruitingDetailFlatDto::getPostId,
+                                Collectors.mapping(
+                                        p -> new RecruitingPostDto.RecruitingPositionDto(
+                                                p.getPosition(),
+                                                p.getCount()
+                                        ),
+                                        Collectors.toList()
+                                )
+                        ));
+
+        List<RecruitingPostDto.RecruitingPostsResponseDTO> result =
+                flatPosts.stream()
+                        .map(post -> {
+                            List<RecruitingPostDto.RecruitingPositionDto> positions =
+                                    positionMap.getOrDefault(post.getPostId(), Collections.emptyList());
+
+                            long dDay = RecruitingPost.checkDDay(post.getDeadline());
+
+                            return RecruitingPostDto.RecruitingPostsResponseDTO.from(
+                                    post,
+                                    positions,
+                                    dDay
+                            );
+                        })
+                        .toList();
+
+        return new PageImpl<>(result, pageable, flatPosts.getTotalElements());
+
     }
 
     public List<RecruitingPost> getTop3ByUser(User user) {
