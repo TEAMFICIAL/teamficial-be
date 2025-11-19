@@ -143,10 +143,11 @@ public class AuthService {
                 .loginType(loginType)
                 .build();
 
-        ProfileRequestDto profileRequestDto = new ProfileRequestDto();
+        User savedUser = userRepository.save(user);
 
+        ProfileRequestDto profileRequestDto = new ProfileRequestDto();
         profileService.createProfile(user,profileRequestDto,null);
 
-        return userRepository.save(user);
+        return savedUser;
     }
 }
