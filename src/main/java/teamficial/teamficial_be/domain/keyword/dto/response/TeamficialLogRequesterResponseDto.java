@@ -6,5 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class TeamficialLogRequesterResponseDto {
+    private Long userId;
     private String requesterName;
 }
