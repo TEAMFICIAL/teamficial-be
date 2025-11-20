@@ -75,7 +75,7 @@ public class RecruitingPostController {
             @RequestParam(required = false) RecruitingStatus status,
             @RequestParam(required = false) Position position,
             @RequestParam(required = false) ProgressWay progressWay,
-            @PageableDefault(page = 0, size = 12, sort = "createdAt", direction = Sort.Direction.DESC)
+            @PageableDefault(page = 0, size = 9, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         return ApiResponse.onSuccess(
