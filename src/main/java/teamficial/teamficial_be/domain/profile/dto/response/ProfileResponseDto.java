@@ -40,6 +40,9 @@ public class ProfileResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
+    @Schema(description = "uuid")
+    private String uuid;
+
     public static ProfileResponseDto of(Profile profile, List<HeadKeyword> headKeywords) {
         List<String> linkList = profile.getProfileLinks().stream()
                 .map(ProfileLink::getLink)
@@ -64,6 +67,7 @@ public class ProfileResponseDto {
                         .map(HeadKeyword::getKeywordName)
                         .toList()
                 )
+                .uuid(profile.getUser().getUuid())
                 .build();
     }
 }
