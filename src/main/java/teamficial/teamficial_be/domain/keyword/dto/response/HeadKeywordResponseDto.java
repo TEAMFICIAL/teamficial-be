@@ -15,17 +15,18 @@ public class HeadKeywordResponseDto {
     Long profileId;
     @Schema(description = "프로필 이름", example="프로필1")
     String profileName;
-    @Schema(description = "키워드 리스트")
-    List<String> headKeywords;
+    @Schema(description = "대표 키워드 리스트 (id + 이름)")
+    private List<HeadKeywordInfo> headKeywords;
     
     public static HeadKeywordResponseDto fromKeyword(Profile profile, List<HeadKeyword> headKeywords) {
+        List<HeadKeywordInfo> infos = headKeywords.stream()
+                .map(HeadKeywordInfo::from)
+                .toList();
+
         return HeadKeywordResponseDto.builder()
                 .profileId(profile.getId())
                 .profileName(profile.getProfileName())
-                .headKeywords(headKeywords.stream()
-                        .map(HeadKeyword::getKeywordName)
-                        .toList()
-                )
+                .headKeywords(infos)
                 .build();
     }
 }
