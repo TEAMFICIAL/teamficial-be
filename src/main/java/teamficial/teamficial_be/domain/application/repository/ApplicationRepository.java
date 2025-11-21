@@ -47,4 +47,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             "JOIN FETCH ap.profile p " +
             "WHERE p = :profile")
     List<Application> findAllByProfile(Profile profile);
+
+    Page<Application> findAllByUserAndApplicationStatusIn(User user, Pageable pageable, List<ApplicationStatus> status);
 }

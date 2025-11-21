@@ -53,7 +53,13 @@ public class MypageService {
     public PagedResponse<MyApplicationResponseDto> getAllApplications(User user, int page, int size,ApplicationStatus applicationStatus) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recruitingPost.createdAt"));
 
-        Page<Application> applicationPage = applicationService.getApplicationsByUserAndStatus(user,pageable,applicationStatus);
+        Page<Application> applicationPage = null;
+
+        if (applicationStatus == ApplicationStatus.MATCHING){
+            applicationPage = applicationService.getApplicationsByUserAndStatusIn(user,pageable,List.of(ApplicationStatus.MATCHING, ApplicationStatus.TEMP_SAVED));
+        } else {
+            applicationPage = applicationService.getApplicationsByUserAndStatus(user,pageable,applicationStatus);
+        }
 
         Page<MyApplicationResponseDto> dtoPage = applicationPage
                 .map(application -> {
