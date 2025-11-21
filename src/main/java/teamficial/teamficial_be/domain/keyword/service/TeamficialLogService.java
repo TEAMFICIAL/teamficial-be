@@ -214,4 +214,24 @@ public class TeamficialLogService {
                 .requesterName(user.getName())
                 .build();
     }
+
+    public KeywordRandResponseDto getTeamficialLogRand3(String requesterUuid) {
+        User user = userService.getUserByUuid(requesterUuid);
+
+        List<Keyword> keywords =
+                keywordService.findRandomHeadKeywordsByUserId(user.getId());
+
+        List<KeywordRandResponseDto.KeywordInfo> keywordInfos = keywords.stream()
+                .map(k -> KeywordRandResponseDto.KeywordInfo.builder()
+                        .keywordName(k.getKeywordName())
+                        .count(k.getCount())
+                        .build())
+                .toList();
+
+        return KeywordRandResponseDto.builder()
+                .requesterUuid(requesterUuid)
+                .keywords(keywordInfos)
+                .build();
+
+    }
 }
