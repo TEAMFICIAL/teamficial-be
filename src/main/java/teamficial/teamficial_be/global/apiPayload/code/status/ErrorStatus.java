@@ -48,6 +48,7 @@ public enum ErrorStatus implements BaseErrorCode {
     //키워드 관련 응답
     KEYWORD_FORBIDDEN(HttpStatus.FORBIDDEN,"KEYWORD4003","키워드 설정 권한이 없습니다."),
     CANNOT_HEAD_KEYWORD_OVER_3(HttpStatus.BAD_REQUEST,"HEADKEYWORD4004","프로필 당 대표키워드는 최대 3개를 넘을 수 없습니다."),
+    HEAD_KEYWORD_DUPLICATE(HttpStatus.BAD_REQUEST,"HEADKEYWORD4005","이미 등록된 대표키워드입니다."),
 
     ;
 

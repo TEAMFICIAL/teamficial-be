@@ -15,4 +15,6 @@ public interface HeadKeywordRepository extends JpaRepository<HeadKeyword, Long> 
 
 
     HeadKeyword findByProfileAndId(Profile profile, Long oldHeadKeywordId);
+
+    boolean existsByProfileAndKeywordName(Profile profile, String keywordName);
 }

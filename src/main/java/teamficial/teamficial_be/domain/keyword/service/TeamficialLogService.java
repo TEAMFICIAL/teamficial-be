@@ -92,6 +92,12 @@ public class TeamficialLogService {
         }
 
         Keyword keyword = keywordService.getKeywordById(newHeadKeywordId);
+        if (!keyword.getUser().getId().equals(user.getId())) {
+            throw new GeneralException(ErrorStatus.KEYWORD_FORBIDDEN);
+        }
+
+        headKeywordService.checkDuplicateHead(profile,keyword.getKeywordName());
+
         keyword.updateHead(true);
         keywordService.saveKeyword(keyword);
 
