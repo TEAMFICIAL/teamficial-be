@@ -11,6 +11,12 @@ import teamficial.teamficial_be.global.entity.BaseEntity;
 @Entity
 @Getter
 @Builder
+@Table(
+        name = "head_keyword",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"profile_id", "keyword_name"})
+        }
+)
 @AllArgsConstructor
 @NoArgsConstructor
 public class HeadKeyword extends BaseEntity {

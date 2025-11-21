@@ -23,6 +23,7 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_FOUND_RECRUITING_POST(HttpStatus.NOT_FOUND,"RECRUITINGPOST404","해당 팀원 모집 글을 찾을 수 없습니다."),
     NOT_FOUND_APPLICAION(HttpStatus.NOT_FOUND,"APPLICATION404","해당 지원을 찾을 수 없습니다."),
     NOT_FOUND_KEYWORD(HttpStatus.NOT_FOUND,"KEYWORD404", "해당 키워드를 찾을 수 없습니다."),
+    NOT_FOUND_HEAD_KEYWORD(HttpStatus.NOT_FOUND,"HEADKEYWORD404", "해당 대표 키워드를 찾을 수 없습니다."),
 
     //로그인 관련 응답
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "LOGIN4001", "토큰이 유효하지 않습니다."),
@@ -42,11 +43,12 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //지원 관련 응답
     DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST,"APPLICATION6001","이미 지원한 모집 글 입니다."),
+    CAN_NOT_APPLICATION(HttpStatus.BAD_REQUEST,"APPLICATION6002","대표 키워드를 등록하지않아 지원이 불가능합니다."),
 
     //키워드 관련 응답
     KEYWORD_FORBIDDEN(HttpStatus.FORBIDDEN,"KEYWORD4003","키워드 설정 권한이 없습니다."),
-
-
+    CANNOT_HEAD_KEYWORD_OVER_3(HttpStatus.BAD_REQUEST,"HEADKEYWORD4004","프로필 당 대표키워드는 최대 3개를 넘을 수 없습니다."),
+    HEAD_KEYWORD_DUPLICATE(HttpStatus.BAD_REQUEST,"HEADKEYWORD4005","이미 등록된 대표키워드입니다."),
 
     ;
 

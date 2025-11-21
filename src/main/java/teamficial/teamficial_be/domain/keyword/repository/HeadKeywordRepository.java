@@ -10,4 +10,11 @@ import java.util.List;
 public interface HeadKeywordRepository extends JpaRepository<HeadKeyword, Long> {
     @Query("SELECT hk FROM HeadKeyword hk JOIN FETCH hk.profile WHERE hk.profile = :profile")
     List<HeadKeyword> findAllByProfile(Profile profile);
+
+    int countByProfile(Profile profile);
+
+
+    HeadKeyword findByProfileAndId(Profile profile, Long oldHeadKeywordId);
+
+    boolean existsByProfileAndKeywordName(Profile profile, String keywordName);
 }

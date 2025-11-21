@@ -32,9 +32,9 @@ public class TeamficialLogController {
     }
 
     @PutMapping("/teamficial-log/head-keyword/{profileId}")
-    @Operation(summary = "대표 키워드 선택하기", description = "해당 프로필의 대표 키워드를 선택하는 api입니다.")
-    public ApiResponse<HeadKeywordResponseDto> updateHeadKeyword(@PathVariable("profileId") Long profileId, @RequestBody @Valid HeadKeywordRequestDto requestDto, @AuthenticationPrincipal AuthDetails authDetails) {
-        HeadKeywordResponseDto responseDto = teamficialLogService.updateHeadKeyword(authDetails.user(),profileId,requestDto);
+    @Operation(summary = "대표 키워드 등록/수정하기", description = "해당 프로필의 대표 키워드를 등록/수정하는 api입니다.")
+    public ApiResponse<CreateHeadKeywordResponseDto> updateHeadKeyword(@PathVariable("profileId") Long profileId, @RequestParam(required = false) Long oldHeadKeywordId, @RequestParam Long keywordId, @AuthenticationPrincipal AuthDetails authDetails) {
+        CreateHeadKeywordResponseDto responseDto = teamficialLogService.updateHeadKeyword(authDetails.user(),profileId,oldHeadKeywordId,keywordId);
 
         return ApiResponse.onSuccess(responseDto);
     }

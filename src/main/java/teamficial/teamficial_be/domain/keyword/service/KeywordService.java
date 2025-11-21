@@ -79,4 +79,9 @@ public class KeywordService {
     public List<Keyword> findRandomHeadKeywordsByUserId(Long userId) {
         return keywordRepository.findRandomHeadKeywordsByUserId(userId);
     }
+
+    public Keyword getKeywordByUserAndKeywordName(User user,String keywordName) {
+        return keywordRepository.findByUserAndKeywordName(user,keywordName)
+                .orElseThrow(()-> new NotFoundHandler(ErrorStatus.NOT_FOUND_KEYWORD));
+    }
 }
