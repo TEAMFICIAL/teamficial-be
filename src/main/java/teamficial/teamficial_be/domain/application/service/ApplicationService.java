@@ -167,4 +167,7 @@ public class ApplicationService {
         return exists;
     }
 
+    public Page<Application> getApplicationsByUserAndStatusIn(User user, Pageable pageable, List<ApplicationStatus> status) {
+        return applicationRepository.findAllByUserAndApplicationStatusIn(user, pageable, status);
+    }
 }
