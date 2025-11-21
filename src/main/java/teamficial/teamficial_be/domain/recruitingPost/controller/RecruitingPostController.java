@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.recruitingPost.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import teamficial.teamficial_be.global.util.GlobalAuthUtil;
 @RestController
 @RequestMapping("/recruiting-posts")
 @RequiredArgsConstructor
+@Tag(name = "모집글 관련 API")
 public class RecruitingPostController {
 
     private final RecruitingPostService recruitingPostService;

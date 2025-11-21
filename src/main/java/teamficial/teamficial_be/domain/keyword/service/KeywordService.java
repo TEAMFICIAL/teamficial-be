@@ -75,4 +75,8 @@ public class KeywordService {
 
         results.add(new KeywordContentPairDto(bestKeyword, content));
     }
+
+    public List<Keyword> findRandomHeadKeywordsByUserId(Long userId) {
+        return keywordRepository.findRandomHeadKeywordsByUserId(userId);
+    }
 }

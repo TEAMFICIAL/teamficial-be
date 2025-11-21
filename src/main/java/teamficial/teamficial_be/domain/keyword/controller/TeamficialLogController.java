@@ -77,4 +77,16 @@ public class TeamficialLogController {
         return ApiResponse.onSuccess(responseDto);
     }
 
+    @GetMapping("/teamficial-log/rand")
+    @Operation(summary = "팀피셜록 대표 키워드 중 3개 조회", description = "팀피셜록 대표 키워드 중 3개를 임의로 조회하는 API입니다.")
+    public ApiResponse<KeywordRandResponseDto> getTeamficialLogRand3(
+            @RequestParam String requesterUuid) {
+
+        KeywordRandResponseDto responseDto =
+                teamficialLogService.getTeamficialLogRand3(requesterUuid);
+
+        return ApiResponse.onSuccess(responseDto);
+    }
+
+
 }
