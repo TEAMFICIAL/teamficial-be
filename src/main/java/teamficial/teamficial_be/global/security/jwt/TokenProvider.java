@@ -133,22 +133,45 @@ public class TokenProvider implements InitializingBean {
         redisService.deleteValue(REFRESH_TOKEN_PREFIX+getUserIdFromToken(token));
     }
 
-    public boolean validateToken(String token){
+//    public boolean validateToken(String token){
+//        try {
+//            Jwts.parserBuilder()
+//                    .setSigningKey(key)
+//                    .build()
+//                    .parseClaimsJws(token);
+//            return true;
+//        } catch (SecurityException | MalformedJwtException ex) {
+//            throw new IllegalArgumentException("Invalid JWT signature or token malformed: "+ ex.getMessage());
+//        } catch (ExpiredJwtException ex) {
+//            throw new IllegalArgumentException("Expired JWT token: "+ ex.getMessage());
+//        } catch (UnsupportedJwtException ex) {
+//            throw new IllegalArgumentException("Unsupported JWT token: "+ ex.getMessage());
+//        } catch (IllegalArgumentException ex) {
+//            throw new IllegalArgumentException("JWT token compact of null or empty: "+ ex.getMessage());
+//        }
+//    }
+
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
             return true;
+
         } catch (SecurityException | MalformedJwtException ex) {
-            throw new IllegalArgumentException("Invalid JWT signature or token malformed: "+ ex.getMessage());
+            return false;
+
         } catch (ExpiredJwtException ex) {
-            throw new IllegalArgumentException("Expired JWT token: "+ ex.getMessage());
+            return false;
+
         } catch (UnsupportedJwtException ex) {
-            throw new IllegalArgumentException("Unsupported JWT token: "+ ex.getMessage());
+            return false;
+
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("JWT token compact of null or empty: "+ ex.getMessage());
+            return false;
         }
     }
+
 
 }
