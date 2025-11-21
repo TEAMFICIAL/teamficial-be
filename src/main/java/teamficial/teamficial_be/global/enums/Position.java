@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum Position {
     FRONTEND("프론트엔드"),
     BACKEND("백엔드"),
-    UI_UX("UI/UX 디자인"),
+    UI_UX("UX/UI 디자인"),
     AI("AI"),
     ANDROID("안드로이드"),
     IOS("ios"),
