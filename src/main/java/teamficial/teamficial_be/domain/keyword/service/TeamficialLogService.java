@@ -63,7 +63,7 @@ public class TeamficialLogService {
 
 
     @Transactional
-    public HeadKeywordResponseDto updateHeadKeyword(User user, Long profileId, HeadKeywordRequestDto requestDto) {
+    public CreateHeadKeywordResponseDto updateHeadKeyword(User user, Long profileId, Long oldHeadKeywordId,Long newHeadKeywordId) {
 
         Profile profile = profileService.getProfileById(profileId);
 
@@ -71,38 +71,35 @@ public class TeamficialLogService {
             throw new GeneralException(ErrorStatus.PROFILE_FORBIDDEN);
         }
 
-        if (profile.getHeadKeywords() !=null) {
-            profile.getHeadKeywords().clear();
+        //대표 키워드 수정할 경우
+        if (oldHeadKeywordId != null) {
+            HeadKeyword oldHeadKeyword = headKeywordService.getHeadKeywordById(oldHeadKeywordId);
+
+            Keyword oldHeadKeyword1 = keywordService.getKeywordByUserAndKeywordName(user,oldHeadKeyword.getKeywordName());
+
+            headKeywordService.delete(oldHeadKeyword);
+
+            oldHeadKeyword1.updateHead(false);
+            keywordService.saveKeyword(oldHeadKeyword1);
         }
 
-
-        //대표키워드 설정
-        if (requestDto.getKeywordIds() != null) {
-            for (Long keywordId : requestDto.getKeywordIds()) {
-
-                Keyword keyword = keywordService.getKeywordById(keywordId);
-
-                if (!keyword.getUser().getId().equals(user.getId())) {
-                    throw new GeneralException(ErrorStatus.KEYWORD_FORBIDDEN);
-                }
-
-                keyword.updateHead();
-                keywordService.saveKeyword(keyword);
-
-                HeadKeyword headKeyword = HeadKeyword.builder()
-                        .profile(profile)
-                        .keywordName(keyword.getKeywordName())
-                        .build();
-
-                profile.getHeadKeywords().add(headKeyword);
-                log.info("headKeyword: {}", headKeyword.getKeywordName());
-
-            }
+        if (headKeywordService.countHeadKeyword(profile) >= 3){
+            throw new GeneralException(ErrorStatus.CANNOT_HEAD_KEYWORD_OVER_3);
         }
+
+        Keyword keyword = keywordService.getKeywordById(newHeadKeywordId);
+        keyword.updateHead(true);
+        keywordService.saveKeyword(keyword);
+
+        HeadKeyword headKeyword = HeadKeyword.builder()
+                .profile(profile)
+                .keywordName(keyword.getKeywordName())
+                .build();
+        profile.getHeadKeywords().add(headKeyword);
 
         profileService.saveProfile(profile);
 
-        return HeadKeywordResponseDto.fromKeyword(profile, profile.getHeadKeywords());
+        return CreateHeadKeywordResponseDto.fromKeyword(profile, headKeyword.getKeywordName());
     }
 
     @Transactional(readOnly = true)
