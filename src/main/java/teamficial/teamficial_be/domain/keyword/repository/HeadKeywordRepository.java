@@ -12,4 +12,7 @@ public interface HeadKeywordRepository extends JpaRepository<HeadKeyword, Long> 
     List<HeadKeyword> findAllByProfile(Profile profile);
 
     int countByProfile(Profile profile);
+
+
+    HeadKeyword findByProfileAndId(Profile profile, Long oldHeadKeywordId);
 }

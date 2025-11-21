@@ -10,6 +10,7 @@ import teamficial.teamficial_be.domain.application.dto.ApplicationDTO;
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.repository.ApplicationRepository;
+import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
@@ -35,6 +36,7 @@ public class ApplicationService {
     private final RecruitingPostRepository recruitingPostRepository;
     private final ApplicationRepository applicationRepository;
     private final RedisService redisService;
+    private final HeadKeywordService headKeywordService;
 
     @Transactional
     public ApplicationDTO.ApplicationResponseDTO createApplication(Long userId, ApplicationDTO.ApplicationRequestDTO req) {
@@ -50,6 +52,10 @@ public class ApplicationService {
 
         if (!profile.getUser().getId().equals(userId)) {
             throw new GeneralException(ErrorStatus._FORBIDDEN);
+        }
+
+        if (headKeywordService.countHeadKeyword(profile) == 0){
+            throw new GeneralException(ErrorStatus.CAN_NOT_APPLICATION);
         }
 
         RecruitingPost recruitingPost = recruitingPostRepository.findById(req.getRecruitingPostId())

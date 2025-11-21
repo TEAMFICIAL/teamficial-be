@@ -75,6 +75,10 @@ public class TeamficialLogService {
         if (oldHeadKeywordId != null) {
             HeadKeyword oldHeadKeyword = headKeywordService.getHeadKeywordById(oldHeadKeywordId);
 
+            if (!oldHeadKeyword.getProfile().equals(profile)) {
+                throw new GeneralException(ErrorStatus.KEYWORD_FORBIDDEN);
+            }
+
             Keyword oldHeadKeyword1 = keywordService.getKeywordByUserAndKeywordName(user,oldHeadKeyword.getKeywordName());
 
             headKeywordService.delete(oldHeadKeyword);
