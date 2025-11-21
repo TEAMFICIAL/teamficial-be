@@ -237,7 +237,7 @@ public class MypageService {
                 .map(app -> {
                     ApplicationStatus status = app.getApplicationStatus();
                     if (status == ApplicationStatus.TEMP_SAVED) {
-                        return MyApplicationResponseDto.of(app.getRecruitingPost(), ApplicationStatus.TEMP_SAVED.getDescription());
+                        return MyApplicationResponseDto.of(app.getRecruitingPost(), ApplicationStatus.MATCHING.getDescription());
                     }
                     return MyApplicationResponseDto.of(app.getRecruitingPost(), app.getApplicationStatus().getDescription());
                 })
