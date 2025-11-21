@@ -27,17 +27,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = tokenProvider.resolveToken(request);
 
-        if (token != null && tokenProvider.validateToken(token)) {
-            try{
+        if (token != null) {
+
+            if (!tokenProvider.validateToken(token)) {
+                throw new GeneralException(ErrorStatus.TOKEN_INVALID);
+            }
+
+            try {
                 Authentication authentication = tokenProvider.getAuthentication(token);
 
                 if (authentication != null) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-            }catch (IllegalArgumentException e){
+
+            } catch (IllegalArgumentException e) {
                 throw new GeneralException(ErrorStatus.TOKEN_INVALID);
             }
         }
+
+
+//        if (token != null && tokenProvider.validateToken(token)) {
+//            try{
+//                Authentication authentication = tokenProvider.getAuthentication(token);
+//
+//                if (authentication != null) {
+//                    SecurityContextHolder.getContext().setAuthentication(authentication);
+//                }
+//            }catch (IllegalArgumentException e){
+//                throw new GeneralException(ErrorStatus.TOKEN_INVALID);
+//            }
+//        }
+
         filterChain.doFilter(request, response);
     }
 
