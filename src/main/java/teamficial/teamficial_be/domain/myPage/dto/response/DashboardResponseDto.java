@@ -12,5 +12,5 @@ import java.util.List;
 public class DashboardResponseDto {
     List<MyApplicationResponseDto> myApplications;
     List<CurrentApplicantResponseDto> myRecruitingPost;
-
+    List<MyTeamResponseDto> myTeamResponses;
 }

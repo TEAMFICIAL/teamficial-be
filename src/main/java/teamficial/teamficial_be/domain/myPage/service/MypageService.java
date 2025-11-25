@@ -13,17 +13,13 @@ import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.confirmed.ConfirmedProfileService;
-import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
-import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicantResponseDto;
-import teamficial.teamficial_be.domain.myPage.dto.response.DashboardResponseDto;
-import teamficial.teamficial_be.domain.myPage.dto.response.MyApplicationResponseDto;
+import teamficial.teamficial_be.domain.myPage.dto.response.*;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.service.ProfileService;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
-import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicationDetailResponseDto;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
@@ -103,7 +99,8 @@ public class MypageService {
                 .map(redisService::applicationKey)
                 .toList();
 
-        List<String> cachedValues = redisService.getValues(keys);
+        List<Object> cachedValues = redisService.getValues(keys);
+        log.debug("cachedValues: {}", cachedValues);
 
         Map<Long,Integer> resultMap = new HashMap<>();
         List<Long> missIds = new ArrayList<>();
@@ -111,11 +108,18 @@ public class MypageService {
         for (int i=0; i < postIds.size(); i++) {
             Long postId = postIds.get(i);
             String key = keys.get(i);
-            String value = cachedValues.get(i);
+            Object raw = cachedValues.get(i);
+            String value = raw.toString().trim();
+
+            // 만약 value가 큰따옴표로 감싸져 있다면 제거
+            if (value.startsWith("\"") && value.endsWith("\"") && value.length() > 1) {
+                value = value.substring(1, value.length()-1);
+            }
 
             if (value != null && !value.isEmpty()) {
-                resultMap.put(postId, Integer.parseInt(value));
-                log.debug("캐시 히트 key={}, value={}, postId={}", key, value, postId);
+                int count = Integer.parseInt(value);
+                resultMap.put(postId, count);
+                log.debug("캐시 히트 key={}, value={}, postId={}", key, raw, postId);
             } else {
                 log.debug("캐시 미스 key={}, postId={}", key, postId);
                 missIds.add(postId);
@@ -222,7 +226,7 @@ public class MypageService {
 
     @Transactional(readOnly = true)
     public DashboardResponseDto getUserDashBoard(User user) {
-        List<RecruitingPost> recruitingPostList = recruitingPostService.getTop3ByUser(user);
+        List<RecruitingPost> recruitingPostList = recruitingPostService.getAllByUser(user);
         List<Application> applicationList = applicationService.getTop3ByUser(user);
 
         List<Long> postIds = recruitingPostList.stream()
@@ -232,6 +236,7 @@ public class MypageService {
         Map<Long,Integer> applicantCountMap = getApplicantCountsBatch(postIds);
 
         List<CurrentApplicantResponseDto> recruitingDtos = recruitingPostList.stream()
+                .limit(3)
                 .map(recruitingPost -> {
                     long dDay = recruitingPost.getDDay();
                     int totalApplicants = applicantCountMap.get(recruitingPost.getId());
@@ -249,9 +254,20 @@ public class MypageService {
                 })
                 .toList();
 
+        List<MyTeamResponseDto> myTeamResponseDtos = recruitingPostList.stream()
+                .filter(recruitingPost -> recruitingPost.getStatus() == RecruitingStatus.CLOSED)
+                .limit(3)
+                .map(recruitingPost -> {
+                    int totalMembers = confirmedProfileService.getTotalMembers(recruitingPost);
+
+                    return MyTeamResponseDto.from(recruitingPost,totalMembers);
+                })
+                .toList();
+
         return DashboardResponseDto.builder()
                 .myRecruitingPost(recruitingDtos)
                 .myApplications(applicationDtos)
+                .myTeamResponses(myTeamResponseDtos)
                 .build();
     }
 
