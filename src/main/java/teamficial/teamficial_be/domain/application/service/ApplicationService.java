@@ -170,4 +170,12 @@ public class ApplicationService {
     public Page<Application> getApplicationsByUserAndStatusIn(User user, Pageable pageable, List<ApplicationStatus> status) {
         return applicationRepository.findAllByUserAndApplicationStatusIn(user, pageable, status);
     }
+
+    public List<Application> getAllByUser(User user) {
+        return applicationRepository.findAllByUser(user);
+    }
+
+    public boolean existApplicationMatched(User user, RecruitingPost recruitingPost) {
+        return applicationRepository.existsByUserAndRecruitingPostAndApplicationStatus(user, recruitingPost, ApplicationStatus.MATCHED);
+    }
 }

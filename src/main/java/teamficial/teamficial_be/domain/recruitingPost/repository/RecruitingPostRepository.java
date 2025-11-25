@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
@@ -27,7 +28,9 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
     @EntityGraph(attributePaths = {"user", "profile"})
     Page<RecruitingPost> findAllByUser(User user, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user"})
+    @Query("SELECT rp FROM RecruitingPost rp " +
+            "JOIN FETCH rp.user " +
+            "ORDER BY rp.deadline ASC ")
     List<RecruitingPost> findAllByUser(User user);
 
     @EntityGraph(attributePaths = {"user", "profile"})
@@ -41,4 +44,12 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "JOIN FETCH rp.profile p " +
             "WHERE p = :profile")
     List<RecruitingPost> findAllByProfile(Profile profile);
+
+    @Query("SELECT rp FROM RecruitingPost rp " +
+            "JOIN FETCH rp.user " +
+            "LEFT JOIN FETCH rp.profile " +
+            "WHERE rp.user = :user " +
+            "ORDER BY rp.deadline ASC " +
+            "LIMIT 3")
+    List<RecruitingPost> findTop3ByUserOrderByDeadlineAsc(User user);
 }

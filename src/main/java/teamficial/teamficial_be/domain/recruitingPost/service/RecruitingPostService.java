@@ -183,6 +183,12 @@ public class RecruitingPostService {
         }
     }
 
+    public boolean isPostOwner(User user, RecruitingPost recruitingPost) {
+        Long writerId = recruitingPost.getUser().getId();
+
+        return user.getId().equals(writerId);
+    }
+
     public Page<RecruitingPost> getAllRecruitingPostsByUserAndStatus(User user, Pageable pageable,RecruitingStatus recruitingStatus) {
         if (recruitingStatus == null){
             return recruitingPostRepository.findAllByUser(user,pageable);
@@ -247,5 +253,9 @@ public class RecruitingPostService {
 
     public List<RecruitingPost> getAllByUser(User user) {
         return recruitingPostRepository.findAllByUser(user);
+    }
+
+    public List<RecruitingPost> getTop3ByUserOrderByDeadlineAsc(User user) {
+        return recruitingPostRepository.findTop3ByUserOrderByDeadlineAsc(user);
     }
 }
