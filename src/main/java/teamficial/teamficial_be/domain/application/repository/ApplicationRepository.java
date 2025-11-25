@@ -26,6 +26,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     @Query("SELECT ap FROM Application ap " +
             "JOIN FETCH ap.user "+
+            "WHERE ap.user = :user " +
             "ORDER BY ap.createdAt DESC ")
     List<Application> findAllByUser(User user);
 

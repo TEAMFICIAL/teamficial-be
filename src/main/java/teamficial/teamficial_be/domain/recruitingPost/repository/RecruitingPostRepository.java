@@ -30,6 +30,7 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
 
     @Query("SELECT rp FROM RecruitingPost rp " +
             "JOIN FETCH rp.user " +
+            "WHERE rp.user = :user " +
             "ORDER BY rp.deadline ASC ")
     List<RecruitingPost> findAllByUser(User user);
 
