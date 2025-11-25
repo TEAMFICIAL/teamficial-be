@@ -109,6 +109,12 @@ public class MypageService {
             Long postId = postIds.get(i);
             String key = keys.get(i);
             Object raw = cachedValues.get(i);
+            if (raw == null) {
+                // 캐시가 없는 경우
+                log.debug("캐시 미스 key={}, postId={}", key, postId);
+                missIds.add(postId);
+                continue;
+            }
             String value = raw.toString().trim();
 
             // 만약 value가 큰따옴표로 감싸져 있다면 제거
@@ -116,7 +122,7 @@ public class MypageService {
                 value = value.substring(1, value.length()-1);
             }
 
-            if (value != null && !value.isEmpty()) {
+            if (!value.isEmpty()) {
                 int count = Integer.parseInt(value);
                 resultMap.put(postId, count);
                 log.debug("캐시 히트 key={}, value={}, postId={}", key, raw, postId);
