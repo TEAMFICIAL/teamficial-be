@@ -9,4 +9,6 @@ import teamficial.teamficial_be.domain.keyword.entity.KeywordComment;
 public interface KeywordCommentRepository extends JpaRepository<KeywordComment, Long> {
 
     Slice<KeywordComment> findAllByKeyword(Keyword keyword, Pageable pageable);
+
+
 }
