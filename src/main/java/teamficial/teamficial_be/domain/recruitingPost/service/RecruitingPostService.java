@@ -241,11 +241,11 @@ public class RecruitingPostService {
 
     }
 
-    public List<RecruitingPost> getTop3ByUser(User user) {
-        return recruitingPostRepository.findTop3ByUserOrderByDeadlineAsc(user);
-    }
-
     public List<RecruitingPost> getRecruitingPostsByProfile(Profile profile) {
         return recruitingPostRepository.findAllByProfile(profile);
+    }
+
+    public List<RecruitingPost> getAllByUser(User user) {
+        return recruitingPostRepository.findAllByUser(user);
     }
 }

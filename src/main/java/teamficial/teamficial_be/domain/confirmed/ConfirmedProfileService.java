@@ -70,4 +70,8 @@ public class ConfirmedProfileService {
                 .map(ConfirmedProfileResponse::from)
                 .toList();
     }
+
+    public int getTotalMembers(RecruitingPost recruitingPost) {
+        return confirmedProfileRepository.countByRecruitingPost(recruitingPost);
+    }
 }

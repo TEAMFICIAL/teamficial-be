@@ -33,6 +33,8 @@ public class RecruitingPostResponseDto {
     private List<String> recruitingDetails;
     @Schema(description = "글 작성일", example="2025-10-28T06:38:03.179Z")
     private LocalDateTime createdAt;
+    @Schema(description = "작성한 모집 글의 상태", example="모집중")
+    private String status;
     private long dDay;
 
     public static RecruitingPostResponseDto from(RecruitingPost recruitingPost, long dDay) {
@@ -51,6 +53,7 @@ public class RecruitingPostResponseDto {
                 )
                 .dDay(dDay)
                 .createdAt(recruitingPost.getCreatedAt())
+                .status(recruitingPost.getStatus().getDescription())
                 .build();
     }
 }

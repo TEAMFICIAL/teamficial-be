@@ -17,17 +17,17 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class RedisService {
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private static final String APPLICANT_COUNT_KEY_PREFIX = "recruit:post:";
 
     public void setValue(String key, String value, long ttlMillis) {
         try {
             if (ttlMillis > 0) {
-                ValueOperations<String, String> values = redisTemplate.opsForValue();
+                ValueOperations<String, Object> values = redisTemplate.opsForValue();
                 values.set(key, value, Duration.ofMillis(ttlMillis));
             } else {
-                ValueOperations<String, String> values = redisTemplate.opsForValue();
+                ValueOperations<String, Object> values = redisTemplate.opsForValue();
                 values.set(key, value);
             }
 
@@ -39,7 +39,7 @@ public class RedisService {
 
     public String getValue(String key) {
         try {
-            ValueOperations<String, String> values = redisTemplate.opsForValue();
+            ValueOperations<String, Object> values = redisTemplate.opsForValue();
             if (values.get(key) == null) {
                 return "";
             }
@@ -67,7 +67,7 @@ public class RedisService {
 
     public void incrementValue(String key, long delta) {
         try {
-            ValueOperations<String, String> ops = redisTemplate.opsForValue();
+            ValueOperations<String, Object> ops = redisTemplate.opsForValue();
             ops.increment(key, delta);
         } catch (Exception e) {
             log.warn("Redis 지원자 수 increment 오류 — key: {}, delta: {}, 예외: {}", key, delta, e.toString(), e);
@@ -79,7 +79,7 @@ public class RedisService {
         return APPLICANT_COUNT_KEY_PREFIX + postId + ":applicantCount";
     }
 
-    public List<String> getValues(List<String> keys) {
+    public List<Object> getValues(List<String> keys) {
         if (keys == null || keys.isEmpty()) {
             return new ArrayList<>();
         }

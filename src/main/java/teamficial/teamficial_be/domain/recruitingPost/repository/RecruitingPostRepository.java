@@ -27,16 +27,11 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
     @EntityGraph(attributePaths = {"user", "profile"})
     Page<RecruitingPost> findAllByUser(User user, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"user"})
+    List<RecruitingPost> findAllByUser(User user);
+
     @EntityGraph(attributePaths = {"user", "profile"})
     Page<RecruitingPost> findAllByUserAndStatus(User user, Pageable pageable, RecruitingStatus recruitingStatus);
-
-    @Query("SELECT rp FROM RecruitingPost rp " +
-            "JOIN FETCH rp.user " +
-            "LEFT JOIN FETCH rp.profile " +
-            "WHERE rp.user = :user " +
-            "ORDER BY rp.deadline ASC " +
-            "LIMIT 3")
-    List<RecruitingPost> findTop3ByUserOrderByDeadlineAsc(@Param("user") User user);
 
     @Modifying
     @Query("UPDATE RecruitingPost p SET p.status = 'CLOSED' WHERE p.deadline < :today AND p.status <> 'CLOSED'")
