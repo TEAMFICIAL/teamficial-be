@@ -12,4 +12,5 @@ public enum Period {
     OVER_SIX_MONTHS("6개월 이상"),
     FLEXIBLE("미정/협의 예정");
     private final String description;
+
 }

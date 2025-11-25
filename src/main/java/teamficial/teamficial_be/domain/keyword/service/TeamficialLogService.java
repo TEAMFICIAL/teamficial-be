@@ -21,6 +21,7 @@ import teamficial.teamficial_be.domain.keyword.dto.response.*;
 import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.keyword.entity.Keyword;
 import teamficial.teamficial_be.domain.keyword.entity.KeywordComment;
+import teamficial.teamficial_be.domain.keyword.entity.KeywordCommentSession;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.service.ProfileService;
 import teamficial.teamficial_be.domain.user.entity.User;
@@ -51,6 +52,7 @@ public class TeamficialLogService {
     private final UserService userService;
     private final EmbeddingService embeddingService;
     private final PromptLoadService promptLoadService;
+    private final KeywordCommentSessionService keywordCommentSessionService;
 
     @Transactional(readOnly = true)
     public HeadKeywordResponseDto getHeadKeyword(Long profileId) {
@@ -138,7 +140,13 @@ public class TeamficialLogService {
         return ScrollResponse.of(dtoList);
     }
 
-    public TeamficialLogResponseDto createTeamficialLog(TeamficialLogRequestDto req) throws IOException {
+    @Transactional
+    public TeamficialLogResponseDto createTeamficialLog(User writer, TeamficialLogRequestDto req) throws IOException {
+        User owner = userService.getUserByUuid(req.getUserUuid());
+
+        if (keywordCommentSessionService.existsByOwnerIdAndWriterId(owner.getId(), writer.getId())) {
+            throw new GeneralException(ErrorStatus.CAN_NOT_WRITE_TEAMFICIAL_LOG_OVER_1);
+        }
 
         List<String> contents = List.of(
                 req.getContent1(),
@@ -157,8 +165,15 @@ public class TeamficialLogService {
 
             String bestKeyword = getBestKeyword(vector);
 
-            keywordService.saveBestKeyword(req, content, bestKeyword, results);
+            keywordService.saveBestKeyword(owner, req, content, bestKeyword, results);
         }
+
+        keywordCommentSessionService.saveSession(
+                KeywordCommentSession.builder()
+                        .owner(owner)
+                        .writer(writer)
+                        .build()
+        );
 
         return new TeamficialLogResponseDto(results);
     }
@@ -181,9 +196,8 @@ public class TeamficialLogService {
                 )
         );
 
-        String bestKeyword = (String) searchResponse.getHits().getHits()[0]
+        return (String) searchResponse.getHits().getHits()[0]
                 .getSourceAsMap().get("keyword");
-        return bestKeyword;
     }
 
     private String buildKeywordKnnQuery(float[] embeddingVector) throws IOException {

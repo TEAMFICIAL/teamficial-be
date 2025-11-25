@@ -62,11 +62,12 @@ public class TeamficialLogController {
     }
 
     @PostMapping("/teamficial-log")
-    @Operation(summary = "팀피셜록 작성하기", description = "팀피셜록을 작성하고 키워드,요약을 추출하는 api 입니다.")
+    @Operation(summary = "팀피셜록 작성하기", description = "팀피셜록을 작성하고 키워드, 코멘트 원문을 추출하는 api 입니다.")
     public ApiResponse<TeamficialLogResponseDto> createTeamficialLog(
-            @Valid @RequestBody TeamficialLogRequestDto request) throws IOException {
+            @Valid @RequestBody TeamficialLogRequestDto request,
+            @AuthenticationPrincipal AuthDetails authDetails) throws IOException {
 
-        return ApiResponse.onSuccess(teamficialLogService.createTeamficialLog(request));
+        return ApiResponse.onSuccess(teamficialLogService.createTeamficialLog(authDetails.user(), request));
     }
 
     @GetMapping("/teamficial-log/requester")

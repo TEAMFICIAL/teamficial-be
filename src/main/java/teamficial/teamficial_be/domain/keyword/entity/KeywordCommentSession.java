@@ -8,22 +8,23 @@ import lombok.NoArgsConstructor;
 import teamficial.teamficial_be.domain.user.entity.User;
 import teamficial.teamficial_be.global.entity.BaseEntity;
 
+
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class KeywordComment extends BaseEntity {
+public class KeywordCommentSession extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "keyword_comment_id")
+    @Column(name = "keyword_comment_session_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "keyword_id")
-    private Keyword keyword;
+    @JoinColumn(name = "user_id")
+    private User owner;
 
-    @Lob
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer_id")
+    private User writer;
 }
