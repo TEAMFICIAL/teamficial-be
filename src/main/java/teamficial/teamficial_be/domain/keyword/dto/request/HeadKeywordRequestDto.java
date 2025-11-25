@@ -6,6 +6,5 @@ import java.util.List;
 
 @Getter
 public class HeadKeywordRequestDto {
-
     private List<Long> keywordIds;
 }

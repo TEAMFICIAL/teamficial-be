@@ -53,7 +53,7 @@ public class RecruitingPostQueryPerformanceTest {
         Position position = null;
         ProgressWay progressWay = null;
 
-        int pageSize = 20;
+        int pageSize = 9;
 
         // 1) 전체 개수 조회
         Long totalCount = em.createQuery(
@@ -78,6 +78,44 @@ public class RecruitingPostQueryPerformanceTest {
 
         System.out.println("마지막 페이지 조회 시간 : " + (end - start) + " ms");
         System.out.println("조회된 데이터 수       : " + lastPage.getContent().size());
+    }
+
+    @Test
+    void measure_querydsl_middle_page_performance() {
+
+        RecruitingStatus status = null;
+        Position position = null;
+        ProgressWay progressWay = null;
+
+        int pageSize = 9;
+
+        // 1) 전체 개수 조회
+        Long totalCount = em.createQuery(
+                "SELECT COUNT(rp) FROM RecruitingPost rp", Long.class
+        ).getSingleResult();
+
+        // 2) 전체 페이지 수 계산
+        int totalPages = (int) (totalCount == 0 ? 0 : (totalCount - 1) / pageSize + 1);
+
+        // 3) 가운데 페이지 번호 계산 (절반 지점)
+        int middlePageNumber = Math.max(0, totalPages / 2);  // page index는 0부터이므로 1 빼지 않음
+
+        Pageable pageable = PageRequest.of(middlePageNumber, pageSize);
+
+        System.out.println("==== QueryDSL Middle Page Performance Test ====");
+        System.out.println("totalCount         = " + totalCount);
+        System.out.println("pageSize           = " + pageSize);
+        System.out.println("totalPages         = " + totalPages);
+        System.out.println("middlePageNumber   = " + middlePageNumber);
+        System.out.println("----------------------------------------------");
+
+        long start = System.currentTimeMillis();
+        Page<RecruitingPostDto.RecruitingPostsResponseDTO> middlePage =
+                recruitingPostService.getRecruitingPosts(status, position, progressWay, pageable);
+        long end = System.currentTimeMillis();
+
+        System.out.println("중간 페이지 조회 시간 : " + (end - start) + " ms");
+        System.out.println("조회된 데이터 수       : " + middlePage.getContent().size());
     }
 
 }
