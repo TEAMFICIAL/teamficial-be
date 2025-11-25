@@ -24,6 +24,11 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     @EntityGraph(attributePaths = {"user", "profile"})
     Page<Application> findAllByUser(User user, Pageable pageable);
 
+    @Query("SELECT ap FROM Application ap " +
+            "JOIN FETCH ap.user "+
+            "ORDER BY ap.createdAt DESC ")
+    List<Application> findAllByUser(User user);
+
     @EntityGraph(attributePaths = {"user", "profile"})
     Page<Application> findAllByUserAndApplicationStatus(User user, Pageable pageable, ApplicationStatus status);
 
@@ -49,4 +54,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findAllByProfile(Profile profile);
 
     Page<Application> findAllByUserAndApplicationStatusIn(User user, Pageable pageable, List<ApplicationStatus> status);
+
+    boolean existsByUserAndRecruitingPostAndApplicationStatus(User user, RecruitingPost recruitingPost,ApplicationStatus status);
+
+    List<Application> findAllByUserAndRecruitingPostAndApplicationStatus(User user, RecruitingPost recruitingPost,ApplicationStatus status);
+
 }

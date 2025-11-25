@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -22,6 +23,7 @@ public class MyTeamResponseDto {
     private List<String> tags;
     @Schema(description = "총 팀원 수", example="2")
     private int totalMembers;
+    private LocalDateTime createAt;
 
     public static MyTeamResponseDto from(RecruitingPost recruitingPost,int totalMembers) {
         List<String> tags = recruitingPost.getRecruitingDetails().stream()
@@ -35,6 +37,7 @@ public class MyTeamResponseDto {
                 .progressWay(recruitingPost.getProgressWay().getDescription())
                 .tags(tags)
                 .totalMembers(totalMembers)
+                .createAt(recruitingPost.getCreatedAt())
                 .build();
     }
 }

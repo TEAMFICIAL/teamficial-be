@@ -1,4 +1,4 @@
-package teamficial.teamficial_be.domain.confirmed;
+package teamficial.teamficial_be.domain.confirmed.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import teamficial.teamficial_be.domain.confirmed.dto.response.ConfirmedProfileResponse;
+import teamficial.teamficial_be.domain.confirmed.service.ConfirmedProfileService;
 import teamficial.teamficial_be.global.enums.Position;
 import teamficial.teamficial_be.global.security.AuthDetails;
 

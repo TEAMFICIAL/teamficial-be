@@ -12,7 +12,7 @@ import teamficial.teamficial_be.domain.application.dto.response.ApplicationRespo
 import teamficial.teamficial_be.domain.application.entity.Application;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
-import teamficial.teamficial_be.domain.confirmed.ConfirmedProfileService;
+import teamficial.teamficial_be.domain.confirmed.service.ConfirmedProfileService;
 import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
 import teamficial.teamficial_be.domain.myPage.dto.response.*;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
@@ -27,10 +27,8 @@ import teamficial.teamficial_be.global.enums.Position;
 import teamficial.teamficial_be.global.redis.RedisService;
 import teamficial.teamficial_be.global.util.PagedResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -233,7 +231,7 @@ public class MypageService {
     @Transactional(readOnly = true)
     public DashboardResponseDto getUserDashBoard(User user) {
         List<RecruitingPost> recruitingPostList = recruitingPostService.getAllByUser(user);
-        List<Application> applicationList = applicationService.getTop3ByUser(user);
+        List<Application> applicationList = applicationService.getAllByUser(user);
 
         List<Long> postIds = recruitingPostList.stream()
                 .map(RecruitingPost::getId)
@@ -251,6 +249,7 @@ public class MypageService {
                 .toList();
 
         List<MyApplicationResponseDto> applicationDtos = applicationList.stream()
+                .limit(3)
                 .map(app -> {
                     ApplicationStatus status = app.getApplicationStatus();
                     if (status == ApplicationStatus.TEMP_SAVED) {
@@ -260,14 +259,28 @@ public class MypageService {
                 })
                 .toList();
 
-        List<MyTeamResponseDto> myTeamResponseDtos = recruitingPostList.stream()
-                .filter(recruitingPost -> recruitingPost.getStatus() == RecruitingStatus.CLOSED)
-                .limit(3)
-                .map(recruitingPost -> {
-                    int totalMembers = confirmedProfileService.getTotalMembers(recruitingPost);
-
-                    return MyTeamResponseDto.from(recruitingPost,totalMembers);
+        //지원한 내역 중 MATCHED 상태인 것들
+        List<MyTeamResponseDto> matchedList = applicationList.stream()
+                .filter(app -> app.getApplicationStatus() == ApplicationStatus.MATCHED)
+                .map(app -> {
+                    int totalMembers = confirmedProfileService.getTotalMembers(app.getRecruitingPost());
+                    return MyTeamResponseDto.from(app.getRecruitingPost(), totalMembers);
                 })
+                .toList();
+
+        //내가 작성한 모집글 중 마감된 것 → MyTeamResponseDto 변환
+        List<MyTeamResponseDto> closedPostList = recruitingPostList.stream()
+                .filter(post -> post.getStatus() == RecruitingStatus.CLOSED)
+                .map(post -> {
+                    int totalMembers = confirmedProfileService.getTotalMembers(post);
+                    return MyTeamResponseDto.from(post, totalMembers);
+                })
+                .toList();
+
+        //두 리스트를 합치고 최대 3개까지 (최신순)
+        List<MyTeamResponseDto> myTeamResponseDtos = Stream.concat(matchedList.stream(), closedPostList.stream())
+                .sorted(Comparator.comparing( MyTeamResponseDto::getCreateAt).reversed())
+                .limit(3)
                 .toList();
 
         return DashboardResponseDto.builder()
@@ -276,5 +289,7 @@ public class MypageService {
                 .myTeamResponses(myTeamResponseDtos)
                 .build();
     }
+
+
 
 }
