@@ -248,4 +248,5 @@ public class RecruitingPostService {
     public List<RecruitingPost> getRecruitingPostsByProfile(Profile profile) {
         return recruitingPostRepository.findAllByProfile(profile);
     }
+
 }
