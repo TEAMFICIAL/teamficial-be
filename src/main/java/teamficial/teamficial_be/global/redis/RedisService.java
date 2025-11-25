@@ -83,11 +83,7 @@ public class RedisService {
         if (keys == null || keys.isEmpty()) {
             return new ArrayList<>();
         }
-        log.info("values: {}", keys.stream().findFirst());
-        List<Object> keyss = redisTemplate.opsForValue().multiGet(keys);
-        log.info("keyss: {}", keyss);
         return redisTemplate.opsForValue().multiGet(keys);
-        //return redisTemplate.opsForValue().multiGet(keys);
     }
 
     public void setValues(Map<String, String> cacheData) {
