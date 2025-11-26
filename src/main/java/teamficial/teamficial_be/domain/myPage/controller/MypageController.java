@@ -7,10 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.application.dto.response.ApplicationResponseDto;
 import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
-import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicantResponseDto;
-import teamficial.teamficial_be.domain.myPage.dto.response.CurrentApplicationDetailResponseDto;
-import teamficial.teamficial_be.domain.myPage.dto.response.DashboardResponseDto;
-import teamficial.teamficial_be.domain.myPage.dto.response.MyApplicationResponseDto;
+import teamficial.teamficial_be.domain.myPage.dto.response.*;
 import teamficial.teamficial_be.domain.myPage.service.MypageService;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
@@ -39,6 +36,16 @@ public class MypageController {
                                                                                       @RequestParam(defaultValue = "0") int page,
                                                                                       @RequestParam(defaultValue = "3") int size) {
         PagedResponse<MyApplicationResponseDto> responseDtos = mypageService.getAllApplications(authDetails.user(),page,size,applicationStatus);
+        return ApiResponse.onSuccess(responseDtos);
+    }
+
+    @GetMapping("/my-page/my-teams")
+    @Operation(summary = "나의 팀 리스트 조회하기", description = "마이페이지에서 나의 팀 리스트를 조회하는 API입니다.")
+    public ApiResponse<PagedResponse<MyTeamResponseDto>> getMyTeams(@AuthenticationPrincipal AuthDetails authDetails,
+                                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                                      @RequestParam(defaultValue = "3") int size){
+        PagedResponse<MyTeamResponseDto> responseDtos = mypageService.getMyTeams(authDetails.user(),page,size);
+
         return ApiResponse.onSuccess(responseDtos);
     }
 
