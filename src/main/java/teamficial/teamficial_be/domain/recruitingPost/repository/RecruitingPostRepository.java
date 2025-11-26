@@ -53,4 +53,10 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "ORDER BY rp.deadline ASC " +
             "LIMIT 3")
     List<RecruitingPost> findTop3ByUserOrderByDeadlineAsc(User user);
+
+    @Query("SELECT rp FROM RecruitingPost rp " +
+            "LEFT JOIN FETCH rp.recruitingDetails d " +
+            "JOIN FETCH rp.user " +
+            "WHERE rp.user = :user AND rp.status = :recruitingStatus")
+    List<RecruitingPost> findAllByUserAndStatus(User user, RecruitingStatus recruitingStatus);
 }

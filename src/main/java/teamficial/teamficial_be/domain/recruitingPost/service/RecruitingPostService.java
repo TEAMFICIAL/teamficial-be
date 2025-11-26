@@ -258,4 +258,8 @@ public class RecruitingPostService {
     public List<RecruitingPost> getTop3ByUserOrderByDeadlineAsc(User user) {
         return recruitingPostRepository.findTop3ByUserOrderByDeadlineAsc(user);
     }
+
+    public List<RecruitingPost> getAllRecruitingPostsByUserAndStatus(User user, RecruitingStatus recruitingStatus) {
+        return recruitingPostRepository.findAllByUserAndStatus(user,recruitingStatus);
+    }
 }

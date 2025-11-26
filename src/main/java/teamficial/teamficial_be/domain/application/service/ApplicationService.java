@@ -178,4 +178,8 @@ public class ApplicationService {
     public boolean existApplicationMatched(User user, RecruitingPost recruitingPost) {
         return applicationRepository.existsByUserAndRecruitingPostAndApplicationStatus(user, recruitingPost, ApplicationStatus.MATCHED);
     }
+
+    public List<Application> getAllByUserAndStatus(User user, ApplicationStatus applicationStatus) {
+        return applicationRepository.findAllByUserAndApplicationStatus(user,applicationStatus);
+    }
 }

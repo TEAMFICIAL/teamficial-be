@@ -58,6 +58,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     boolean existsByUserAndRecruitingPostAndApplicationStatus(User user, RecruitingPost recruitingPost,ApplicationStatus status);
 
-    List<Application> findAllByUserAndRecruitingPostAndApplicationStatus(User user, RecruitingPost recruitingPost,ApplicationStatus status);
 
+    @Query("SELECT ap FROM Application ap " +
+            "JOIN FETCH ap.user "+
+            "WHERE ap.user = :user AND ap.applicationStatus = :applicationStatus")
+    List<Application> findAllByUserAndApplicationStatus(User user, ApplicationStatus applicationStatus);
 }

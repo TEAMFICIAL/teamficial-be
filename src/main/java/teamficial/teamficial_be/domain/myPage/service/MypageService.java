@@ -2,10 +2,7 @@ package teamficial.teamficial_be.domain.myPage.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.application.dto.response.ApplicationResponseDto;
@@ -291,5 +288,39 @@ public class MypageService {
     }
 
 
+    public PagedResponse<MyTeamResponseDto> getMyTeams(User user, int page, int size) {
 
+        //지원한 내역 중 MATCHED 상태인 것들의 게시글
+        List<RecruitingPost> myMatchedPostList = applicationService.getAllByUserAndStatus(user, ApplicationStatus.MATCHED).stream()
+                .map(Application::getRecruitingPost)
+                .toList();
+
+        //내가 작성한 모집글 중 마감된 것
+        List<RecruitingPost> recruitingPostList = recruitingPostService.getAllRecruitingPostsByUserAndStatus(user,RecruitingStatus.CLOSED);
+
+        //두 리스트 합치고 모집 글 최신순으로 페이징
+        List<MyTeamResponseDto> posts = new ArrayList<>();
+
+        myMatchedPostList.forEach(post -> {
+            int totalMembers = confirmedProfileService.getTotalMembers(post);
+            posts.add(MyTeamResponseDto.from(post,totalMembers));
+        });
+
+        recruitingPostList.forEach(post -> {
+            int totalMembers = confirmedProfileService.getTotalMembers(post);
+            posts.add(MyTeamResponseDto.from(post,totalMembers));
+        });
+
+        posts.sort(Comparator.comparing( MyTeamResponseDto::getCreateAt).reversed());
+
+
+        Pageable pageable = PageRequest.of(page, size);
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), posts.size());
+        List<MyTeamResponseDto> pageContent = (start <= end) ? posts.subList(start, end) : List.of();
+
+        Page<MyTeamResponseDto> pageResult = new PageImpl<>(pageContent, pageable, posts.size());
+
+        return PagedResponse.of(pageResult);
+    }
 }
