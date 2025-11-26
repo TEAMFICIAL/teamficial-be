@@ -261,7 +261,7 @@ public class MypageService {
                 .filter(app -> app.getApplicationStatus() == ApplicationStatus.MATCHED)
                 .map(app -> {
                     int totalMembers = confirmedProfileService.getTotalMembers(app.getRecruitingPost());
-                    return MyTeamResponseDto.from(app.getRecruitingPost(), totalMembers);
+                    return MyTeamResponseDto.of(app.getRecruitingPost(), totalMembers);
                 })
                 .toList();
 
@@ -270,7 +270,7 @@ public class MypageService {
                 .filter(post -> post.getStatus() == RecruitingStatus.CLOSED)
                 .map(post -> {
                     int totalMembers = confirmedProfileService.getTotalMembers(post);
-                    return MyTeamResponseDto.from(post, totalMembers);
+                    return MyTeamResponseDto.of(post, totalMembers);
                 })
                 .toList();
 
@@ -287,7 +287,7 @@ public class MypageService {
                 .build();
     }
 
-
+    @Transactional(readOnly = true)
     public PagedResponse<MyTeamResponseDto> getMyTeams(User user, int page, int size) {
 
         //지원한 내역 중 MATCHED 상태인 것들의 게시글
@@ -303,12 +303,18 @@ public class MypageService {
 
         myMatchedPostList.forEach(post -> {
             int totalMembers = confirmedProfileService.getTotalMembers(post);
-            posts.add(MyTeamResponseDto.from(post,totalMembers));
+            List<String> tags = post.getRecruitingDetails().stream()
+                    .map(recruitingDetail -> recruitingDetail.getPosition().getDescription())
+                    .toList();
+            posts.add(MyTeamResponseDto.from(post,totalMembers, tags));
         });
 
         recruitingPostList.forEach(post -> {
             int totalMembers = confirmedProfileService.getTotalMembers(post);
-            posts.add(MyTeamResponseDto.from(post,totalMembers));
+            List<String> tags = post.getRecruitingDetails().stream()
+                    .map(recruitingDetail -> recruitingDetail.getPosition().getDescription())
+                    .toList();
+            posts.add(MyTeamResponseDto.from(post,totalMembers, tags));
         });
 
         posts.sort(Comparator.comparing( MyTeamResponseDto::getCreateAt).reversed());

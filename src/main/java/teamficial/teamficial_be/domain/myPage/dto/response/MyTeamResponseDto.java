@@ -25,10 +25,23 @@ public class MyTeamResponseDto {
     private int totalMembers;
     private LocalDateTime createAt;
 
-    public static MyTeamResponseDto from(RecruitingPost recruitingPost,int totalMembers) {
+    public static MyTeamResponseDto of(RecruitingPost recruitingPost,int totalMembers) {
         List<String> tags = recruitingPost.getRecruitingDetails().stream()
                 .map(recruitingDetail -> recruitingDetail.getPosition().getDescription())
                 .toList();
+
+        return MyTeamResponseDto.builder()
+                .postId(recruitingPost.getId())
+                .period(recruitingPost.getPeriod().getDescription())
+                .title(recruitingPost.getTitle())
+                .progressWay(recruitingPost.getProgressWay().getDescription())
+                .tags(tags)
+                .totalMembers(totalMembers)
+                .createAt(recruitingPost.getCreatedAt())
+                .build();
+    }
+
+    public static MyTeamResponseDto from(RecruitingPost recruitingPost,int totalMembers, List<String> tags) {
 
         return MyTeamResponseDto.builder()
                 .postId(recruitingPost.getId())
