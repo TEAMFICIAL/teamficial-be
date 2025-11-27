@@ -25,6 +25,11 @@ public class AuthDetailsService implements UserDetailsService {
             Long id = Long.valueOf(userId);
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));
+
+            if (user == null) {
+                throw new GeneralException(ErrorStatus.NOT_FOUND_USER);
+            }
+
             return new AuthDetails(user);
         } catch (NumberFormatException e){
             throw new GeneralException(ErrorStatus.TOKEN_INVALID);
