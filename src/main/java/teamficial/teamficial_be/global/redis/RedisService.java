@@ -86,7 +86,7 @@ public class RedisService {
         return redisTemplate.opsForValue().multiGet(keys);
     }
 
-    public void setValues(Map<String, String> cacheData) {
+    public void setValues(Map<String, Object> cacheData) {
         if (cacheData.isEmpty()) {
             return;
         }

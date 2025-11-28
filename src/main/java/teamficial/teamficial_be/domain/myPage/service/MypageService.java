@@ -131,7 +131,7 @@ public class MypageService {
             log.debug("DB 조회 대상 모집글들: {}", missIds);
             Map<Long, Integer> dbCounts = applicationService.getApplicantCountBatch(missIds);
 
-            Map<String, String> cacheData = new HashMap<>();
+            Map<String, Object> cacheData = new HashMap<>();
             dbCounts.forEach((postId,count) -> {
                 resultMap.put(postId, count);
                 cacheData.put(redisService.applicationKey(postId), String.valueOf(count));
