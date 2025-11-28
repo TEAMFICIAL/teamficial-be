@@ -93,4 +93,20 @@ public class RedisService {
         redisTemplate.opsForValue().multiSet(cacheData);
 
     }
+
+    public void setValue(String key, int value, long ttlMillis) {
+        try {
+            if (ttlMillis > 0) {
+                ValueOperations<String, Object> values = redisTemplate.opsForValue();
+                values.set(key, value, Duration.ofMillis(ttlMillis));
+            } else {
+                ValueOperations<String, Object> values = redisTemplate.opsForValue();
+                values.set(key, value);
+            }
+
+        } catch (Exception e) {
+            log.error("Redis set 오류 — key: {}, ttl: {}, 예외: {}", key, ttlMillis, e.toString(), e);
+            throw new GeneralException(ErrorStatus.REDIS_ERROR);
+        }
+    }
 }
