@@ -134,7 +134,7 @@ public class MypageService {
             Map<String, Object> cacheData = new HashMap<>();
             dbCounts.forEach((postId,count) -> {
                 resultMap.put(postId, count);
-                cacheData.put(redisService.applicationKey(postId), String.valueOf(count));
+                cacheData.put(redisService.applicationKey(postId), count);
             });
 
             if (!cacheData.isEmpty()) {
