@@ -11,6 +11,33 @@
 
 팀피셜은 더 신뢰할 수 있는 협업, 더 조화로운 팀워크로 이어지는 과정
 전반을 설계합니다.
+<img width="1920" height="1080" alt="3" src="https://github.com/user-attachments/assets/aa97217f-b9bd-4205-a8b1-fbe9f51226f5" />
+<img width="1920" height="1080" alt="4" src="https://github.com/user-attachments/assets/d771c6f1-57ce-4b1f-95a2-db80311e4af4" />
+<img width="1920" height="1080" alt="5" src="https://github.com/user-attachments/assets/0ee380d1-c7ea-4a2b-8dd0-9b77f0eae134" />
+<img width="1920" height="1080" alt="15" src="https://github.com/user-attachments/assets/d555f742-1730-41b4-a71a-ad25a71078ec" />
+<img width="1920" height="1080" alt="19" src="https://github.com/user-attachments/assets/8f22a0c4-db4d-4df3-acc4-5b7e1e553899" />
+<img width="1920" height="1080" alt="21" src="https://github.com/user-attachments/assets/bf878e94-8ccd-4388-a6e3-693847518a15" />
+<img width="1920" height="1080" alt="28" src="https://github.com/user-attachments/assets/cd243c9d-4217-4173-a322-2bca81ccaeff" />
+
+
+# 주요기능
+<img width="1920" height="1080" alt="30" src="https://github.com/user-attachments/assets/479eaaaa-1eac-47bd-ab40-31fcbbb8d3f6" />  
+
+🚨 프로필 수정 및 삭제 시에는, 다른 유저들에게 혼동을 주지않기 위해 제약과 에러처리를 세세하게 로직에 구현해두었습니다.  
+&emsp; 코드 경로 : `src/main/java/teamficial/teamficial_be/domain/profile/dto/ProfileStatus.java`
+
+<img width="1920" height="1080" alt="31" src="https://github.com/user-attachments/assets/cdb95aba-6dbd-4117-ae43-101d25965576" />
+<img width="1920" height="1080" alt="32" src="https://github.com/user-attachments/assets/c7aa1c2c-1737-4ec9-a280-0f3c0cab80f3" />
+<img width="1920" height="1080" alt="33" src="https://github.com/user-attachments/assets/fe962466-73a6-4229-9e64-e6c45c9ad0b1" />
+<img width="1920" height="1080" alt="34" src="https://github.com/user-attachments/assets/53f89848-bbad-4694-8456-c1cf1996923b" />
+
+### 프로젝트 뷰 & 지원하기
+
+<img width="2048" height="1181" alt="Section 1" src="https://github.com/user-attachments/assets/a735dcf6-1319-4dd1-b60a-83ca70b7e618" />
+
+🚨 메인페이지에 게시글 리스트가 있는 만큼, 게시글 리스트 조회 API 쿼리 성능 개선에 집중했습니다.
+&emsp; 서브쿼리를 사용하고 관련 인덱스를 사용하여, 300만건의 데이터에서 쿼리 속도를 300ms ~ 500ms정도로 개선하였습니다.
+
 
 # 기술 스택
 
@@ -52,4 +79,47 @@
 
 # 데이터 파이프라인
 <img width="824" height="356" alt="image" src="https://github.com/user-attachments/assets/34d7b295-02bf-4ff3-8308-5d552c621fd0" />
+ 
+✅ 팀원이 작성해준 팀피셜록과 유사한 키워드를 찾기위해 우선 미리 선정한 키워드 100여개를 먼저 벡터 DB에 임베딩합니다.  
+&emsp; 이후, 3개의 팀피셜록에 대해 각각 LLM을 이용하여 키워드 위주의 짧은 문장으로 변환합니다.  
+&emsp; 그 문장을 임베딩하고, KNN 벡터 검색을 사용해 가장 의미가 유사한 키워드를 추출합니다.
 
+# 프로젝트 구조
+```
+src
+ └─ main
+     └─ java
+         └─ teamficial
+             └─ teamficial_be
+                 ├─ batch
+                 │   ├─ job
+                 │   ├─ scheduler
+                 │   ├─ step
+                 │   └─ tasklet
+                 │
+                 ├─ domain
+                 │   ├─ application
+                 │   ├─ auth
+                 │   ├─ confirmed
+                 │   ├─ keyword
+                 │   ├─ myPage
+                 │   ├─ profile
+                 │   ├─ recruitingDetail
+                 │   ├─ recruitingPost
+                 │   └─ user
+                 │
+                 └─ global
+                     ├─ apiPayload
+                     ├─ config
+                     ├─ entity
+                     ├─ enums
+                     ├─ redis
+                     ├─ security
+                     ├─ test
+                     └─ util
+```
+
+# 관련 블로그
+ - [NCP를 활용한 RAG 기반 키워드 추출](https://velog.io/@minco/NCP%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-RAG-%EA%B8%B0%EB%B0%98-%ED%82%A4%EC%9B%8C%EB%93%9C-%EC%B6%94%EC%B6%9C-%ED%8C%80%ED%94%BC%EC%85%9C)
+
+ - [offset, limit 페이징 쿼리 최적화](https://velog.io/@minco/offset-limit-%ED%8E%98%EC%9D%B4%EC%A7%95-%EC%BF%BC%EB%A6%AC-%EC%B5%9C%EC%A0%81%ED%99%94-%EC%B2%AB-%ED%8E%98%EC%9D%B4%EC%A7%80-72s-%EB%A7%88%EC%A7%80%EB%A7%89-%ED%8E%98%EC%9D%B4%EC%A7%80-1s)
