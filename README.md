@@ -46,6 +46,66 @@
 | **Backend** | <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/> <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/> <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/> <img src="https://img.shields.io/badge/JPA%2FHibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white"/> <img src="https://img.shields.io/badge/QueryDSL-3DDC84?style=for-the-badge&logo=google&logoColor=white"/> <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white"/> <img src="https://img.shields.io/badge/NCP-03C75A?style=for-the-badge&logo=naver&logoColor=white"/> |
 <br />
 
+: **Java 17**
+
+- 장기 지원(LTS, Long Term Support)을 제공하므로 안정성과 보안성이 높습니다.
+- 최신 언어 기능(레코드, 패턴 매칭, switch 표현식 등)을 활용할 수 있어 코드 가독성과 유지보수성이 개선됩니다.
+- 또한 GC 개선과 퍼포먼스 향상 기능들이 포함되어 있어 생산환경 운영에 유리합니다.
+
+**: Spring Boot 3.5.4**
+
+- Spring Boot 3 버전은 최신 Spring Framework 기반이며, 성능, 보안, 관측성(observability) 등이 강화되어 있습니다.
+- 기본 설정으로도 안정적이고 빠른 개발/배포가 가능하며, 요즘 트렌드인 마이크로서비스 또는 클라우드 네이티브 환경에서 잘 맞습니다.
+
+**: Spring Data JPA**
+
+- 관계형 데이터베이스(MySQL)와의 상호작용을 객체지향적으로 다룰 수 있게 해 주며, 복잡한 SQL 없이 CRUD 및 쿼리 정의가 간편합니다.
+- 트랜잭션 관리, 영속성 컨텍스트, 캐시 사용 등 엔터프라이즈 애플리케이션에 필수적인 기능을 제공합니다.
+
+**: Spring Security + JWT + OAuth2**
+
+- 인증·인가를 표준화된 방식으로 처리 가능합니다
+- JWT 토큰 기반 인증으로 무상태(Stateless) 서버 아키텍처 구성합니다
+- OAuth2 연동을 통해 카카오, 구글 등 외부 로그인 지원합니다
+
+**: Docker**
+
+- 개발 환경과 프로덕션 환경 간의 차이를 줄이고, 배포 일관성(consistency)을 확보할 수 있습니다. 그리고 컨테이너를 통해 의존성 관리, 확장성, 롤백 등이 쉬워지고, CI/CD와의 통합이 용이하여 사용했습니다.
+
+**: Github Actions**
+
+- 자동화된 빌드(build), 테스트, 이미지 생성, 배포 파이프라인을 구성하기에 매우 적합하며, 코드 변경이 있을 때마다 지속적 통합(Continuous Integration) 및 지속적 배포(Continuous Deployment) 과정 자동화가 가능해 에러 가능성을 낮추고 배포 속도를 높이기에 사용했습니다.
+
+**: Swagger**
+
+- API 문서화를 자동으로 생성해 주므로 프론트엔드 개발자가 API 명세를 쉽게 이해하고 사용할 수 있습니다.
+- 또한 API 변경 시 문서 유지보수가 쉬워지며, API 테스트/검증 시 유용합니다.
+
+**: MySQL**
+
+- 안정성과 성숙성이 검증된 관계형 데이터베이스이며, 트랜잭션, 조인 쿼리, 데이터 무결성(INTEGRITY) 등이 중요한 데이터 저장소로 저희 프로젝트에 적합합니다.
+- 스케일업 및 스케일아웃 구조 설계 시에도 다양한 옵션과 커뮤니티/툴 지원이 풍부하여 사용했습니다.
+
+**: Redis**
+
+- 빠른 읽기/쓰기 응답(latency)이 필요한 캐시(cache) 용도 또는 세션 관리, 빈번히 조회되는 데이터 저장 등에 적합합니다.
+- MySQL 등의 디스크 기반 DB와 혼합 사용 시 전체 시스템 응답성(performance) 및 확장성(scalability)을 향상시킬 수 있습니다.
+- 카카오 로그인을 통해 인증을 마친 뒤, token 정보 저장 및 관리를 위해 사용합니다.
+
+**: CLOVA Studio**
+
+- **키워드 임베딩**: 키워드를 벡터화하여 단순 키워드 매칭이 아닌 의미적 유사도 검색이 가능하도록 구현했습니다
+- 즉, 사용자가 질문에 대한 대답을 했을 때 문맥파악을 하여 키워드를 추출하였습니다.
+
+**: Open Search**
+
+- **벡터 검색(Vector Search):** 기능을 활용해 임베딩된 키워드를 효율적으로 저장·조회했습니다.
+
+단순 키워드 일치 방식이 아니라, 질문·답변의 **의미적 유사도(semantic similarity)** 를 기반으로 콘텐츠를 추천하거나 관련 키워드를 찾아낼 수 있도록 구성했습니다.
+
+- 전체적으로 **RAG 파이프라인의 Retrieval 단계**를 담당하며, CLOVA Studio로 생성한 벡터를 OpenSearch에 저장하고, KNN 검색을 통해 가장 의미적으로 가까운 결과를 빠르게 반환하도록 구성했습니다.  
+
+
 # BE 팀원
 <table>
   <tr>
