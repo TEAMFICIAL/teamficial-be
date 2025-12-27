@@ -10,6 +10,8 @@ import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileIdListResponseDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.service.ProfileService;
+import teamficial.teamficial_be.domain.user.entity.User;
+import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.security.AuthDetails;
 
@@ -20,6 +22,7 @@ import java.util.List;
 @Tag(name = "Profile 관련 API", description = "피그마 GUI 4.1")
 public class ProfileController {
     private final ProfileService profileService;
+    private final UserService userService;
 
     @PostMapping("/profile")
     @Operation(summary = "프로필 생성", description = "프로필을 생성하는 API입니다.")
@@ -38,9 +41,10 @@ public class ProfileController {
     }
 
     @GetMapping("/{userUuid}/profile")
-    @Operation(summary = "uuid로 프로필 id 리스트 조회", description = "uuid로 프로필 id 리스트룰 조회하는 API입니다.")
-    public ApiResponse<ProfileIdListResponseDto> getProfileIdList(@PathVariable String userUuid) {
-        ProfileIdListResponseDto profileResponseDtos = profileService.getProfileIdList(userUuid);
+    @Operation(summary = "uuid로 프로필 리스트 조회", description = "uuid로 다른 유저의 프로필 리스트룰 조회하는 API입니다.")
+    public ApiResponse<List<ProfileResponseDto>> getProfileIdList(@PathVariable String userUuid) {
+        User user = userService.getUserByUuid(userUuid);
+        List<ProfileResponseDto> profileResponseDtos = profileService.getProfileList(user);
         return ApiResponse.onSuccess(profileResponseDtos);
     }
 
