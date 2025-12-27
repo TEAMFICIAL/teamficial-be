@@ -8,6 +8,7 @@ import teamficial.teamficial_be.domain.application.entity.ApplicationStatus;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.profile.dto.ProfileStatus;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
+import teamficial.teamficial_be.domain.profile.dto.response.ProfileIdListResponseDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
@@ -16,6 +17,7 @@ import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
 import teamficial.teamficial_be.domain.recruitingPost.service.RecruitingPostService;
 import teamficial.teamficial_be.domain.user.entity.User;
+import teamficial.teamficial_be.domain.user.service.UserService;
 import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
 import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
@@ -29,6 +31,7 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final PreSignedUrlService preSignedUrlService;
     private final RecruitingPostService recruitingPostService;
+    private final UserService userService;
 
     @Transactional
     public ProfileResponseDto createProfile(User user, ProfileRequestDto requestDto, String objectKey){
@@ -205,5 +208,17 @@ public class ProfileService {
     public Profile getProfileWithLinks(Long profileId) {
         return profileRepository.findWithLinksById(profileId)
                 .orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_PROFILE));
+    }
+
+    @Transactional(readOnly = true)
+    public ProfileIdListResponseDto getProfileIdList(String userUuid) {
+        User user = userService.getUserByUuid(userUuid);
+        List<Long> profileIdList = profileRepository.findAllByUserAndIsDeletedFalse(user).stream()
+                .map(Profile::getId)
+                .toList();
+
+        return ProfileIdListResponseDto.builder()
+                .profileIdList(profileIdList)
+                .build();
     }
 }
