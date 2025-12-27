@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.profile.dto.request.ProfileRequestDto;
+import teamficial.teamficial_be.domain.profile.dto.response.ProfileIdListResponseDto;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.profile.service.ProfileService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
@@ -33,6 +34,13 @@ public class ProfileController {
     @Operation(summary = "프로필리스트 조회", description = "프로필을 조회하는 API입니다.")
     public ApiResponse<List<ProfileResponseDto>> getProfileList(@AuthenticationPrincipal AuthDetails authDetails) {
         List<ProfileResponseDto> profileResponseDtos = profileService.getProfileList(authDetails.user());
+        return ApiResponse.onSuccess(profileResponseDtos);
+    }
+
+    @GetMapping("/{userUuid}/profile")
+    @Operation(summary = "uuid로 프로필 id 리스트 조회", description = "uuid로 프로필 id 리스트룰 조회하는 API입니다.")
+    public ApiResponse<ProfileIdListResponseDto> getProfileIdList(@PathVariable String userUuid) {
+        ProfileIdListResponseDto profileResponseDtos = profileService.getProfileIdList(userUuid);
         return ApiResponse.onSuccess(profileResponseDtos);
     }
 
