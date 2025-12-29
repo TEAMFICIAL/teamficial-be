@@ -32,7 +32,7 @@ public class ReportService {
                 .reportType(reportRequestDto.getReportType())
                 .reportEtc(reportRequestDto.getReportType()== ReportType.OTHER? reportRequestDto.getReportEtc() : null)
                 .content(reportRequestDto.getContent())
-                .is_applied(false)
+                .isApplied(false)
                 .user(user)
                 .build();
 

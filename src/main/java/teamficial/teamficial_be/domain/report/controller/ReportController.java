@@ -19,7 +19,16 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @Operation(summary = "팀피셜록 신고하기 API", description = "유저가 자신에게 달린 팀피셜록을 신고하는 API입니다.")
+    @Operation(summary = "팀피셜록 신고하기 API", description = """
+            유저가 자신에게 달린 팀피셜록을 신고하는 API입니다. \n
+            ## Request Body
+            `reportType` : HATE_SPEECH, UNSUITABLE_KEYWORD, OTHER 중 택 1 \n
+                - `HATE_SPEECH` : 비방적인 내용입니다. \n
+                - `UNSUITABLE_KEYWORD` : 적합하지 않은 내용의 키워드입니다. \n
+                - `OTHER` : 기타 (직접 입력) \n
+            `reportEtc` : reportType이 기타일 경우, 입력해주세요. \n
+            `content` : 신고 내용
+            """)
     @PostMapping("/reports/{keywordCommentId}")
     public ApiResponse<String> reportTeamficialLog(
             @AuthenticationPrincipal AuthDetails authDetails,

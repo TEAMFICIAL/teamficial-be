@@ -22,7 +22,7 @@ public class Report extends BaseEntity {
     @Column(length = 500, nullable = false)
     private String content;
 
-    private boolean is_applied;
+    private boolean isApplied;
 
     @Column(length = 100)
     private String reportEtc;
