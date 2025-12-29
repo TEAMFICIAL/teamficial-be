@@ -24,6 +24,7 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_FOUND_APPLICAION(HttpStatus.NOT_FOUND,"APPLICATION404","해당 지원을 찾을 수 없습니다."),
     NOT_FOUND_KEYWORD(HttpStatus.NOT_FOUND,"KEYWORD404", "해당 키워드를 찾을 수 없습니다."),
     NOT_FOUND_HEAD_KEYWORD(HttpStatus.NOT_FOUND,"HEADKEYWORD404", "해당 대표 키워드를 찾을 수 없습니다."),
+    NOT_FOUND_KEYWORD_COMMENT(HttpStatus.NOT_FOUND,"KEYWORDCOMMENT404", "해당 키워드 코멘트를 찾을 수 없습니다."),
 
     //로그인 관련 응답
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "LOGIN4001", "토큰이 유효하지 않습니다."),
@@ -51,8 +52,9 @@ public enum ErrorStatus implements BaseErrorCode {
     HEAD_KEYWORD_DUPLICATE(HttpStatus.BAD_REQUEST,"HEADKEYWORD4005","이미 등록된 대표키워드입니다."),
     CAN_NOT_WRITE_TEAMFICIAL_LOG_OVER_1(HttpStatus.FORBIDDEN,"KEYWORD_COMMENT5001","해당 유저에게 쓴 팀피셜록이 이미 존재합니다."),
 
+
     //나의 팀 관련 응답
-    TEAM_FORBIDDEN(HttpStatus.FORBIDDEN, "TEAM_FORBIDDEN403", "팀 멤버를 조회할 수 있는 권한이 없습니다.")
+    TEAM_FORBIDDEN(HttpStatus.FORBIDDEN, "TEAM_FORBIDDEN403", "팀 멤버를 조회할 수 있는 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

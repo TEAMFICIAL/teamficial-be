@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class KeywordCommentResponseDto {
+    @Schema(description = "코멘트 id", example = "1")
+    Long commentId;
     @Schema(description = "코멘트 내용", example="너무 친절해요")
     String comment;
     @Schema(description = "코멘트 생성 시간")
@@ -17,6 +19,7 @@ public class KeywordCommentResponseDto {
 
     public static KeywordCommentResponseDto from(KeywordComment keywordComment) {
         return KeywordCommentResponseDto.builder()
+                .commentId(keywordComment.getId())
                 .comment(keywordComment.getContent())
                 .createdAt(keywordComment.getCreatedAt())
                 .build();
