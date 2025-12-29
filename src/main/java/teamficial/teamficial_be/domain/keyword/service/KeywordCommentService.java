@@ -9,6 +9,8 @@ import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.keyword.entity.Keyword;
 import teamficial.teamficial_be.domain.keyword.entity.KeywordComment;
 import teamficial.teamficial_be.domain.keyword.repository.KeywordCommentRepository;
+import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,4 +27,8 @@ public class KeywordCommentService {
     }
 
 
+    public KeywordComment getById(Long keywordCommentId) {
+        return keywordCommentRepository.findById(keywordCommentId)
+                .orElseThrow(()-> new GeneralException(ErrorStatus.NOT_FOUND_KEYWORD_COMMENT));
+    }
 }
