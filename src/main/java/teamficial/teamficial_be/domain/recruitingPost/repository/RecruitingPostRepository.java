@@ -58,4 +58,14 @@ public interface RecruitingPostRepository extends JpaRepository<RecruitingPost, 
             "JOIN FETCH rp.user " +
             "WHERE rp.user = :user AND rp.status = :recruitingStatus")
     List<RecruitingPost> findAllByUserAndStatus(User user, RecruitingStatus recruitingStatus);
+
+    @Query("""
+    select rp
+    from RecruitingPost rp
+    left join fetch rp.recruitingDetails
+    where rp.id = :id
+""")
+    Optional<RecruitingPost> findWithDetailsById(@Param("id") Long id);
+
+
 }

@@ -2,6 +2,7 @@ package teamficial.teamficial_be.domain.confirmed.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 import teamficial.teamficial_be.domain.profile.entity.WorkingTime;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.global.entity.BaseEntity;
@@ -50,6 +51,10 @@ public class ConfirmedProfile extends BaseEntity {
     private String contactWay;
 
     private Position position;
+
+    @UuidGenerator
+    @Column(nullable = false, unique = true, updatable=false, length=36)
+    private String uuid;
 
     public void addProfileLink(ConfirmedProfileLink profileLink) {
         confirmedProfileLinks.add(profileLink);
