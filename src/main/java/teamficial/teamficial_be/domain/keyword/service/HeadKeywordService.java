@@ -11,6 +11,8 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +49,14 @@ public class HeadKeywordService {
         if (exists) {
             throw new GeneralException(ErrorStatus.HEAD_KEYWORD_DUPLICATE);
         }
+    }
+
+    public Map<Long, List<String>> getKeywordMapByProfiles(List<Long> profileIds) {
+        return headKeywordRepository.findByProfile_IdIn(profileIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        hk -> hk.getProfile().getId(),
+                        Collectors.mapping(HeadKeyword::getKeywordName, Collectors.toList())
+                ));
     }
 }

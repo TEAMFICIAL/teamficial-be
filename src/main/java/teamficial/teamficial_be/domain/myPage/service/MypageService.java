@@ -149,7 +149,7 @@ public class MypageService {
     @Transactional(readOnly = true)
     public CurrentApplicationDetailResponseDto getCurrentApplication(Long recruitingPostId, User user, Position position) {
 
-        RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostById(recruitingPostId);
+        RecruitingPost recruitingPost = recruitingPostService.getRecruitingPostWithDetails(recruitingPostId);
         log.info("모집 글 id: " + recruitingPost.getId());
         recruitingPostService.validatePostOwner(user,recruitingPost);
 
@@ -162,10 +162,21 @@ public class MypageService {
                     .filter(application -> application.getPosition() == position)
                     .toList();
         }
-        recruitingPost.getDDay();
 
+        Map<Long, List<String>> keywordMap =
+                headKeywordService.getKeywordMapByProfiles(
+                        applications.stream()
+                                .map(a -> a.getProfile().getId())
+                                .toList()
+                );
 
-        return CurrentApplicationDetailResponseDto.from(recruitingPost, applications, dDay);
+        return CurrentApplicationDetailResponseDto.from(
+                recruitingPost,
+                applications,
+                dDay,
+                keywordMap
+        );
+
     }
 
     @Transactional

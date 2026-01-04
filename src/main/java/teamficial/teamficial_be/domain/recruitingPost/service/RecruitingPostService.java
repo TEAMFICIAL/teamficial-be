@@ -106,6 +106,16 @@ public class RecruitingPostService {
                 .orElseThrow(()-> new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST));
     }
 
+    @Transactional(readOnly = true)
+    public RecruitingPost getRecruitingPostWithDetails(Long recruitingPostId) {
+        return recruitingPostRepository.findWithDetailsById(recruitingPostId)
+                .orElseThrow(() ->
+                        new NotFoundHandler(ErrorStatus.NOT_FOUND_RECRUITING_POST)
+                );
+    }
+
+
+
     @Transactional
     public RecruitingPostDto.RecruitingPostModifyResponseDTO updatePost(Long userId, Long postId, RecruitingPostDto.RecruitingPostModifyRequestDTO dto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundHandler(ErrorStatus.NOT_FOUND_USER));

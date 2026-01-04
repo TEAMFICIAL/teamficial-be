@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface HeadKeywordRepository extends JpaRepository<HeadKeyword, Long> {
@@ -17,4 +18,6 @@ public interface HeadKeywordRepository extends JpaRepository<HeadKeyword, Long> 
     HeadKeyword findByProfileAndId(Profile profile, Long oldHeadKeywordId);
 
     boolean existsByProfileAndKeywordName(Profile profile, String keywordName);
+
+    List<HeadKeyword> findByProfile_IdIn(List<Long> profileIds);
 }
