@@ -25,7 +25,6 @@ import java.util.List;
 public class ConfirmedProfileService {
 
     private final ConfirmedProfileRepository confirmedProfileRepository;
-    private final ProfileService profileService;
     private final RecruitingPostService recruitingPostService;
     private final ApplicationService applicationService;
 
@@ -40,6 +39,7 @@ public class ConfirmedProfileService {
                 .workingTime(profile.getWorkingTime())
                 .contactWay(profile.getContactWay())
                 .position(position)
+                .uuid(profile.getUser().getUuid())
                 .build();
 
         profile.getProfileLinks().forEach(link ->

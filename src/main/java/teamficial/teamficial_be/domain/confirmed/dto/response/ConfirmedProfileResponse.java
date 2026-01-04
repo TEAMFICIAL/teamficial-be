@@ -30,6 +30,8 @@ public class ConfirmedProfileResponse {
 
     private Position position;
 
+    private String uuid;
+
     private List<String> keywords;
 
     private List<String> links;
@@ -52,6 +54,7 @@ public class ConfirmedProfileResponse {
                 .contactWay(profile.getContactWay())
                 .position(profile.getPosition())
                 .keywords(keywordList)
+                .uuid(profile.getUuid())
                 .links(linkList)
                 .build();
     }
