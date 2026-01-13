@@ -83,4 +83,8 @@ public class KeywordService {
         return keywordRepository.findByUserAndKeywordName(user,keywordName)
                 .orElseThrow(()-> new NotFoundHandler(ErrorStatus.NOT_FOUND_KEYWORD));
     }
+
+    public void delete(Keyword keyword) {
+        keywordRepository.delete(keyword);
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import teamficial.teamficial_be.domain.user.entity.UserRole;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.OAuth2AuthenticationSuccessHandler;
 import teamficial.teamficial_be.global.security.CustomOauth2UserService;
 import teamficial.teamficial_be.global.security.jwt.CookieUtil;
@@ -63,6 +64,7 @@ public class SecurityConfig {
                                 "/api/swagger-ui/**",
                                 "/profile/{profileId}"
                         ).permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/preSigned-url","/profile/**").authenticated()
                         .anyRequest().permitAll()
                 );

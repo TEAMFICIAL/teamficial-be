@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import java.io.IOException;
 
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -36,6 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Authentication authentication = tokenProvider.getAuthentication(token);
 
+                log.info("Authorities = {}", authentication.getAuthorities());
+
                 if (authentication != null) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
@@ -44,19 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new GeneralException(ErrorStatus.TOKEN_INVALID);
             }
         }
-
-
-//        if (token != null && tokenProvider.validateToken(token)) {
-//            try{
-//                Authentication authentication = tokenProvider.getAuthentication(token);
-//
-//                if (authentication != null) {
-//                    SecurityContextHolder.getContext().setAuthentication(authentication);
-//                }
-//            }catch (IllegalArgumentException e){
-//                throw new GeneralException(ErrorStatus.TOKEN_INVALID);
-//            }
-//        }
 
         filterChain.doFilter(request, response);
     }
