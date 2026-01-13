@@ -52,9 +52,14 @@ public enum ErrorStatus implements BaseErrorCode {
     HEAD_KEYWORD_DUPLICATE(HttpStatus.BAD_REQUEST,"HEADKEYWORD4005","이미 등록된 대표키워드입니다."),
     CAN_NOT_WRITE_TEAMFICIAL_LOG_OVER_1(HttpStatus.FORBIDDEN,"KEYWORD_COMMENT5001","해당 유저에게 쓴 팀피셜록이 이미 존재합니다."),
 
-
     //나의 팀 관련 응답
     TEAM_FORBIDDEN(HttpStatus.FORBIDDEN, "TEAM_FORBIDDEN403", "팀 멤버를 조회할 수 있는 권한이 없습니다."),
+
+    //신고 관련 응답
+    REPORT_DUPLICATE(HttpStatus.CONFLICT,"REPORT4001","이미 신고된 코멘트입니다."),
+    NOT_FOUND_REPORT(HttpStatus.NOT_FOUND, "REPORT404", "해당 신고를 찾을 수 없습니다."),
+    REPORT_ALREADY_APPLIED(HttpStatus.CONFLICT,"REPORT4002","이미 반영된 신고입니다.")
+
     ;
 
     private final HttpStatus httpStatus;

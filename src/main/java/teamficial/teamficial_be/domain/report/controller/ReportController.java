@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.report.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +14,7 @@ import teamficial.teamficial_be.domain.report.service.ReportService;
 import teamficial.teamficial_be.global.apiPayload.ApiResponse;
 import teamficial.teamficial_be.global.security.AuthDetails;
 
+@Tag(name = "신고 관련 API")
 @RestController
 @RequiredArgsConstructor
 public class ReportController {
