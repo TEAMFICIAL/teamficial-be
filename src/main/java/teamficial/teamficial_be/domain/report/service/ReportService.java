@@ -19,6 +19,7 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final KeywordCommentService keywordCommentService;
+    private final MailService mailService;
 
     @Transactional
     public void reportTeamficialLog(User user, Long keywordCommentId, ReportRequestDto reportRequestDto) {
@@ -39,5 +40,6 @@ public class ReportService {
         reportRepository.save(report);
 
         //이메일 전송 로직
+        mailService.sendReportEmail(user.getEmail());
     }
 }
