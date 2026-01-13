@@ -60,6 +60,11 @@ public class ReportService {
 
     @Transactional
     public void acceptReport(Report report) {
+
+        if (report.isApplied()) {
+            throw new GeneralException(ErrorStatus.REPORT_ALREADY_APPLIED);
+        }
+
         //코멘트 삭제
         KeywordComment comment = keywordCommentService.getById(report.getReportedCommentId());
 

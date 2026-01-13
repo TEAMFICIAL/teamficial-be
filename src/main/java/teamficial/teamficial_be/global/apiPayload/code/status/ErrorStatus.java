@@ -57,7 +57,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //신고 관련 응답
     REPORT_DUPLICATE(HttpStatus.CONFLICT,"REPORT4001","이미 신고된 코멘트입니다."),
-    NOT_FOUND_REPORT(HttpStatus.NOT_FOUND, "REPORT404", "해당 신고를 찾을 수 없습니다.")
+    NOT_FOUND_REPORT(HttpStatus.NOT_FOUND, "REPORT404", "해당 신고를 찾을 수 없습니다."),
+    REPORT_ALREADY_APPLIED(HttpStatus.CONFLICT,"REPORT4002","이미 반영된 신고입니다.")
+
     ;
 
     private final HttpStatus httpStatus;
