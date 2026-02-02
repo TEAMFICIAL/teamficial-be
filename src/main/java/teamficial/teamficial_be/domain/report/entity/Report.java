@@ -10,6 +10,9 @@ import teamficial.teamficial_be.global.entity.BaseEntity;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "reported_comment_id"})
+})
 public class Report extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "report_id")
@@ -31,7 +34,7 @@ public class Report extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "reported_comment_id", nullable = false)
     private Long reportedCommentId;
 
     public void reportAccept(){

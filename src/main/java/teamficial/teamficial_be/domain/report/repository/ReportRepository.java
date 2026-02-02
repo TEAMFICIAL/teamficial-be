@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import teamficial.teamficial_be.domain.report.entity.Report;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
-    boolean existsByReportedCommentId(Long keywordCommentId);
+
+    boolean existsByReportedCommentIdAndUserId(Long keywordCommentId, Long userId);
 
     @Query("SELECT r FROM Report r " +
             "WHERE r.isApplied = false ")

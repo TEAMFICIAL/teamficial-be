@@ -1,14 +1,13 @@
 package teamficial.teamficial_be.domain.report.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
 import teamficial.teamficial_be.domain.keyword.entity.Keyword;
 import teamficial.teamficial_be.domain.keyword.entity.KeywordComment;
-import teamficial.teamficial_be.domain.keyword.service.HeadKeywordService;
 import teamficial.teamficial_be.domain.keyword.service.KeywordCommentService;
 import teamficial.teamficial_be.domain.keyword.service.KeywordService;
 import teamficial.teamficial_be.domain.report.dto.ReportRequestDto;
@@ -27,14 +26,13 @@ public class ReportService {
     private final KeywordCommentService keywordCommentService;
     private final MailService mailService;
     private final KeywordService keywordService;
-    private final HeadKeywordService headKeywordService;
 
     @Transactional
     public void reportTeamficialLog(User user, Long keywordCommentId, ReportRequestDto reportRequestDto) {
         KeywordComment comment = keywordCommentService.getById(keywordCommentId);
 
         //중복 신고 방지
-        if (alreadyExistReport(keywordCommentId)){
+        if (alreadyExistReport(keywordCommentId, user.getId())){
             throw new GeneralException(ErrorStatus.REPORT_DUPLICATE);
         }
 
@@ -52,7 +50,11 @@ public class ReportService {
                 .user(user)
                 .build();
 
-        reportRepository.save(report);
+        try {
+            reportRepository.save(report);
+        } catch (DataIntegrityViolationException e) {
+            throw new GeneralException(ErrorStatus.REPORT_DUPLICATE);
+        }
 
         //이메일 전송 로직
         mailService.sendReportEmail(user.getEmail());
@@ -94,7 +96,7 @@ public class ReportService {
         return reportRepository.findAllByIsApplied(pageable);
     }
 
-    private boolean alreadyExistReport(Long keywordCommentId) {
-        return reportRepository.existsByReportedCommentId(keywordCommentId);
+    private boolean alreadyExistReport(Long keywordCommentId, Long userId) {
+        return reportRepository.existsByReportedCommentIdAndUserId(keywordCommentId, userId);
     }
 }
