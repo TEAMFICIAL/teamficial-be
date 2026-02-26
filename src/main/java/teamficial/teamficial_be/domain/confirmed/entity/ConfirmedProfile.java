@@ -50,6 +50,7 @@ public class ConfirmedProfile extends BaseEntity {
     @Column(name = "contact_way", length = 255)
     private String contactWay;
 
+    @Enumerated(EnumType.STRING)
     private Position position;
 
     @UuidGenerator

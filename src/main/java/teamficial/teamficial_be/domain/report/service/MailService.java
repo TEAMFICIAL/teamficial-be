@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import teamficial.teamficial_be.domain.keyword.entity.Keyword;
 
 
 @Slf4j
@@ -22,9 +23,13 @@ public class MailService {
     private final TemplateEngine templateEngine;
 
     @Async
-    public void sendReportEmail(String toEmail) {
+    public void sendReportEmail(String toEmail,
+                                String keyword,
+                                String commentContent) {
         try {
             Context context = new Context();
+            context.setVariable("keyword", keyword);
+            context.setVariable("commentContent", commentContent);
             String body = templateEngine.process("report", context);
             sendHtmlEmail(toEmail, "[팀피셜] 신고가 접수되었습니다", body);
 
