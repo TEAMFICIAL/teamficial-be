@@ -57,7 +57,7 @@ public class ReportService {
         }
 
         //이메일 전송 로직
-        mailService.sendReportEmail(user.getEmail());
+        mailService.sendReportEmail(user.getEmail(), comment.getKeyword().getKeywordName(), comment.getContent());
     }
 
     @Transactional

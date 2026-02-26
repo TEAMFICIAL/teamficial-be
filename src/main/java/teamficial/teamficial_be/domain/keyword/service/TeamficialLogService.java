@@ -115,7 +115,7 @@ public class TeamficialLogService {
     }
 
     @Transactional(readOnly = true)
-    public PagedResponse<KeywordResponseDto> getKeywordList(User viewer,Long userId, int page, int size) {
+    public PagedResponse<KeywordResponseDto> getKeywordList(Long userId, int page, int size) {
         User user = userService.getUserById(userId);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));

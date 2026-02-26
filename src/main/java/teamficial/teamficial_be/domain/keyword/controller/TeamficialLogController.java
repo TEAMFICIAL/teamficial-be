@@ -41,11 +41,11 @@ public class TeamficialLogController {
 
     @GetMapping("/teamficial-log/{userId}")
     @Operation(summary = "키워드 리스트 조회하기", description = "한 유저의 키워드 리스트를 조회하는 api 입니다.")
-    public ApiResponse<PagedResponse<KeywordResponseDto>> getKeywordList(@AuthenticationPrincipal AuthDetails authDetails,
+    public ApiResponse<PagedResponse<KeywordResponseDto>> getKeywordList(
                                                                          @PathVariable Long userId,
                                                                          @RequestParam(defaultValue = "0") int page,
                                                                          @RequestParam(defaultValue = "3") int size) {
-        PagedResponse<KeywordResponseDto> responseDto = teamficialLogService.getKeywordList(authDetails.user(),userId,page,size);
+        PagedResponse<KeywordResponseDto> responseDto = teamficialLogService.getKeywordList(userId,page,size);
 
         return ApiResponse.onSuccess(responseDto);
     }
