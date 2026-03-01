@@ -128,7 +128,7 @@ public class TeamficialLogService {
     }
 
     @Transactional(readOnly = true)
-    public ScrollResponse<KeywordCommentResponseDto> getKeywordCommentList(User user,Long keywordId, int page, int size) {
+    public ScrollResponse<KeywordCommentResponseDto> getKeywordCommentList(Long keywordId, int page, int size) {
         Keyword keyword = keywordService.getKeywordById(keywordId);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
