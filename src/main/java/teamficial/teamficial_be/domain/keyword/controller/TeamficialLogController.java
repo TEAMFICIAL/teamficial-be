@@ -52,11 +52,10 @@ public class TeamficialLogController {
 
     @GetMapping("/teamficial-log/users/{keywordId}")
     @Operation(summary = "키워드 코멘트 리스트 조회하기", description = "키워드 코멘트 리스트를 조회하는 api 입니다.")
-    public ApiResponse<ScrollResponse<KeywordCommentResponseDto>> getKeywordCommentList(@AuthenticationPrincipal AuthDetails authDetails,
-                                                                                        @PathVariable Long keywordId,
+    public ApiResponse<ScrollResponse<KeywordCommentResponseDto>> getKeywordCommentList(@PathVariable Long keywordId,
                                                                                  @RequestParam(defaultValue = "0") int page,
                                                                                  @RequestParam(defaultValue = "3") int size) {
-        ScrollResponse<KeywordCommentResponseDto> responseDto = teamficialLogService.getKeywordCommentList(authDetails.user(),keywordId,page,size);
+        ScrollResponse<KeywordCommentResponseDto> responseDto = teamficialLogService.getKeywordCommentList(keywordId,page,size);
 
         return ApiResponse.onSuccess(responseDto);
     }
