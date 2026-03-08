@@ -22,7 +22,7 @@ public class PreSignedUrlController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "이미지 업로드용 presigned url 발급", description = "이미지 업로드용 presigned url을 발급합니다.")
     public ApiResponse<PreSignedUrlResponseDto> createPreSignedUrl(@RequestParam String imageName) {
-        PreSignedUrlResponseDto responseDto = preSignedUrlService.getPreSignedUrl(imageName);
+        PreSignedUrlResponseDto responseDto = preSignedUrlService.getPreSignedUrl("profile", imageName);
         return ApiResponse.onSuccess(responseDto);
     }
 }

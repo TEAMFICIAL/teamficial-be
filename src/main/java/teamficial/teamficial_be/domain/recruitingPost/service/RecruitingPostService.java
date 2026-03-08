@@ -10,10 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.application.service.ApplicationService;
 import teamficial.teamficial_be.domain.profile.entity.Profile;
 import teamficial.teamficial_be.domain.profile.repository.ProfileRepository;
+import teamficial.teamficial_be.domain.profile.service.PreSignedUrlService;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
 import teamficial.teamficial_be.domain.recruitingDetail.repository.RecruitingDetailRepository;
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDto;
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostPagingDto;
+import teamficial.teamficial_be.domain.recruitingPost.entity.PostImage;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingStatus;
@@ -26,10 +28,7 @@ import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
 import teamficial.teamficial_be.global.apiPayload.exception.handler.NotFoundHandler;
 import teamficial.teamficial_be.global.enums.Position;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,6 +42,8 @@ public class RecruitingPostService {
     private final RecruitingDetailRepository recruitingDetailRepository;
     private final ApplicationService applicationService;
     private final UserService userService;
+    private final PreSignedUrlService preSignedUrlService;
+    private final PostImageService postImageService;
 
 
     @Transactional
@@ -78,9 +79,12 @@ public class RecruitingPostService {
 
         recruitingDetailRepository.saveAll(details);
 
+        // 게시글 이미지 처리
+        if (dto.getImageKeys() != null && !dto.getImageKeys().isEmpty()) {
+            postImageService.saveImages(saved, dto.getImageKeys());
+        }
 
-
-        return RecruitingPostDto.RecruitingPostsResponseDTO.from(saved, details,dDay);
+        return RecruitingPostDto.RecruitingPostsResponseDTO.from(saved, details, dDay);
     }
 
 
@@ -93,6 +97,9 @@ public class RecruitingPostService {
         if (!post.getUser().getId().equals(user.getId())) {
             throw new GeneralException(ErrorStatus._FORBIDDEN); // 권한 없음
         }
+
+        // S3 이미지 삭제
+        postImageService.deleteImagesByPostId(postId);
 
         recruitingPostRepository.delete(post);
 

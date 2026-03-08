@@ -32,8 +32,8 @@ public class PreSignedUrlService {
     @Value("${ncp.end-point}")
     private String endpoint;
 
-    public PreSignedUrlResponseDto getPreSignedUrl(String imageName) {
-        String objectKey = createPath(imageName);
+    public PreSignedUrlResponseDto getPreSignedUrl(String prefix, String imageName) {
+        String objectKey = createPath(prefix, imageName);
 
         GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(bucketName, objectKey);
         URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
@@ -55,6 +55,18 @@ public class PreSignedUrlService {
         return generatePresignedUrlRequest;
     }
 
+    public String moveTempImageToPost(String objectKey, Long postId) {
+
+        String fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+
+        String newKey = "post/" + postId + "/" + fileName;
+
+        amazonS3.copyObject(bucketName, objectKey, bucketName, newKey);
+        amazonS3.deleteObject(bucketName, objectKey);
+
+        return newKey;
+    }
+
     private Date getPreSignedUrlExpiration() {
         Date expiration = new Date();
         long expTimeMillis = expiration.getTime();
@@ -63,9 +75,8 @@ public class PreSignedUrlService {
         return expiration;
     }
 
-    private String createPath(String fileName) {
+    private String createPath(String prefix, String fileName) {
         String fileId = UUID.randomUUID().toString();
-        String prefix = "profile";
         return String.format("%s/%s", prefix, fileId + fileName);
     }
 

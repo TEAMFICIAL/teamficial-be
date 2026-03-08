@@ -32,6 +32,9 @@ public class RecruitingPostDto {
         private String content;
         private String title;
 
+        // 게시글 이미지 keys
+        private List<String> imageKeys;
+
         // 모집 직무 & 인원 리스트
         private List<RecruitingPositionDto> recruitingPositions;
 
