@@ -41,6 +41,9 @@ public class RecruitingPost extends BaseEntity {
     @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Application> applications = new ArrayList<>();
 
+    @OneToMany(mappedBy = "recruitingPost", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PostImage> postImages = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(name = "progress_way", nullable = false)
     private ProgressWay progressWay;

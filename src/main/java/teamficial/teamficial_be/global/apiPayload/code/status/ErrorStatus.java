@@ -58,7 +58,10 @@ public enum ErrorStatus implements BaseErrorCode {
     //신고 관련 응답
     REPORT_DUPLICATE(HttpStatus.CONFLICT,"REPORT409","이미 신고된 코멘트입니다."),
     NOT_FOUND_REPORT(HttpStatus.NOT_FOUND, "REPORT404", "해당 신고를 찾을 수 없습니다."),
-    REPORT_ALREADY_APPLIED(HttpStatus.CONFLICT,"REPORT4002","이미 반영된 신고입니다.")
+    REPORT_ALREADY_APPLIED(HttpStatus.CONFLICT,"REPORT4002","이미 반영된 신고입니다."),
+
+    // 게시글 관련 응답
+    POST_IMAGE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "POST4001", "이미지는 최대 2개까지 업로드 가능합니다.")
 
     ;
 
