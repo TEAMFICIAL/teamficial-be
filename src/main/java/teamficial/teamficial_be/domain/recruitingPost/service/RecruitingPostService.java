@@ -162,12 +162,17 @@ public class RecruitingPostService {
             });
         }
 
+        if (dto.getImageKeys() != null) {
+            postImageService.updatePostImages(post, dto.getImageKeys());
+        }
+
+        List<String> imageUrls = postImageService.getPostImageUrls(postId);
+
         return RecruitingPostDto.RecruitingPostModifyResponseDTO.from(
-                post, recruitingDetailRepository.findByRecruitingPostId(postId)
+                post, imageUrls, recruitingDetailRepository.findByRecruitingPostId(postId)
         );
 
     }
-
 
     @Transactional(readOnly = true)
     public RecruitingPostDto.RecruitingPostDetailResponseDTO getPost(Long postId,Long userId) {
@@ -180,6 +185,8 @@ public class RecruitingPostService {
         List<RecruitingDetail> recruitingDetails =
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
+        List<String> imageUrls = postImageService.getPostImageUrls(postId);
+
         boolean alreadyApplied = false;
         boolean isWriter = false;
 
@@ -190,7 +197,7 @@ public class RecruitingPostService {
             isWriter = post.isWriter(user);
         }
 
-        return RecruitingPostDto.RecruitingPostDetailResponseDTO.from(post, recruitingDetails,dDay,alreadyApplied,isWriter);
+        return RecruitingPostDto.RecruitingPostDetailResponseDTO.from(post, recruitingDetails, imageUrls, dDay, alreadyApplied,isWriter);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
@@ -213,7 +220,6 @@ public class RecruitingPostService {
             return recruitingPostRepository.findAllByUserAndStatus(user,pageable,recruitingStatus);
         }
     }
-
 
     public Page<RecruitingPostDto.RecruitingPostsResponseDTO> getRecruitingPosts(
             RecruitingStatus status,

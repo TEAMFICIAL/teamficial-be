@@ -57,7 +57,6 @@ public class RecruitingPostController {
 
         Long userId = GlobalAuthUtil.extractUserId(authDetails);
 
-
         return ApiResponse.onSuccess(recruitingPostService.updatePost(userId, postId, dto));
     }
 

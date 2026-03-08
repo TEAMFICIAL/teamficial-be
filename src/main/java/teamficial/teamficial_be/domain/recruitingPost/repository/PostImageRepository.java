@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface PostImageRepository extends JpaRepository<PostImage, Long> {
     List<PostImage> findByRecruitingPostId(Long postId);
+
+    List<PostImage> findByRecruitingPostIdOrderByImageOrder(Long postId);
 }

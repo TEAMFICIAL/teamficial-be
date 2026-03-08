@@ -177,11 +177,12 @@ public class RecruitingPostDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
         private LocalDateTime createdAt;
         private long dDay;
+        private List<String> imageUrls;
         private List<RecruitingPositionDto> recruitingPositions;
         private boolean alreadyApplied;
         private boolean isWriter;
 
-        public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, long dDay, boolean alreadyApplied, boolean isWriter) {
+        public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, List<String> imageUrls, long dDay, boolean alreadyApplied, boolean isWriter) {
             return RecruitingPostDetailResponseDTO.builder()
                     .postId(post.getId())
                     .writerUserId(post.getUser().getId())
@@ -206,6 +207,7 @@ public class RecruitingPostDto {
                     )
                     .createdAt(post.getCreatedAt())
                     .dDay(dDay)
+                    .imageUrls(imageUrls)
                     .alreadyApplied(alreadyApplied)
                     .isWriter(isWriter)
                     .build();
@@ -244,6 +246,8 @@ public class RecruitingPostDto {
         private String content;
         private String title;
 
+        private List<String> imageKeys;
+
         private List<RecruitingPositionDto> recruitingPositions;
 
     }
@@ -267,13 +271,15 @@ public class RecruitingPostDto {
         private String content;
         private String title;
 
+        private List<String> imageUrls;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
         private LocalDateTime createdAt;
 
         // 모집 직무 & 인원 리스트
         private List<RecruitingPositionDto> recruitingPositions;
 
-        public static RecruitingPostModifyResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails) {
+        public static RecruitingPostModifyResponseDTO from(RecruitingPost post, List<String> imageUrls, List<RecruitingDetail> recruitingDetails) {
             return RecruitingPostModifyResponseDTO.builder()
                     .title(post.getTitle())
                     .content(post.getContent())
@@ -289,6 +295,7 @@ public class RecruitingPostDto {
                                     .toList()
                                     : Collections.emptyList()
                     )
+                    .imageUrls(imageUrls)
                     .createdAt(post.getCreatedAt())
                     .build();
 

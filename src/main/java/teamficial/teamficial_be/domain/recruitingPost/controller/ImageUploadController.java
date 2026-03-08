@@ -1,6 +1,7 @@
 package teamficial.teamficial_be.domain.recruitingPost.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import teamficial.teamficial_be.domain.profile.dto.response.PreSignedUrlResponseDto;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/post-images")
+@Tag(name = "모집글 이미지 관련 API")
 public class ImageUploadController {
 
     private final PreSignedUrlService preSignedUrlService;
