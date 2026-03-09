@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import teamficial.teamficial_be.domain.profile.dto.response.ProfileResponseDto;
 import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
+import teamficial.teamficial_be.domain.recruitingPost.dto.response.PostImageResponseDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.Period;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
@@ -177,12 +178,13 @@ public class RecruitingPostDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
         private LocalDateTime createdAt;
         private long dDay;
-        private List<String> imageUrls;
+
+        private List<PostImageResponseDto> images;
         private List<RecruitingPositionDto> recruitingPositions;
         private boolean alreadyApplied;
         private boolean isWriter;
 
-        public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, List<String> imageUrls, long dDay, boolean alreadyApplied, boolean isWriter) {
+        public static RecruitingPostDetailResponseDTO from(RecruitingPost post, List<RecruitingDetail> recruitingDetails, List<PostImageResponseDto> images, long dDay, boolean alreadyApplied, boolean isWriter) {
             return RecruitingPostDetailResponseDTO.builder()
                     .postId(post.getId())
                     .writerUserId(post.getUser().getId())
@@ -207,7 +209,7 @@ public class RecruitingPostDto {
                     )
                     .createdAt(post.getCreatedAt())
                     .dDay(dDay)
-                    .imageUrls(imageUrls)
+                    .images(images)
                     .alreadyApplied(alreadyApplied)
                     .isWriter(isWriter)
                     .build();

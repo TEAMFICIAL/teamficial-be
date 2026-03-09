@@ -15,6 +15,7 @@ import teamficial.teamficial_be.domain.recruitingDetail.entity.RecruitingDetail;
 import teamficial.teamficial_be.domain.recruitingDetail.repository.RecruitingDetailRepository;
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostDto;
 import teamficial.teamficial_be.domain.recruitingPost.dto.RecruitingPostPagingDto;
+import teamficial.teamficial_be.domain.recruitingPost.dto.response.PostImageResponseDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.PostImage;
 import teamficial.teamficial_be.domain.recruitingPost.entity.ProgressWay;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
@@ -185,7 +186,8 @@ public class RecruitingPostService {
         List<RecruitingDetail> recruitingDetails =
                 recruitingDetailRepository.findByRecruitingPostId(postId);
 
-        List<String> imageUrls = postImageService.getPostImageUrls(postId);
+        List<PostImageResponseDto> images =
+                postImageService.getPostImages(postId);
 
         boolean alreadyApplied = false;
         boolean isWriter = false;
@@ -197,7 +199,7 @@ public class RecruitingPostService {
             isWriter = post.isWriter(user);
         }
 
-        return RecruitingPostDto.RecruitingPostDetailResponseDTO.from(post, recruitingDetails, imageUrls, dDay, alreadyApplied,isWriter);
+        return RecruitingPostDto.RecruitingPostDetailResponseDTO.from(post, recruitingDetails, images, dDay, alreadyApplied,isWriter);
     }
 
     public void validatePostOwner(User user, RecruitingPost recruitingPost) {
