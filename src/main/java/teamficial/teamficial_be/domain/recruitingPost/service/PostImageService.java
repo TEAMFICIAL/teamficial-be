@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamficial.teamficial_be.domain.profile.service.PreSignedUrlService;
+import teamficial.teamficial_be.domain.recruitingPost.dto.response.PostImageResponseDto;
 import teamficial.teamficial_be.domain.recruitingPost.entity.PostImage;
 import teamficial.teamficial_be.domain.recruitingPost.entity.RecruitingPost;
 import teamficial.teamficial_be.domain.recruitingPost.repository.PostImageRepository;
@@ -96,4 +97,17 @@ public class PostImageService {
         postImageRepository.saveAll(images);
     }
 
+
+    public List<PostImageResponseDto> getPostImages(Long postId) {
+
+        List<PostImage> images =
+                postImageRepository.findByRecruitingPostIdOrderByImageOrder(postId);
+
+        return images.stream()
+                .map(img -> PostImageResponseDto.builder()
+                        .imageUrl(preSignedUrlService.getPublicUrl(img.getObjectKey()))
+                        .objectKey(img.getObjectKey())
+                        .build())
+                .toList();
+    }
 }
