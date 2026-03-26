@@ -4,7 +4,9 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,10 +60,14 @@ public class PreSignedUrlService {
     public String moveTempImageToPost(String objectKey, Long postId) {
 
         String fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
-
         String newKey = "post/" + postId + "/" + fileName;
 
-        amazonS3.copyObject(bucketName, objectKey, bucketName, newKey);
+        CopyObjectRequest copyReq =
+                new CopyObjectRequest(bucketName, objectKey, bucketName, newKey);
+
+        copyReq.setCannedAccessControlList(CannedAccessControlList.PublicRead);
+
+        amazonS3.copyObject(copyReq);
         amazonS3.deleteObject(bucketName, objectKey);
 
         return newKey;
