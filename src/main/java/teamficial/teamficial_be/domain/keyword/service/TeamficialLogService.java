@@ -1,0 +1,258 @@
+package teamficial.teamficial_be.domain.keyword.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.util.EntityUtils;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.client.Request;
+import org.opensearch.client.Response;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.common.xcontent.XContentFactory;
+import org.opensearch.common.xcontent.json.JsonXContent;
+import org.opensearch.core.xcontent.DeprecationHandler;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.XContentBuilder;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import teamficial.teamficial_be.domain.keyword.dto.request.HeadKeywordRequestDto;
+import teamficial.teamficial_be.domain.keyword.dto.request.TeamficialLogRequestDto;
+import teamficial.teamficial_be.domain.keyword.dto.response.*;
+import teamficial.teamficial_be.domain.keyword.entity.HeadKeyword;
+import teamficial.teamficial_be.domain.keyword.entity.Keyword;
+import teamficial.teamficial_be.domain.keyword.entity.KeywordComment;
+import teamficial.teamficial_be.domain.keyword.entity.KeywordCommentSession;
+import teamficial.teamficial_be.domain.profile.entity.Profile;
+import teamficial.teamficial_be.domain.profile.service.ProfileService;
+import teamficial.teamficial_be.domain.user.entity.User;
+import teamficial.teamficial_be.domain.user.service.UserService;
+import teamficial.teamficial_be.global.apiPayload.code.status.ErrorStatus;
+import teamficial.teamficial_be.global.apiPayload.exception.GeneralException;
+import teamficial.teamficial_be.global.util.PagedResponse;
+import teamficial.teamficial_be.global.util.ScrollResponse;
+
+import org.springframework.ai.chat.model.ChatModel;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class TeamficialLogService {
+
+    private final ChatModel chatModel;
+    private final RestHighLevelClient client;
+
+    private final ProfileService profileService;
+    private final KeywordService keywordService;
+    private final HeadKeywordService headKeywordService;
+    private final KeywordCommentService keywordCommentService;
+    private final UserService userService;
+    private final EmbeddingService embeddingService;
+    private final PromptLoadService promptLoadService;
+    private final KeywordCommentSessionService keywordCommentSessionService;
+
+    @Transactional(readOnly = true)
+    public HeadKeywordResponseDto getHeadKeyword(Long profileId) {
+        Profile profile = profileService.getProfileById(profileId);
+
+        List<HeadKeyword> headKeywords= headKeywordService.getAllByProfile(profile);
+
+        return HeadKeywordResponseDto.fromKeyword(profile, headKeywords);
+    }
+
+
+    @Transactional
+    public CreateHeadKeywordResponseDto updateHeadKeyword(User user, Long profileId, Long oldHeadKeywordId,Long newHeadKeywordId) {
+
+        Profile profile = profileService.getProfileById(profileId);
+
+        if (!profile.getUser().getId().equals(user.getId())) {
+            throw new GeneralException(ErrorStatus.PROFILE_FORBIDDEN);
+        }
+
+        //대표 키워드 수정할 경우
+        if (oldHeadKeywordId != null) {
+            HeadKeyword oldHeadKeyword = headKeywordService.getHeadKeywordById(oldHeadKeywordId);
+
+            if (!oldHeadKeyword.getProfile().equals(profile)) {
+                throw new GeneralException(ErrorStatus.KEYWORD_FORBIDDEN);
+            }
+
+            Keyword oldHeadKeyword1 = keywordService.getKeywordByUserAndKeywordName(user,oldHeadKeyword.getKeywordName());
+
+            headKeywordService.delete(oldHeadKeyword);
+
+            oldHeadKeyword1.updateHead(false);
+            keywordService.saveKeyword(oldHeadKeyword1);
+        }
+
+        if (headKeywordService.countHeadKeyword(profile) >= 3){
+            throw new GeneralException(ErrorStatus.CANNOT_HEAD_KEYWORD_OVER_3);
+        }
+
+        Keyword keyword = keywordService.getKeywordById(newHeadKeywordId);
+        if (!keyword.getUser().getId().equals(user.getId())) {
+            throw new GeneralException(ErrorStatus.KEYWORD_FORBIDDEN);
+        }
+
+        headKeywordService.checkDuplicateHead(profile,keyword.getKeywordName());
+
+        keyword.updateHead(true);
+        keywordService.saveKeyword(keyword);
+
+        HeadKeyword headKeyword = HeadKeyword.builder()
+                .profile(profile)
+                .keywordName(keyword.getKeywordName())
+                .build();
+        profile.getHeadKeywords().add(headKeyword);
+
+        profileService.saveProfile(profile);
+
+        return CreateHeadKeywordResponseDto.fromKeyword(profile, headKeyword.getKeywordName());
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<KeywordResponseDto> getKeywordList(Long userId, int page, int size) {
+        User user = userService.getUserById(userId);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Keyword> keywordPage = keywordService.getAllKeywordByUser(user,pageable);
+
+        Page<KeywordResponseDto> dtoPage = keywordPage.map(KeywordResponseDto::from);
+
+        return PagedResponse.of(dtoPage);
+    }
+
+    @Transactional(readOnly = true)
+    public ScrollResponse<KeywordCommentResponseDto> getKeywordCommentList(Long keywordId, int page, int size) {
+        Keyword keyword = keywordService.getKeywordById(keywordId);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Slice<KeywordComment> keywordComments = keywordCommentService.getAllByKeyword(keyword,pageable);
+
+        Slice<KeywordCommentResponseDto> dtoList = keywordComments.map(KeywordCommentResponseDto::from);
+
+        return ScrollResponse.of(dtoList);
+    }
+
+    @Transactional
+    public TeamficialLogResponseDto createTeamficialLog(User writer, TeamficialLogRequestDto req) throws IOException {
+        User owner = userService.getUserByUuid(req.getUserUuid());
+
+        if (keywordCommentSessionService.existsByOwnerIdAndWriterId(owner.getId(), writer.getId())) {
+            throw new GeneralException(ErrorStatus.CAN_NOT_WRITE_TEAMFICIAL_LOG_OVER_1);
+        }
+
+        List<String> contents = List.of(
+                req.getContent1(),
+                req.getContent2(),
+                req.getContent3()
+        );
+
+        List<KeywordContentPairDto> results = new ArrayList<>();
+
+        for (String content : contents) {
+            String prompt = promptLoadService.loadVectorSummaryPrompt(content);
+
+            String vectorText = chatModel.call(prompt).trim();
+
+            float[] vector = embeddingService.embed(vectorText);
+
+            String bestKeyword = getBestKeyword(vector);
+
+            keywordService.saveBestKeyword(owner, req, content, bestKeyword, results);
+        }
+
+        keywordCommentSessionService.saveSession(
+                KeywordCommentSession.builder()
+                        .owner(owner)
+                        .writer(writer)
+                        .build()
+        );
+
+        return new TeamficialLogResponseDto(results);
+    }
+
+    private String getBestKeyword(float[] vector) throws IOException {
+        String queryJson = buildKeywordKnnQuery(vector);
+
+        Request request = new Request("POST", "/keyword_embeddings/_search");
+        request.setJsonEntity(queryJson);
+
+        Response response = client.getLowLevelClient().performRequest(request);
+
+        String responseBody = EntityUtils.toString(response.getEntity());
+
+        SearchResponse searchResponse = SearchResponse.fromXContent(
+                JsonXContent.jsonXContent.createParser(
+                        NamedXContentRegistry.EMPTY,
+                        DeprecationHandler.THROW_UNSUPPORTED_OPERATION,
+                        responseBody
+                )
+        );
+
+        return (String) searchResponse.getHits().getHits()[0]
+                .getSourceAsMap().get("keyword");
+    }
+
+    private String buildKeywordKnnQuery(float[] embeddingVector) throws IOException {
+        XContentBuilder builder = XContentFactory.jsonBuilder();
+        builder.startObject();
+        {
+            builder.field("size", 1);
+
+            builder.startObject("query");
+            {
+                builder.startObject("knn");
+                {
+                    builder.startObject("embedding");
+                    {
+                        builder.field("vector", embeddingVector);
+                        builder.field("k", 1);
+                    }
+                    builder.endObject();
+                }
+                builder.endObject();
+            }
+            builder.endObject();
+        }
+        builder.endObject();
+
+        return builder.toString();
+    }
+
+
+    public TeamficialLogRequesterResponseDto getTeamficialLogRequester(String requesterUuid) {
+        User user = userService.getUserByUuid(requesterUuid);
+
+        return TeamficialLogRequesterResponseDto.builder()
+                .userId(user.getId())
+                .requesterName(user.getName())
+                .build();
+    }
+
+    public KeywordRandResponseDto getTeamficialLogRand3(String requesterUuid) {
+        User user = userService.getUserByUuid(requesterUuid);
+
+        List<Keyword> keywords =
+                keywordService.findRandomHeadKeywordsByUserId(user.getId());
+
+        List<KeywordRandResponseDto.KeywordInfo> keywordInfos = keywords.stream()
+                .map(k -> KeywordRandResponseDto.KeywordInfo.builder()
+                        .keywordName(k.getKeywordName())
+                        .count(k.getCount())
+                        .build())
+                .toList();
+
+        return KeywordRandResponseDto.builder()
+                .requesterUuid(requesterUuid)
+                .keywords(keywordInfos)
+                .build();
+
+    }
+}

@@ -1,0 +1,38 @@
+{
+  "config": {
+    "target": "http://localhost:8080",
+    "phases": [
+      {
+        "name": "warm-up",
+        "duration": 20,
+        "arrivalRate": 3
+      },
+      {
+        "name": "load-test",
+        "duration": 30,
+        "arrivalRate": 10
+      }
+    ],
+    "payload": {
+      "path": "../data/post_ids.csv",
+      "fields": ["postId"]
+    },
+    "defaults": {
+      "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzY5NTg3ODEyLCJleHAiOjE3Njk1OTg2MTJ9.6flgpY6H2BIdfauZj4_1Vq_-QOZ6s5rQHjaKBsze9w1VXC_HJYFqwkHCHd1ZxkFNXL7YWm0lxa1jB_prkDr2QA"
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "name": "ConfirmedProfile ALL (no position)",
+      "flow": [
+        {
+          "get": {
+            "url": "/api/confirmed-profile/{{ postId }}"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+package teamficial.teamficial_be.domain.profile.dto.response;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.List;
+
+@Builder
+@Getter
+public class ProfileIdListResponseDto {
+    List<Long> profileIdList;
+}
